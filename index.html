@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aatmiya Clinical Toolkit</title>
+<style>
+  :root {
+    --bg:#F5F2EC;--surface:#FFF;--surface2:#EEEAE2;--border:#DDD9D0;
+    --text:#1A1710;--text2:#5A5448;--text3:#9A9488;
+    --accent:#2D6E5E;--accent-light:#E3F0EC;
+    --blue:#1A3D70;--blue-light:#E8EEF8;
+    --purple:#4C2D8E;--purple-light:#EDE8FA;
+    --amber:#8B5E00;--amber-light:#FFF8E1;
+    --red:#7B1818;--red-light:#FBEBEB;
+    --coral:#7B3500;--coral-light:#FAEEE5;
+    --radius:14px;--shadow:0 2px 16px rgba(45,110,94,.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+  /* Header */
+  .header{background:var(--accent);color:#fff;padding:20px 28px 18px}
+  .header-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .logo-row{display:flex;align-items:center;gap:14px}
+  .logo{width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800}
+  .brand-title{font-size:20px;font-weight:700;letter-spacing:-.3px}
+  .brand-sub{font-size:12px;opacity:.75;margin-top:2px}
+  .header-meta{font-size:11px;opacity:.6;text-align:right;line-height:1.6}
+  .search-wrap{margin-top:16px;position:relative}
+  .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;opacity:.6;pointer-events:none}
+  .search-input{width:100%;padding:11px 14px 11px 38px;border-radius:10px;border:none;font-size:14px;font-family:inherit;background:rgba(255,255,255,.15);color:#fff;outline:none;max-width:500px}
+  .search-input::placeholder{color:rgba(255,255,255,.6)}
+  .search-input:focus{background:rgba(255,255,255,.22)}
+
+  /* Stats strip */
+  .stats-strip{background:var(--accent);border-top:1px solid rgba(255,255,255,.12);padding:10px 28px;display:flex;gap:24px;flex-wrap:wrap}
+  .stat{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,.8)}
+  .stat-val{font-size:15px;font-weight:700;color:#fff}
+
+  /* Filter tabs */
+  .filter-row{padding:16px 24px 0;display:flex;gap:6px;flex-wrap:wrap}
+  .filter-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .12s;font-family:inherit}
+  .filter-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  /* Tool grid */
+  .content{padding:16px 24px 32px}
+  .section-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+  .tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  .tool-card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1.5px solid var(--border);transition:all .15s;cursor:pointer;text-decoration:none;display:block}
+  .tool-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 24px rgba(45,110,94,.14)}
+  .tool-card-top{padding:14px 16px 10px;display:flex;align-items:flex-start;gap:12px}
+  .tool-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .tool-info{flex:1}
+  .tool-num{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px}
+  .tool-name{font-size:14px;font-weight:600;color:var(--text);line-height:1.3}
+  .tool-desc{font-size:11px;color:var(--text2);line-height:1.5;margin-top:3px}
+  .tool-card-foot{padding:8px 16px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);background:var(--surface2)}
+  .tool-tags{display:flex;gap:4px;flex-wrap:wrap}
+  .tool-tag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500}
+  .tool-arrow{font-size:14px;color:var(--text3)}
+  .tool-card:hover .tool-arrow{color:var(--accent)}
+  .tool-card.hidden{display:none}
+
+  /* Category colour codings */
+  .cat-patient{--cat:#2D6E5E;--cat-light:#E3F0EC}
+  .cat-clinician{--cat:#1A3D70;--cat-light:#E8EEF8}
+  .cat-de-addiction{--cat:#7B3500;--cat-light:#FAEEE5}
+  .cat-corporate{--cat:#4C2D8E;--cat-light:#EDE8FA}
+  .cat-setup{--cat:#8B5E00;--cat-light:#FFF8E1}
+  .tool-card:hover{border-color:var(--cat,var(--accent))}
+
+  /* Empty state */
+  .empty{text-align:center;padding:40px;color:var(--text3);font-size:14px;display:none}
+  .empty.visible{display:block}
+
+  /* Footer */
+  .footer{text-align:center;padding:20px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:8px}
+  .footer a{color:var(--accent);text-decoration:none}
+
+  /* Phase indicator */
+  .phase-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo-row">
+      <div class="logo">A</div>
+      <div>
+        <div class="brand-title">Aatmiya Clinical Toolkit</div>
+        <div class="brand-sub">Aatmiya Hospital · Gandhidham, Kutch · Dr. Dhaivat Mehta</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      All tools offline-capable<br>
+      No patient data stored online
+    </div>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="search" placeholder="Search tools — feelings, COWS, safety plan, burnout…" oninput="filterTools()">
+  </div>
+</div>
+
+<div class="stats-strip">
+  <div class="stat"><span class="stat-val" id="tool-count">12</span> tools built</div>
+  <div class="stat"><span class="stat-val">4</span> categories</div>
+  <div class="stat"><span class="stat-val">∞</span> offline use</div>
+  <div class="stat"><span class="stat-val">0</span> patient data online</div>
+</div>
+
+<div class="filter-row">
+  <button class="filter-btn active" onclick="setFilter('all',this)">All tools</button>
+  <button class="filter-btn" onclick="setFilter('patient',this)">Patient-facing</button>
+  <button class="filter-btn" onclick="setFilter('clinician',this)">Clinician</button>
+  <button class="filter-btn" onclick="setFilter('de-addiction',this)">De-addiction</button>
+  <button class="filter-btn" onclick="setFilter('corporate',this)">Corporate wellness</button>
+  <button class="filter-btn" onclick="setFilter('setup',this)">Setup &amp; guides</button>
+</div>
+
+<div class="content">
+
+  <div class="empty" id="empty-state">No tools match your search.</div>
+
+  <!-- Patient-facing -->
+  <div class="section-head" id="sec-patient">Patient-facing tools</div>
+  <div class="tool-grid" id="grid-patient"></div>
+
+  <!-- Clinician -->
+  <div class="section-head" id="sec-clinician">Clinician decision support</div>
+  <div class="tool-grid" id="grid-clinician"></div>
+
+  <!-- De-addiction -->
+  <div class="section-head" id="sec-de-addiction">De-addiction OPD</div>
+  <div class="tool-grid" id="grid-de-addiction"></div>
+
+  <!-- Corporate -->
+  <div class="section-head" id="sec-corporate">Corporate wellness</div>
+  <div class="tool-grid" id="grid-corporate"></div>
+
+  <!-- Setup -->
+  <div class="section-head" id="sec-setup">Setup &amp; guides</div>
+  <div class="tool-grid" id="grid-setup"></div>
+
+</div>
+
+<div class="footer">
+  Aatmiya Hospital · Param Diagnostic Microbiology Laboratory · Aatmiya Pharmacy &nbsp;·&nbsp; Gandhidham, Kutch, Gujarat<br>
+  All tools are for clinical use within Aatmiya ecosystem. Patient data is never transmitted — all tools run locally in the browser.
+</div>
+
+<script>
+const TOOLS = [
+  // Patient-facing
+  {
+    num:'01', name:'Feelings Wheel + Body Map',
+    desc:'Interactive emotion identification across 120+ feelings with somatic body map and session snapshot.',
+    file:'01-feelings-wheel.html', cat:'patient',
+    tags:['Emotions','Somatic','In-session'], icon:'🎡', iconBg:'#E3F0EC',
+    phase:'Phase 1'
+  },
+  {
+    num:'02', name:'Breathing Timer',
+    desc:'9 clinical breath patterns — Box, 4-7-8, Physiological sigh, Coherent, TIPP, Diaphragmatic and more with animated pacer.',
+    file:'02-breathing-timer.html', cat:'patient',
+    tags:['Anxiety','Parasympathetic','HSM'], icon:'🫁', iconBg:'#EDE8FA',
+    phase:'Phase 1'
+  },
+  {
+    num:'04', name:'Safety Plan',
+    desc:'Stanley-Brown 6-step adapted with Indian crisis lines — iCall, Vandrevala, iMind — trusted contacts, reasons to live, means safety.',
+    file:'04-safety-plan.html', cat:'patient',
+    tags:['Crisis','Suicide risk','Print-ready'], icon:'🛡️', iconBg:'#E5F2E9',
+    phase:'Phase 1'
+  },
+  {
+    num:'05', name:'Daily Mood + Meds Check-in',
+    desc:'Low-literacy emoji mood scale, sleep, energy, medication tracking with 14-day visual trend. Stores locally on patient\'s device.',
+    file:'05-daily-checkin.html', cat:'patient',
+    tags:['Between sessions','Adherence','Trend'], icon:'📅', iconBg:'#EDE8FA',
+    phase:'Phase 1'
+  },
+  // Clinician
+  {
+    num:'07', name:'OPD Progress Note (SOAP)',
+    desc:'Full SOAP note generator with ICD-11 search, MSE chip-select, Rx builder with Indian brand names, psychotherapy chips, and copy-ready output.',
+    file:'07-opd-progress-note.html', cat:'clinician',
+    tags:['ICD-11','MSE','Documentation'], icon:'📋', iconBg:'#E8EEF8',
+    phase:'Phase 1'
+  },
+  {
+    num:'10', name:'4P Case Formulation',
+    desc:'Biopsychosocial 4P framework — Predisposing, Precipitating, Perpetuating, Protective — with Indian context fields and printable summary.',
+    file:'10-case-formulation.html', cat:'clinician',
+    tags:['Formulation','4P','Biopsychosocial'], icon:'🧩', iconBg:'#E8EEF8',
+    phase:'Phase 1'
+  },
+  // De-addiction
+  {
+    num:'03', name:'COWS / CIWA-Ar Scorer',
+    desc:'Live bedside withdrawal severity scoring for opioids (COWS) and alcohol (CIWA-Ar) with auto-severity bands, escalation alerts and reassessment log.',
+    file:'03-cows-ciwa-scorer.html', cat:'de-addiction',
+    tags:['Withdrawal','Opioids','Alcohol'], icon:'⚕️', iconBg:'#FAEEE5',
+    phase:'Phase 1'
+  },
+  {
+    num:'06', name:'Readiness Ruler — MI',
+    desc:'Importance / Confidence / Readiness sliders with stage of change auto-classification, importance-confidence gap alert, and change talk prompts.',
+    file:'06-readiness-ruler.html', cat:'de-addiction',
+    tags:['MI','Stage of change','De-addiction'], icon:'📏', iconBg:'#FAEEE5',
+    phase:'Phase 1'
+  },
+  {
+    num:'08', name:'Craving Chain + HRS Planner',
+    desc:'6-link craving chain map for Indian substances (desi alcohol, gutka, buprenorphine, ganja) with festival calendar high-risk planner and coping bank.',
+    file:'08-craving-chain.html', cat:'de-addiction',
+    tags:['Relapse prevention','Craving','HRS calendar'], icon:'⛓️', iconBg:'#FAEEE5',
+    phase:'Phase 1'
+  },
+  // Corporate
+  {
+    num:'09', name:'Burnout Screener',
+    desc:'18-item Maslach-adapted burnout screener across 6 domains — Emotional exhaustion, Depersonalisation, Personal accomplishment, Overload, Control, Recovery — with 4-week recovery plan.',
+    file:'09-burnout-screener.html', cat:'corporate',
+    tags:['Burnout','Maslach','Wellness AMC'], icon:'🔋', iconBg:'#EDE8FA',
+    phase:'Phase 1'
+  },
+  {
+    num:'11', name:'Workplace Stress Self-assessment',
+    desc:'PHQ-2, GAD-2, and burnout 3-minute group screener with instant green/amber/red feedback tiers and coping tip cards for workshop delivery.',
+    file:'11-stress-assessment.html', cat:'corporate',
+    tags:['PHQ-2','GAD-2','Group workshop'], icon:'📊', iconBg:'#EDE8FA',
+    phase:'Phase 1'
+  },
+  {
+    num:'12', name:'HSM Practice Companion',
+    desc:'Himalayan Samarpan Meditation–aligned breathing and mindfulness guided practices — auto-advancing, mobile-first, for patients and corporate wellness sessions.',
+    file:'12-hsm-companion.html', cat:'corporate',
+    tags:['HSM','Meditation','Mobile'], icon:'🕉️', iconBg:'#E3F0EC',
+    phase:'Phase 1'
+  },
+  // Setup
+  {
+    num:'00', name:'GitHub Setup Guide',
+    desc:'Plain-language step-by-step guide to hosting the toolkit on GitHub Pages — account setup, file upload, domain, no technical background needed.',
+    file:'00-github-setup-guide.html', cat:'setup',
+    tags:['Hosting','GitHub','One-time'], icon:'📖', iconBg:'#FFF8E1',
+    phase:'Setup'
+  },
+];
+
+let activeFilter = 'all';
+
+function renderTools(toolList) {
+  const grids = {patient:'', clinician:'', 'de-addiction':'', corporate:'', setup:''};
+  const counts = {patient:0, clinician:0, 'de-addiction':0, corporate:0, setup:0};
+  let total = 0;
+
+  toolList.forEach(t => {
+    const catClass = 'cat-' + t.cat;
+    const tagHTML = t.tags.map(tag =>
+      `<span class="tool-tag" style="background:var(--surface);border:1px solid var(--border);color:var(--text3)">${tag}</span>`
+    ).join('');
+    const card = `
+      <a class="tool-card ${catClass}" href="${t.file}" style="--cat:${getCatColor(t.cat)};--cat-light:${getCatLightColor(t.cat)}">
+        <div class="tool-card-top">
+          <div class="tool-icon" style="background:${t.iconBg}">${t.icon}</div>
+          <div class="tool-info">
+            <div class="tool-num">Tool ${t.num}</div>
+            <div class="tool-name">${t.name}</div>
+            <div class="tool-desc">${t.desc}</div>
+          </div>
+        </div>
+        <div class="tool-card-foot">
+          <div class="tool-tags">${tagHTML}</div>
+          <div class="tool-arrow">→</div>
+        </div>
+      </a>`;
+    grids[t.cat] += card;
+    counts[t.cat]++;
+    total++;
+  });
+
+  Object.keys(grids).forEach(cat => {
+    document.getElementById('grid-' + cat).innerHTML = grids[cat] || '<div style="font-size:12px;color:var(--text3);padding:8px 0">No tools in this category match your search.</div>';
+    const sec = document.getElementById('sec-' + cat);
+    if (sec) sec.style.display = (activeFilter === 'all' || activeFilter === cat) ? 'block' : 'none';
+    document.getElementById('grid-' + cat).style.display = (activeFilter === 'all' || activeFilter === cat) ? 'grid' : 'none';
+  });
+
+  document.getElementById('tool-count').textContent = total;
+  document.getElementById('empty-state').classList.toggle('visible', total === 0);
+}
+
+function getCatColor(cat) {
+  const map = {patient:'#2D6E5E',clinician:'#1A3D70','de-addiction':'#7B3500',corporate:'#4C2D8E',setup:'#8B5E00'};
+  return map[cat]||'#2D6E5E';
+}
+function getCatLightColor(cat) {
+  const map = {patient:'#E3F0EC',clinician:'#E8EEF8','de-addiction':'#FAEEE5',corporate:'#EDE8FA',setup:'#FFF8E1'};
+  return map[cat]||'#E3F0EC';
+}
+
+function setFilter(filter, btn) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterTools();
+}
+
+function filterTools() {
+  const q = document.getElementById('search').value.toLowerCase();
+  let filtered = TOOLS;
+  if (activeFilter !== 'all') filtered = filtered.filter(t => t.cat === activeFilter);
+  if (q) filtered = filtered.filter(t =>
+    t.name.toLowerCase().includes(q) ||
+    t.desc.toLowerCase().includes(q) ||
+    t.tags.some(tag => tag.toLowerCase().includes(q))
+  );
+  renderTools(filtered);
+}
+
+renderTools(TOOLS);
+</script>
+</body>
+</html>
