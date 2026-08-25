@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COWS / CIWA Scorer — Aatmiya Hospital</title>
+<style>
+  :root {
+    --bg: #F4F6F9;
+    --surface: #FFFFFF;
+    --surface2: #F0F2F5;
+    --border: #DDE1E8;
+    --text: #1A2030;
+    --text2: #5A6070;
+    --text3: #9BA0AB;
+    --accent: #1A4A7A;
+    --accent-light: #E8F0F8;
+    --green: #2E7D52; --green-light: #E8F5EE;
+    --amber: #B85C00; --amber-light: #FFF3E0;
+    --red: #C62828; --red-light: #FFEBEE;
+    --purple: #6A1B9A; --purple-light: #F3E5F5;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(26,42,64,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .header {
+    background: var(--accent);
+    color: #fff;
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-mark { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; }
+  .header-title { font-size: 16px; font-weight: 600; }
+  .header-sub { font-size: 11px; opacity: 0.7; margin-top: 1px; }
+  .tool-switch { display: flex; background: rgba(255,255,255,0.15); border-radius: 8px; padding: 3px; }
+  .tool-btn { padding: 6px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; transition: all 0.15s; background: transparent; color: rgba(255,255,255,0.7); }
+  .tool-btn.active { background: #fff; color: var(--accent); }
+
+  .wrapper { max-width: 1200px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
+  @media (max-width: 800px) { .wrapper { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .panel-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .panel-head-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .panel-head-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+  /* Score summary bar */
+  .score-bar {
+    padding: 16px 18px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .score-display { text-align: center; }
+  .score-num { font-size: 48px; font-weight: 800; line-height: 1; transition: color 0.3s; }
+  .score-lbl { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .severity-badge {
+    padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 700;
+    transition: all 0.3s;
+  }
+  .severity-detail { font-size: 12px; color: var(--text2); line-height: 1.5; flex: 1; min-width: 180px; }
+
+  /* Items */
+  .items-wrap { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .item-card { border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .item-head {
+    padding: 10px 14px;
+    background: var(--surface2);
+    display: flex; align-items: flex-start; gap: 10px;
+    cursor: pointer;
+  }
+  .item-num { font-size: 10px; font-weight: 600; color: var(--text3); min-width: 20px; margin-top: 2px; }
+  .item-title { font-size: 13px; font-weight: 500; flex: 1; }
+  .item-score-pill { font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 20px; min-width: 32px; text-align: center; background: var(--surface2); border: 1px solid var(--border); transition: all 0.2s; }
+  .item-body { padding: 8px 14px 12px; }
+  .item-note { font-size: 11px; color: var(--text3); margin-bottom: 8px; font-style: italic; }
+  .options { display: flex; flex-direction: column; gap: 4px; }
+  .option {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 7px 10px; border-radius: 8px;
+    cursor: pointer; border: 1px solid transparent;
+    transition: all 0.12s; background: var(--surface2);
+  }
+  .option:hover { border-color: var(--border); background: #fff; }
+  .option.selected { border-color: var(--accent); background: var(--accent-light); }
+  .option-score { font-size: 11px; font-weight: 700; color: var(--text3); min-width: 18px; }
+  .option-label { font-size: 12px; color: var(--text); line-height: 1.4; flex: 1; }
+  .option.selected .option-label { color: var(--accent); font-weight: 500; }
+  .option.selected .option-score { color: var(--accent); }
+
+  /* Right panel */
+  .side-section { padding: 14px; border-bottom: 1px solid var(--border); }
+  .side-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 8px; }
+
+  .severity-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .severity-table td { padding: 5px 8px; border-radius: 4px; }
+  .severity-table tr td:first-child { font-weight: 600; padding-right: 4px; }
+
+  .timestamp-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text2); padding: 4px 0; border-bottom: 1px dashed var(--border); }
+  .timestamp-score { font-weight: 700; }
+
+  .btn-primary { background: var(--accent); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+  .btn-primary:hover { background: #133a60; }
+  .btn-outline { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 8px 18px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .btn-outline:hover { background: var(--accent-light); }
+
+  .notes-area { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; font-family: inherit; background: var(--surface2); color: var(--text); resize: none; line-height: 1.5; }
+  .notes-area:focus { outline: none; border-color: var(--accent); background: #fff; }
+
+  .alert-box { border-radius: 8px; padding: 10px 12px; font-size: 12px; line-height: 1.5; font-weight: 500; display: none; }
+  .alert-box.visible { display: block; }
+
+  .action-row { display: flex; gap: 8px; flex-wrap: wrap; padding: 14px; border-top: 1px solid var(--border); }
+
+  .snapshot-out { margin: 0 14px 14px; padding: 12px; background: var(--surface2); border-radius: 8px; font-size: 11px; color: var(--text2); white-space: pre-wrap; line-height: 1.6; display: none; }
+  .snapshot-out.visible { display: block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">A</div>
+    <div>
+      <div class="header-title">Withdrawal Severity Scorer</div>
+      <div class="header-sub">Aatmiya Hospital · De-addiction OPD · Tool 03</div>
+    </div>
+  </div>
+  <div class="tool-switch">
+    <button class="tool-btn active" id="cows-btn" onclick="switchTool('COWS')">COWS</button>
+    <button class="tool-btn" id="ciwa-btn" onclick="switchTool('CIWA')">CIWA-Ar</button>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <div id="main-panel">
+    <!-- Score bar + items rendered here -->
+  </div>
+
+  <!-- Side panel -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+
+    <div class="panel">
+      <div class="panel-head">
+        <div><div class="panel-head-title" id="side-title">COWS severity guide</div></div>
+      </div>
+      <div class="side-section">
+        <div class="side-label">Score bands</div>
+        <table class="severity-table" id="severity-table"></table>
+      </div>
+      <div class="side-section">
+        <div class="side-label">Alert</div>
+        <div class="alert-box" id="alert-box"></div>
+      </div>
+      <div class="side-section">
+        <div class="side-label">Reassessment log</div>
+        <div id="timestamp-log" style="min-height:40px"></div>
+        <button class="btn-outline" style="margin-top:8px;width:100%;font-size:11px" onclick="logTimestamp()">Log current score</button>
+      </div>
+      <div class="side-section">
+        <div class="side-label">Clinician notes</div>
+        <textarea class="notes-area" id="clinical-notes" rows="4" placeholder="Observations, vitals, context…"></textarea>
+      </div>
+      <div class="action-row">
+        <button class="btn-primary" onclick="generateReport()">Generate report</button>
+        <button class="btn-outline" onclick="resetAll()">Reset</button>
+      </div>
+      <div class="snapshot-out" id="snapshot-out"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ============================================================
+// TOOL DATA
+// ============================================================
+const TOOLS = {
+  COWS: {
+    name: 'COWS',
+    fullName: 'Clinical Opiate Withdrawal Scale',
+    bands: [
+      {label:'Mild',range:'5–12',color:'#2E7D52',bg:'#E8F5EE'},
+      {label:'Moderate',range:'13–24',color:'#B85C00',bg:'#FFF3E0'},
+      {label:'Mod–severe',range:'25–36',color:'#C62828',bg:'#FFEBEE'},
+      {label:'Severe',range:'≥ 37',color:'#6A1B9A',bg:'#F3E5F5'},
+    ],
+    alertThreshold: 25,
+    alertText: 'Score ≥ 25 — Moderate-severe withdrawal. Consider buprenorphine/naloxone initiation or escalation. Clinical review required.',
+    alertColor: '#C62828', alertBg: '#FFEBEE',
+    items: [
+      {
+        id:'pulse', label:'Resting pulse rate', note:'Measure after patient sits for 1 minute.',
+        options:[{s:0,l:'≤ 80 bpm'},{s:1,l:'81–100 bpm'},{s:2,l:'101–120 bpm'},{s:4,l:'> 120 bpm'}]
+      },
+      {
+        id:'sweat', label:'Sweating',note:'Not accounted for by room temperature or patient activity.',
+        options:[{s:0,l:'No report of chills or flushing'},{s:1,l:'Subjective complaint; no signs'},{s:2,l:'Flushed or observable moisture on face'},{s:3,l:'Beads of sweat on brow or face'},{s:4,l:'Sweat streaming off face'}]
+      },
+      {
+        id:'restless', label:'Restlessness', note:'Observation during assessment.',
+        options:[{s:0,l:'Able to sit still'},{s:1,l:'Reports difficulty sitting still; able to do so'},{s:3,l:'Frequent shifting or extraneous movements of legs/arms'},{s:5,l:'Unable to sit still for more than a few seconds'}]
+      },
+      {
+        id:'pupils', label:'Pupil size', note:'Observe in normal room light.',
+        options:[{s:0,l:'Pupils pinned or normal for ambient light'},{s:1,l:'Pupils possibly larger than normal for ambient light'},{s:2,l:'Pupils moderately dilated'},{s:5,l:'Pupils so dilated that only the rim of the iris is visible'}]
+      },
+      {
+        id:'bones', label:'Bone or joint aches', note:'If prior pain present, only additional component from opiate withdrawal.',
+        options:[{s:0,l:'Not present'},{s:1,l:'Mild diffuse discomfort'},{s:2,l:'Patient reports severe aches/pains'},{s:4,l:'Patient is rubbing joints or muscles and is unable to sit still due to discomfort'}]
+      },
+      {
+        id:'runny', label:'Runny nose or tearing', note:'Not accounted for by cold or allergies.',
+        options:[{s:0,l:'Not present'},{s:1,l:'Nasal stuffiness or unusually moist eyes'},{s:2,l:'Nose running or tearing'},{s:4,l:'Nose constantly running or tears streaming down cheeks'}]
+      },
+      {
+        id:'gi', label:'GI upset', note:'Over last 30 minutes.',
+        options:[{s:0,l:'No GI symptoms'},{s:1,l:'Stomach cramps'},{s:2,l:'Nausea or loose stool'},{s:3,l:'Vomiting or diarrhoea'},{s:5,l:'Multiple episodes of vomiting or diarrhoea'}]
+      },
+      {
+        id:'tremor', label:'Tremor', note:'Observation of outstretched hands.',
+        options:[{s:0,l:'No tremor'},{s:1,l:'Tremor can be felt but not observed'},{s:2,l:'Slight tremor observable'},{s:4,l:'Gross tremor or muscle twitching'}]
+      },
+      {
+        id:'yawn', label:'Yawning', note:'Observation during assessment.',
+        options:[{s:0,l:'No yawning'},{s:1,l:'Yawning once or twice during assessment'},{s:2,l:'Yawning 3+ times during assessment'},{s:4,l:'Yawning several times per minute'}]
+      },
+      {
+        id:'anxiety', label:'Anxiety or irritability',
+        options:[{s:0,l:'None'},{s:1,l:'Patient reports increasing irritability or anxiousness'},{s:2,l:'Patient obviously irritable or anxious'},{s:4,l:'Patient so irritable or anxious that participation in assessment is difficult'}]
+      },
+      {
+        id:'goose', label:'Gooseflesh skin',
+        options:[{s:0,l:'Skin is smooth'},{s:3,l:'Piloerection of skin can be felt or hairs standing up on arms'},{s:5,l:'Prominent piloerection (gooseflesh)'}]
+      },
+    ]
+  },
+  CIWA: {
+    name: 'CIWA-Ar',
+    fullName: 'Clinical Institute Withdrawal Assessment for Alcohol',
+    bands: [
+      {label:'Absent / minimal',range:'0–9',color:'#2E7D52',bg:'#E8F5EE'},
+      {label:'Mild–moderate',range:'10–15',color:'#B85C00',bg:'#FFF3E0'},
+      {label:'Moderate–severe',range:'16–20',color:'#C62828',bg:'#FFEBEE'},
+      {label:'Severe',range:'≥ 21',color:'#6A1B9A',bg:'#F3E5F5'},
+    ],
+    alertThreshold: 16,
+    alertText: 'Score ≥ 16 — Moderate-severe AWS. High seizure and delirium tremens risk. Benzodiazepine therapy and close monitoring indicated. Escalate care.',
+    alertColor: '#C62828', alertBg: '#FFEBEE',
+    items: [
+      {
+        id:'nausea', label:'Nausea / vomiting', note:'Ask: "Do you feel sick? Have you vomited?"',
+        options:[{s:0,l:'No nausea, no vomiting'},{s:1,l:'Mild nausea with no dry heaves'},{s:4,l:'Intermittent nausea with dry heaves'},{s:7,l:'Constant nausea, frequent dry heaves and vomiting'}]
+      },
+      {
+        id:'tremor', label:'Tremor', note:'Arms extended, fingers spread. Observe.',
+        options:[{s:0,l:'No tremor'},{s:1,l:'Not visible; felt at fingertips'},{s:4,l:'Moderate, with patient arms extended'},{s:7,l:'Severe, even with arms not extended'}]
+      },
+      {
+        id:'psweats', label:'Paroxysmal sweats', note:'Observe.',
+        options:[{s:0,l:'No sweats'},{s:1,l:'Barely perceptible sweating; palms moist'},{s:4,l:'Beads of sweat obvious on forehead'},{s:7,l:'Drenching sweats'}]
+      },
+      {
+        id:'anxiety', label:'Anxiety', note:'Ask: "Do you feel nervous?" Observe.',
+        options:[{s:0,l:'No anxiety; at ease'},{s:1,l:'Mildly anxious'},{s:4,l:'Moderately anxious or guarded'},{s:7,l:'Equivalent to acute panic state; patient very agitated'}]
+      },
+      {
+        id:'agitation', label:'Agitation', note:'Observe throughout.',
+        options:[{s:0,l:'Normal activity'},{s:1,l:'Somewhat more than normal activity'},{s:4,l:'Moderately fidgety and restless'},{s:7,l:'Paces back and forth during most of assessment; thrashes about'}]
+      },
+      {
+        id:'tactile', label:'Tactile disturbances', note:'Ask: "Itching, pins and needles, burning, numbness, insects on or under skin?"',
+        options:[{s:0,l:'None'},{s:1,l:'Very mild itching / burning / numbness'},{s:2,l:'Mild itching / burning / numbness'},{s:3,l:'Moderate itching / burning / numbness'},{s:4,l:'Moderately severe hallucinations'},{s:5,l:'Severe hallucinations'},{s:6,l:'Extremely severe hallucinations'},{s:7,l:'Continuous hallucinations'}]
+      },
+      {
+        id:'auditory', label:'Auditory disturbances', note:'Ask: "Sounds harsh, frightening? Hearing things that are not there?"',
+        options:[{s:0,l:'Not present'},{s:1,l:'Very mild harshness or ability to frighten'},{s:2,l:'Mild harshness or ability to frighten'},{s:3,l:'Moderate harshness or ability to frighten'},{s:4,l:'Moderately severe hallucinations'},{s:5,l:'Severe hallucinations'},{s:6,l:'Extremely severe hallucinations'},{s:7,l:'Continuous hallucinations'}]
+      },
+      {
+        id:'visual', label:'Visual disturbances', note:'Ask: "Sensitivity to light, seeing things that are not there?"',
+        options:[{s:0,l:'Not present'},{s:1,l:'Very mild sensitivity'},{s:2,l:'Mild sensitivity'},{s:3,l:'Moderate sensitivity'},{s:4,l:'Moderately severe hallucinations'},{s:5,l:'Severe hallucinations'},{s:6,l:'Extremely severe hallucinations'},{s:7,l:'Continuous hallucinations'}]
+      },
+      {
+        id:'headache', label:'Headache / fullness in head', note:'Ask: "Does your head feel different? Feel like a band around head?" Do not rate dizziness.',
+        options:[{s:0,l:'Not present'},{s:1,l:'Very mild'},{s:2,l:'Mild'},{s:3,l:'Moderate'},{s:4,l:'Moderately severe'},{s:5,l:'Severe'},{s:6,l:'Very severe'},{s:7,l:'Extremely severe'}]
+      },
+      {
+        id:'orient', label:'Orientation / clouding of sensorium', note:'Ask: "What day is this? Where are you? Who am I?"',
+        options:[{s:0,l:'Oriented; can do serial additions'},{s:1,l:'Cannot do serial additions or uncertain about date'},{s:2,l:'Date disorientation ≤ 2 calendar days'},{s:3,l:'Date disorientation > 2 calendar days'},{s:4,l:'Disoriented for place / person'}]
+      },
+    ]
+  }
+};
+
+let activeTool = 'COWS';
+let scores = {};
+let timestampLog = [];
+
+// ============================================================
+// RENDER
+// ============================================================
+function switchTool(tool) {
+  activeTool = tool;
+  scores = {};
+  timestampLog = [];
+  document.getElementById('cows-btn').classList.toggle('active', tool==='COWS');
+  document.getElementById('ciwa-btn').classList.toggle('active', tool==='CIWA');
+  document.getElementById('side-title').textContent = `${tool} severity guide`;
+  renderSeverityTable();
+  renderItems();
+  updateScore();
+  renderTimestampLog();
+}
+
+function renderSeverityTable() {
+  const tool = TOOLS[activeTool];
+  document.getElementById('severity-table').innerHTML = tool.bands.map(b => `
+    <tr>
+      <td style="color:${b.color}">${b.label}</td>
+      <td>${b.range}</td>
+    </tr>
+  `).join('');
+}
+
+function renderItems() {
+  const tool = TOOLS[activeTool];
+  document.getElementById('main-panel').innerHTML = `
+    <div class="panel">
+      <div class="score-bar" id="score-bar">
+        <div class="score-display">
+          <div class="score-num" id="score-num">0</div>
+          <div class="score-lbl">${tool.name} score</div>
+        </div>
+        <div class="severity-badge" id="severity-badge" style="background:#F0F2F5;color:#9BA0AB">—</div>
+        <div class="severity-detail" id="severity-detail">${tool.fullName} · Select responses below</div>
+      </div>
+      <div class="items-wrap">
+        ${tool.items.map((item, idx) => `
+          <div class="item-card" id="card-${item.id}">
+            <div class="item-head" onclick="toggleItem('${item.id}')">
+              <div class="item-num">${String(idx+1).padStart(2,'0')}</div>
+              <div class="item-title">${item.label}</div>
+              <div class="item-score-pill" id="pill-${item.id}">—</div>
+            </div>
+            <div class="item-body" id="body-${item.id}" style="display:none">
+              ${item.note ? `<div class="item-note">${item.note}</div>` : ''}
+              <div class="options">
+                ${item.options.map(opt => `
+                  <div class="option" onclick="selectOption('${item.id}', ${opt.s}, this)">
+                    <div class="option-score">${opt.s}</div>
+                    <div class="option-label">${opt.l}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function toggleItem(id) {
+  const body = document.getElementById('body-' + id);
+  body.style.display = body.style.display === 'none' ? 'block' : 'none';
+}
+
+function selectOption(itemId, score, el) {
+  el.closest('.options').querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  scores[itemId] = score;
+  const pill = document.getElementById('pill-' + itemId);
+  pill.textContent = score;
+  pill.style.background = score === 0 ? '#E8F5EE' : score <= 2 ? '#FFF3E0' : '#FFEBEE';
+  pill.style.color = score === 0 ? '#2E7D52' : score <= 2 ? '#B85C00' : '#C62828';
+  pill.style.borderColor = score === 0 ? '#A5D6B8' : score <= 2 ? '#FFCC80' : '#EF9A9A';
+  updateScore();
+  // Auto-expand next unanswered
+  const tool = TOOLS[activeTool];
+  const items = tool.items;
+  const idx = items.findIndex(it => it.id === itemId);
+  if (idx < items.length - 1) {
+    const nextId = items[idx+1].id;
+    if (scores[nextId] === undefined) {
+      document.getElementById('body-' + nextId).style.display = 'block';
+      document.getElementById('card-' + nextId).scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  }
+}
+
+function updateScore() {
+  const tool = TOOLS[activeTool];
+  const total = Object.values(scores).reduce((a,b)=>a+b, 0);
+  document.getElementById('score-num').textContent = total;
+
+  let band = null;
+  for (const b of [...tool.bands].reverse()) {
+    const [lo] = b.range.replace('≥ ','').split('–').map(Number);
+    if (total >= lo || b.range.startsWith('≥')) {
+      const loVal = parseInt(b.range.replace('≥ ',''));
+      if (total >= loVal) { band = b; break; }
+    }
+  }
+  // simpler check
+  band = tool.bands[0];
+  if (tool.name === 'COWS') {
+    if (total >= 37) band = tool.bands[3];
+    else if (total >= 25) band = tool.bands[2];
+    else if (total >= 13) band = tool.bands[1];
+    else if (total >= 5) band = tool.bands[0];
+    else band = {label:'Below threshold',range:'< 5',color:'#5A6070',bg:'#F0F2F5'};
+  } else {
+    if (total >= 21) band = tool.bands[3];
+    else if (total >= 16) band = tool.bands[2];
+    else if (total >= 10) band = tool.bands[1];
+    else if (total >= 1) band = tool.bands[0];
+    else band = {label:'None',range:'0',color:'#5A6070',bg:'#F0F2F5'};
+  }
+
+  document.getElementById('score-num').style.color = band.color;
+  const badge = document.getElementById('severity-badge');
+  badge.textContent = band.label;
+  badge.style.background = band.bg;
+  badge.style.color = band.color;
+  document.getElementById('severity-detail').textContent = `${tool.fullName} · Total ${total} of ${tool.name==='COWS'?48:67} · ${band.label}`;
+
+  const alert = document.getElementById('alert-box');
+  if (total >= tool.alertThreshold) {
+    alert.textContent = tool.alertText;
+    alert.style.background = tool.alertBg;
+    alert.style.color = tool.alertColor;
+    alert.style.border = `1px solid ${tool.alertColor}55`;
+    alert.classList.add('visible');
+  } else {
+    alert.classList.remove('visible');
+  }
+}
+
+function logTimestamp() {
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+  const now = new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'});
+  timestampLog.push({time:now, score:total});
+  renderTimestampLog();
+}
+
+function renderTimestampLog() {
+  const log = document.getElementById('timestamp-log');
+  if (timestampLog.length === 0) {
+    log.innerHTML = '<div style="font-size:11px;color:var(--text3)">No entries yet</div>';
+    return;
+  }
+  log.innerHTML = timestampLog.map(e => `
+    <div class="timestamp-row">
+      <span>${e.time}</span>
+      <span class="timestamp-score">${activeTool}: ${e.score}</span>
+    </div>
+  `).join('');
+}
+
+function generateReport() {
+  const tool = TOOLS[activeTool];
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+  const now = new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const answered = tool.items.map(it => `  ${it.label}: ${scores[it.id] !== undefined ? scores[it.id] : 'not scored'}`).join('\n');
+  const log = timestampLog.length ? '\nREASSESSMENT LOG:\n' + timestampLog.map(e=>`  ${e.time}: ${e.score}`).join('\n') : '';
+  const notes = document.getElementById('clinical-notes').value;
+  const text = [
+    `AATMIYA HOSPITAL — ${tool.fullName} (${tool.name})`,
+    `Date/Time: ${now}`,
+    ``,
+    `TOTAL SCORE: ${total}`,
+    ``,
+    `ITEM BREAKDOWN:`,
+    answered,
+    log,
+    notes ? `\nCLINICIAN NOTES:\n${notes}` : ''
+  ].join('\n');
+  const out = document.getElementById('snapshot-out');
+  out.textContent = text;
+  out.classList.add('visible');
+  navigator.clipboard?.writeText(text);
+}
+
+function resetAll() {
+  scores = {};
+  timestampLog = [];
+  document.getElementById('clinical-notes').value = '';
+  document.getElementById('snapshot-out').classList.remove('visible');
+  renderItems();
+  renderTimestampLog();
+  updateScore();
+}
+
+// Init
+renderSeverityTable();
+renderItems();
+// Open first item
+setTimeout(() => {
+  const first = TOOLS[activeTool].items[0];
+  if (first) document.getElementById('body-' + first.id).style.display = 'block';
+}, 100);
+renderTimestampLog();
+</script>
+</body>
+</html>

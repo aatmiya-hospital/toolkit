@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feelings Wheel + Body Map — Aatmiya Hospital</title>
+<style>
+  :root {
+    --bg: #F7F4EF;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE8;
+    --border: #DDD9D2;
+    --text: #1E1C18;
+    --text2: #6B6760;
+    --text3: #9E9B96;
+    --accent: #2D6E5E;
+    --accent-light: #E3F0EC;
+    --accent2: #8B4513;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+
+    /* Emotion color palette */
+    --joy: #F5A623; --joy-light: #FEF3DC;
+    --trust: #4CAF50; --trust-light: #E8F5E9;
+    --fear: #9C6EAD; --fear-light: #F3EEF7;
+    --surprise: #2196F3; --surprise-light: #E3F2FD;
+    --sadness: #5C7AEA; --sadness-light: #EEF1FD;
+    --disgust: #795548; --disgust-light: #EFEBE9;
+    --anger: #E53935; --anger-light: #FFEBEE;
+    --anticipation: #FF9800; --anticipation-light: #FFF3E0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: var(--accent);
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #fff;
+    letter-spacing: -1px;
+  }
+  .header-title { font-size: 16px; font-weight: 600; }
+  .header-sub { font-size: 11px; opacity: 0.75; margin-top: 1px; }
+  .header-actions { display: flex; gap: 8px; }
+  .btn-ghost {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.25); }
+
+  /* Layout */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 320px;
+    gap: 16px;
+    padding: 16px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 1100px) {
+    .main { grid-template-columns: 1fr 1fr; }
+    .panel-right { grid-column: 1 / -1; }
+  }
+  @media (max-width: 700px) {
+    .main { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .panel-head {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel-head-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+  }
+  .panel-head-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .panel-head-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .panel-body { padding: 16px; }
+
+  /* Feelings Wheel */
+  #wheel-svg { width: 100%; height: auto; cursor: pointer; }
+
+  .wheel-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+  }
+
+  .layer-tabs {
+    display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; justify-content: center;
+  }
+  .layer-tab {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .layer-tab.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  /* Body Map */
+  .body-map-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+  }
+  #body-svg { width: 100%; max-width: 260px; height: auto; cursor: pointer; }
+
+  .body-legend {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    padding: 0 8px;
+  }
+  .body-legend-item {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--text2);
+  }
+  .body-legend-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+
+  /* Selected Feelings Panel */
+  .selection-list {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 12px;
+    min-height: 120px;
+  }
+  .selection-empty {
+    text-align: center;
+    color: var(--text3);
+    font-size: 12px;
+    padding: 20px 0;
+    line-height: 1.6;
+  }
+  .sel-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    position: relative;
+  }
+  .sel-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .sel-info { flex: 1; }
+  .sel-name { font-size: 13px; font-weight: 500; }
+  .sel-core { font-size: 11px; color: var(--text3); }
+  .sel-intensity { display: flex; align-items: center; gap: 4px; }
+  .intensity-pip {
+    width: 14px; height: 14px; border-radius: 3px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+  .sel-remove {
+    width: 20px; height: 20px;
+    border-radius: 50%; background: var(--border);
+    border: none; cursor: pointer;
+    font-size: 12px; color: var(--text2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .sel-remove:hover { background: #ffcdd2; color: #c62828; }
+
+  /* Body sensations */
+  .body-sensations {
+    padding: 0 12px 12px;
+  }
+  .sensation-title { font-size: 11px; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .sensation-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .sensation-chip {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .sensation-chip.selected {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* Notes */
+  .notes-wrap { padding: 0 12px 12px; }
+  .notes-label { font-size: 11px; font-weight: 600; color: var(--text2); margin-bottom: 5px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .notes-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: inherit;
+    background: var(--surface2);
+    color: var(--text);
+    resize: none;
+    line-height: 1.5;
+    transition: border-color 0.15s;
+  }
+  .notes-input:focus { outline: none; border-color: var(--accent); background: #fff; }
+
+  /* Export snapshot */
+  .snapshot-area {
+    margin: 12px;
+    padding: 12px;
+    background: var(--accent-light);
+    border-radius: 8px;
+    border: 1px solid #b2d8cf;
+    font-size: 12px;
+    color: var(--accent);
+    display: none;
+    white-space: pre-wrap;
+    line-height: 1.6;
+  }
+  .snapshot-area.visible { display: block; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+  .btn-primary:hover { background: #235a4c; }
+  .btn-outline {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn-outline:hover { background: var(--accent-light); }
+  .action-row { display: flex; gap: 8px; padding: 0 12px 12px; flex-wrap: wrap; }
+
+  /* Tooltip */
+  .tooltip {
+    position: fixed;
+    background: var(--text);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.1s;
+    white-space: nowrap;
+  }
+  .tooltip.visible { opacity: 1; }
+
+  /* Intensity row */
+  .intensity-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .intensity-label { font-size: 10px; color: var(--text3); }
+
+  /* Print */
+  @media print {
+    .header-actions, .action-row, .layer-tabs { display: none !important; }
+    body { background: white; }
+    .panel { box-shadow: none; border: 1px solid #ddd; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">A</div>
+    <div>
+      <div class="header-title">Feelings Wheel + Body Map</div>
+      <div class="header-sub">Aatmiya Hospital · Clinical Tool 01</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn-ghost" onclick="resetAll()">Reset</button>
+    <button class="btn-ghost" onclick="generateSnapshot()">Copy snapshot</button>
+    <button class="btn-ghost" onclick="window.print()">Print</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Feelings Wheel Panel -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-head-dot"></div>
+      <div>
+        <div class="panel-head-title">Feelings wheel</div>
+        <div class="panel-head-sub">Tap any segment to select</div>
+      </div>
+    </div>
+    <div class="wheel-container">
+      <div class="layer-tabs">
+        <button class="layer-tab active" onclick="setLayer(0,this)">Core (8)</button>
+        <button class="layer-tab" onclick="setLayer(1,this)">Secondary (40)</button>
+        <button class="layer-tab" onclick="setLayer(2,this)">Tertiary (120+)</button>
+      </div>
+      <svg id="wheel-svg" viewBox="-300 -300 600 600" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+
+  <!-- Body Map Panel -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-head-dot" style="background:#8B4513"></div>
+      <div>
+        <div class="panel-head-title">Somatic body map</div>
+        <div class="panel-head-sub">Tap body regions to mark sensations</div>
+      </div>
+    </div>
+    <div class="body-map-wrap">
+      <svg id="body-svg" viewBox="0 0 200 420" xmlns="http://www.w3.org/2000/svg">
+        <!-- Front body silhouette -->
+        <!-- Head -->
+        <ellipse cx="100" cy="38" rx="28" ry="33" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="head" onclick="toggleBodyRegion('head',this)" style="cursor:pointer"/>
+        <!-- Neck -->
+        <rect x="88" y="68" width="24" height="18" rx="4" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="neck" onclick="toggleBodyRegion('neck',this)" style="cursor:pointer"/>
+        <!-- Chest -->
+        <rect x="66" y="84" width="68" height="58" rx="8" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="chest" onclick="toggleBodyRegion('chest',this)" style="cursor:pointer"/>
+        <!-- Abdomen -->
+        <rect x="68" y="140" width="64" height="52" rx="6" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="abdomen" onclick="toggleBodyRegion('abdomen',this)" style="cursor:pointer"/>
+        <!-- Left arm -->
+        <rect x="34" y="84" width="28" height="90" rx="10" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="left-arm" onclick="toggleBodyRegion('left-arm',this)" style="cursor:pointer"/>
+        <!-- Right arm -->
+        <rect x="138" y="84" width="28" height="90" rx="10" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="right-arm" onclick="toggleBodyRegion('right-arm',this)" style="cursor:pointer"/>
+        <!-- Left hand -->
+        <ellipse cx="48" cy="186" rx="14" ry="18" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="left-hand" onclick="toggleBodyRegion('left-hand',this)" style="cursor:pointer"/>
+        <!-- Right hand -->
+        <ellipse cx="152" cy="186" rx="14" ry="18" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="right-hand" onclick="toggleBodyRegion('right-hand',this)" style="cursor:pointer"/>
+        <!-- Pelvis -->
+        <rect x="66" y="190" width="68" height="42" rx="8" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="pelvis" onclick="toggleBodyRegion('pelvis',this)" style="cursor:pointer"/>
+        <!-- Left leg -->
+        <rect x="68" y="230" width="28" height="100" rx="10" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="left-leg" onclick="toggleBodyRegion('left-leg',this)" style="cursor:pointer"/>
+        <!-- Right leg -->
+        <rect x="104" y="230" width="28" height="100" rx="10" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="right-leg" onclick="toggleBodyRegion('right-leg',this)" style="cursor:pointer"/>
+        <!-- Left foot -->
+        <ellipse cx="82" cy="340" rx="18" ry="12" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="left-foot" onclick="toggleBodyRegion('left-foot',this)" style="cursor:pointer"/>
+        <!-- Right foot -->
+        <ellipse cx="118" cy="340" rx="18" ry="12" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="right-foot" onclick="toggleBodyRegion('right-foot',this)" style="cursor:pointer"/>
+        <!-- Shoulders -->
+        <ellipse cx="60" cy="88" rx="18" ry="12" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="left-shoulder" onclick="toggleBodyRegion('left-shoulder',this)" style="cursor:pointer"/>
+        <ellipse cx="140" cy="88" rx="18" ry="12" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
+          class="body-region" data-region="right-shoulder" onclick="toggleBodyRegion('right-shoulder',this)" style="cursor:pointer"/>
+
+        <!-- Region labels (small) -->
+        <text x="100" y="41" text-anchor="middle" font-size="8" fill="#888" pointer-events="none">Head</text>
+        <text x="100" y="117" text-anchor="middle" font-size="8" fill="#888" pointer-events="none">Chest</text>
+        <text x="100" y="168" text-anchor="middle" font-size="8" fill="#888" pointer-events="none">Abdomen</text>
+        <text x="100" y="212" text-anchor="middle" font-size="8" fill="#888" pointer-events="none">Pelvis</text>
+        <text x="48" y="138" text-anchor="middle" font-size="7" fill="#888" pointer-events="none">L arm</text>
+        <text x="152" y="138" text-anchor="middle" font-size="7" fill="#888" pointer-events="none">R arm</text>
+        <text x="82" y="285" text-anchor="middle" font-size="7" fill="#888" pointer-events="none">L leg</text>
+        <text x="118" y="285" text-anchor="middle" font-size="7" fill="#888" pointer-events="none">R leg</text>
+      </svg>
+
+      <div class="body-legend">
+        <div class="body-legend-item"><div class="body-legend-dot" style="background:#E53935"></div>Tension / pain</div>
+        <div class="body-legend-item"><div class="body-legend-dot" style="background:#2196F3"></div>Heaviness / numbness</div>
+        <div class="body-legend-item"><div class="body-legend-dot" style="background:#FF9800"></div>Flutter / energy</div>
+        <div class="body-legend-item"><div class="body-legend-dot" style="background:#4CAF50"></div>Ease / warmth</div>
+      </div>
+
+      <!-- Sensation type selector -->
+      <div style="width:100%">
+        <div class="sensation-title" style="padding:0 8px;margin-bottom:6px">Active sensation type</div>
+        <div class="sensation-chips" style="padding:0 8px" id="sensation-type-chips">
+          <div class="sensation-chip selected" data-type="tension" data-color="#E53935" onclick="selectSensationType(this)">Tension / pain</div>
+          <div class="sensation-chip" data-type="heavy" data-color="#2196F3" onclick="selectSensationType(this)">Heaviness / numbness</div>
+          <div class="sensation-chip" data-type="flutter" data-color="#FF9800" onclick="selectSensationType(this)">Flutter / energy</div>
+          <div class="sensation-chip" data-type="ease" data-color="#4CAF50" onclick="selectSensationType(this)">Ease / warmth</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Selection + Notes -->
+  <div class="panel panel-right" style="display:flex;flex-direction:column;gap:0">
+
+    <!-- Selected feelings -->
+    <div class="panel-head">
+      <div class="panel-head-dot" style="background:#F5A623"></div>
+      <div>
+        <div class="panel-head-title">Selected feelings</div>
+        <div class="panel-head-sub">Tap wheel segments to add</div>
+      </div>
+    </div>
+    <div class="selection-list" id="selection-list">
+      <div class="selection-empty" id="sel-empty">
+        Tap any segment on the feelings wheel to begin.<br>
+        You can select multiple feelings.
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--border)"></div>
+
+    <!-- Body sensations -->
+    <div style="padding:10px 12px 6px">
+      <div class="sensation-title">Body sensations marked</div>
+      <div class="sensation-chips" id="body-selected-list">
+        <span style="font-size:11px;color:var(--text3)">None yet — tap body map</span>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--border);margin-top:4px"></div>
+
+    <!-- Somatic descriptors -->
+    <div class="body-sensations" style="padding:10px 12px">
+      <div class="sensation-title">Add somatic descriptors</div>
+      <div class="sensation-chips" id="somatic-chips">
+        <div class="sensation-chip" onclick="toggleChip(this)">Tight</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Hollow</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Heavy</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Light</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Racing heart</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Breathless</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Nausea</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Dizzy</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Trembling</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Frozen</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Burning</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Cold</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Aching</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Tingling</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Warm</div>
+        <div class="sensation-chip" onclick="toggleChip(this)">Open</div>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--border)"></div>
+
+    <!-- Intensity overall -->
+    <div style="padding:10px 12px 6px">
+      <div class="sensation-title">Overall distress (0–10)</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="range" id="distress-slider" min="0" max="10" value="5"
+          style="flex:1;accent-color:var(--accent)"
+          oninput="document.getElementById('distress-val').textContent=this.value">
+        <span id="distress-val" style="font-size:18px;font-weight:700;color:var(--accent);min-width:24px;text-align:center">5</span>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--border)"></div>
+
+    <!-- Notes -->
+    <div class="notes-wrap" style="padding:10px 12px">
+      <div class="notes-label">Clinical note</div>
+      <textarea class="notes-input" id="clinical-note" rows="3"
+        placeholder="Observations, context, session themes…"></textarea>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-row">
+      <button class="btn-primary" onclick="generateSnapshot()">Generate snapshot</button>
+      <button class="btn-outline" onclick="resetAll()">Clear all</button>
+    </div>
+    <div class="snapshot-area" id="snapshot"></div>
+  </div>
+
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const EMOTIONS = [
+  {
+    id:'joy', label:'Joy', color:'#F5A623', light:'#FEF3DC',
+    secondary:[
+      {id:'ecstatic',label:'Ecstatic', tertiary:['Elated','Euphoric','Blissful']},
+      {id:'cheerful',label:'Cheerful', tertiary:['Optimistic','Enthusiastic','Zest']},
+      {id:'content',label:'Content', tertiary:['Satisfied','Fulfilled','Grateful']},
+      {id:'proud',label:'Proud', tertiary:['Confident','Triumphant','Worthy']},
+      {id:'amusement',label:'Amused', tertiary:['Playful','Delighted','Jovial']}
+    ]
+  },
+  {
+    id:'trust', label:'Trust', color:'#4CAF50', light:'#E8F5E9',
+    secondary:[
+      {id:'admiration',label:'Admiration', tertiary:['Reverence','Awe','Respect']},
+      {id:'acceptance',label:'Acceptance', tertiary:['Belonging','Included','Safe']},
+      {id:'confident',label:'Confident', tertiary:['Secure','Assured','Faithful']},
+      {id:'compassion',label:'Compassion', tertiary:['Caring','Empathetic','Gentle']},
+      {id:'peaceful',label:'Peaceful', tertiary:['Calm','Serene','At ease']}
+    ]
+  },
+  {
+    id:'fear', label:'Fear', color:'#9C6EAD', light:'#F3EEF7',
+    secondary:[
+      {id:'terror',label:'Terror', tertiary:['Panic','Dread','Horror']},
+      {id:'anxiety',label:'Anxiety', tertiary:['Nervous','Apprehensive','Worried']},
+      {id:'insecure',label:'Insecure', tertiary:['Vulnerable','Helpless','Weak']},
+      {id:'rejected',label:'Rejected', tertiary:['Excluded','Isolated','Unloved']},
+      {id:'inadequate',label:'Inadequate', tertiary:['Inferior','Worthless','Ashamed']}
+    ]
+  },
+  {
+    id:'surprise', label:'Surprise', color:'#2196F3', light:'#E3F2FD',
+    secondary:[
+      {id:'amazed',label:'Amazed', tertiary:['Astonished','Stunned','Awe-struck']},
+      {id:'confused',label:'Confused', tertiary:['Unsure','Bewildered','Disoriented']},
+      {id:'excited',label:'Excited', tertiary:['Eager','Curious','Alert']},
+      {id:'moved',label:'Moved', tertiary:['Touched','Speechless','Overwhelmed']}
+    ]
+  },
+  {
+    id:'sadness', label:'Sadness', color:'#5C7AEA', light:'#EEF1FD',
+    secondary:[
+      {id:'grief',label:'Grief', tertiary:['Anguish','Heartbroken','Despair']},
+      {id:'lonely',label:'Lonely', tertiary:['Abandoned','Isolated','Disconnected']},
+      {id:'hopeless',label:'Hopeless', tertiary:['Powerless','Lost','Empty']},
+      {id:'guilty',label:'Guilty', tertiary:['Remorseful','Regretful','Ashamed']},
+      {id:'depressed',label:'Depressed', tertiary:['Heavy','Numb','Withdrawn']}
+    ]
+  },
+  {
+    id:'disgust', label:'Disgust', color:'#795548', light:'#EFEBE9',
+    secondary:[
+      {id:'contempt',label:'Contempt', tertiary:['Disdain','Scornful','Dismissive']},
+      {id:'revulsion',label:'Revulsion', tertiary:['Repulsed','Sickened','Nauseated']},
+      {id:'judgmental',label:'Judgmental', tertiary:['Critical','Disapproving','Intolerant']},
+      {id:'reluctant',label:'Reluctant', tertiary:['Hesitant','Resistant','Avoidant']}
+    ]
+  },
+  {
+    id:'anger', label:'Anger', color:'#E53935', light:'#FFEBEE',
+    secondary:[
+      {id:'rage',label:'Rage', tertiary:['Furious','Explosive','Violent']},
+      {id:'frustrated',label:'Frustrated', tertiary:['Annoyed','Irritated','Impatient']},
+      {id:'bitter',label:'Bitter', tertiary:['Resentful','Hostile','Envious']},
+      {id:'betrayed',label:'Betrayed', tertiary:['Cheated','Let down','Used']},
+      {id:'violated',label:'Violated', tertiary:['Provoked','Threatened','Humiliated']}
+    ]
+  },
+  {
+    id:'anticipation', label:'Anticipation', color:'#FF9800', light:'#FFF3E0',
+    secondary:[
+      {id:'hopeful',label:'Hopeful', tertiary:['Optimistic','Expectant','Wishing']},
+      {id:'interested',label:'Interested', tertiary:['Engaged','Curious','Alert']},
+      {id:'vigilant',label:'Vigilant', tertiary:['Watchful','Alert','Prepared']},
+      {id:'anxious_ant',label:'Anxious', tertiary:['On edge','Tense','Restless']}
+    ]
+  }
+];
+
+let currentLayer = 0;
+let selectedFeelings = [];
+let bodyRegions = {}; // region -> {type, color}
+let activeSensationType = {type:'tension', color:'#E53935'};
+
+// ============================================================
+// WHEEL DRAWING
+// ============================================================
+function drawWheel() {
+  const svg = document.getElementById('wheel-svg');
+  svg.innerHTML = '';
+  const n = EMOTIONS.length;
+  const coreR = 75;
+  const secR = 160;
+  const terR = 245;
+
+  EMOTIONS.forEach((em, i) => {
+    const startAngle = (i / n) * 2 * Math.PI - Math.PI / 2;
+    const endAngle = ((i + 1) / n) * 2 * Math.PI - Math.PI / 2;
+
+    // Core segment
+    if (currentLayer >= 0) {
+      const path = makeSector(0, 0, 0, coreR, startAngle, endAngle);
+      const el = document.createElementNS('http://www.w3.org/2000/svg','path');
+      el.setAttribute('d', path);
+      el.setAttribute('fill', em.color);
+      el.setAttribute('stroke', '#fff');
+      el.setAttribute('stroke-width', '2');
+      el.style.cursor = 'pointer';
+      el.style.transition = 'opacity 0.1s';
+      el.addEventListener('mouseenter', e => { el.style.opacity='0.8'; showTooltip(e, em.label); });
+      el.addEventListener('mouseleave', () => { el.style.opacity='1'; hideTooltip(); });
+      el.addEventListener('click', () => selectFeeling(em.id, em.label, em.color, 'core'));
+      svg.appendChild(el);
+
+      // Core label
+      const midA = (startAngle + endAngle) / 2;
+      const lx = Math.cos(midA) * 44;
+      const ly = Math.sin(midA) * 44;
+      const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      txt.setAttribute('x', lx); txt.setAttribute('y', ly);
+      txt.setAttribute('text-anchor','middle');
+      txt.setAttribute('dominant-baseline','central');
+      txt.setAttribute('font-size', '10');
+      txt.setAttribute('font-weight', '600');
+      txt.setAttribute('fill','#fff');
+      txt.setAttribute('pointer-events','none');
+      txt.textContent = em.label;
+      svg.appendChild(txt);
+    }
+
+    // Secondary segments
+    if (currentLayer >= 1) {
+      const nSec = em.secondary.length;
+      em.secondary.forEach((sec, si) => {
+        const sStart = startAngle + (si / nSec) * (endAngle - startAngle);
+        const sEnd = startAngle + ((si + 1) / nSec) * (endAngle - startAngle);
+        const path = makeSector(0, 0, coreR + 2, secR, sStart, sEnd);
+        const el = document.createElementNS('http://www.w3.org/2000/svg','path');
+        el.setAttribute('d', path);
+        el.setAttribute('fill', blendColor(em.color, '#fff', 0.35));
+        el.setAttribute('stroke', '#fff');
+        el.setAttribute('stroke-width', '1.5');
+        el.style.cursor = 'pointer';
+        el.style.transition = 'opacity 0.1s';
+        el.addEventListener('mouseenter', e => { el.style.opacity='0.75'; showTooltip(e, sec.label); });
+        el.addEventListener('mouseleave', () => { el.style.opacity='1'; hideTooltip(); });
+        el.addEventListener('click', () => selectFeeling(sec.id, sec.label, em.color, em.label));
+        svg.appendChild(el);
+
+        const midA = (sStart + sEnd) / 2;
+        const r = (coreR + 2 + secR) / 2;
+        const lx = Math.cos(midA) * r;
+        const ly = Math.sin(midA) * r;
+        const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+        txt.setAttribute('x', lx); txt.setAttribute('y', ly);
+        txt.setAttribute('text-anchor','middle');
+        txt.setAttribute('dominant-baseline','central');
+        txt.setAttribute('font-size', '8.5');
+        txt.setAttribute('font-weight', '500');
+        txt.setAttribute('fill', darkenColor(em.color, 0.4));
+        txt.setAttribute('pointer-events','none');
+        txt.setAttribute('transform', `rotate(${(midA * 180 / Math.PI) + 90}, ${lx}, ${ly})`);
+        txt.textContent = sec.label;
+        svg.appendChild(txt);
+      });
+    }
+
+    // Tertiary segments
+    if (currentLayer >= 2) {
+      const nSec = em.secondary.length;
+      em.secondary.forEach((sec, si) => {
+        const sStart = startAngle + (si / nSec) * (endAngle - startAngle);
+        const sEnd = startAngle + ((si + 1) / nSec) * (endAngle - startAngle);
+        const nTer = sec.tertiary.length;
+        sec.tertiary.forEach((ter, ti) => {
+          const tStart = sStart + (ti / nTer) * (sEnd - sStart);
+          const tEnd = sStart + ((ti + 1) / nTer) * (sEnd - sStart);
+          const path = makeSector(0, 0, secR + 2, terR, tStart, tEnd);
+          const el = document.createElementNS('http://www.w3.org/2000/svg','path');
+          el.setAttribute('d', path);
+          el.setAttribute('fill', blendColor(em.color, '#fff', 0.6));
+          el.setAttribute('stroke', '#fff');
+          el.setAttribute('stroke-width', '1');
+          el.style.cursor = 'pointer';
+          el.style.transition = 'opacity 0.1s';
+          el.addEventListener('mouseenter', e => { el.style.opacity='0.7'; showTooltip(e, ter); });
+          el.addEventListener('mouseleave', () => { el.style.opacity='1'; hideTooltip(); });
+          el.addEventListener('click', () => selectFeeling(ter, ter, em.color, sec.label));
+          svg.appendChild(el);
+
+          const midA = (tStart + tEnd) / 2;
+          const r = (secR + 2 + terR) / 2;
+          const lx = Math.cos(midA) * r;
+          const ly = Math.sin(midA) * r;
+          const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+          txt.setAttribute('x', lx); txt.setAttribute('y', ly);
+          txt.setAttribute('text-anchor','middle');
+          txt.setAttribute('dominant-baseline','central');
+          txt.setAttribute('font-size', '7.5');
+          txt.setAttribute('fill', darkenColor(em.color, 0.5));
+          txt.setAttribute('pointer-events','none');
+          txt.setAttribute('transform', `rotate(${(midA * 180 / Math.PI) + 90}, ${lx}, ${ly})`);
+          txt.textContent = ter;
+          svg.appendChild(txt);
+        });
+      });
+    }
+  });
+
+  // Centre circle
+  const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  c.setAttribute('cx','0'); c.setAttribute('cy','0'); c.setAttribute('r','22');
+  c.setAttribute('fill','#fff'); c.setAttribute('stroke','#ddd'); c.setAttribute('stroke-width','1');
+  svg.appendChild(c);
+  const ct = document.createElementNS('http://www.w3.org/2000/svg','text');
+  ct.setAttribute('x','0'); ct.setAttribute('y','0');
+  ct.setAttribute('text-anchor','middle'); ct.setAttribute('dominant-baseline','central');
+  ct.setAttribute('font-size','8'); ct.setAttribute('fill','#aaa'); ct.setAttribute('pointer-events','none');
+  ct.textContent = 'How I feel';
+  svg.appendChild(ct);
+
+  // Highlight selected
+  highlightSelected();
+}
+
+function makeSector(cx, cy, r1, r2, startA, endA) {
+  const x1 = cx + r1 * Math.cos(startA), y1 = cy + r1 * Math.sin(startA);
+  const x2 = cx + r2 * Math.cos(startA), y2 = cy + r2 * Math.sin(startA);
+  const x3 = cx + r2 * Math.cos(endA),   y3 = cy + r2 * Math.sin(endA);
+  const x4 = cx + r1 * Math.cos(endA),   y4 = cy + r1 * Math.sin(endA);
+  const large = (endA - startA) > Math.PI ? 1 : 0;
+  if (r1 === 0) {
+    return `M ${cx} ${cy} L ${x3} ${y3} A ${r2} ${r2} 0 ${large} 0 ${x2} ${y2} Z`;
+  }
+  return `M ${x1} ${y1} L ${x2} ${y2} A ${r2} ${r2} 0 ${large} 1 ${x3} ${y3} L ${x4} ${y4} A ${r1} ${r1} 0 ${large} 0 ${x1} ${y1} Z`;
+}
+
+function blendColor(hex, target, t) {
+  const r1=parseInt(hex.slice(1,3),16), g1=parseInt(hex.slice(3,5),16), b1=parseInt(hex.slice(5,7),16);
+  const r2=parseInt(target.slice(1,3),16), g2=parseInt(target.slice(3,5),16), b2=parseInt(target.slice(5,7),16);
+  const r=Math.round(r1+(r2-r1)*t), g=Math.round(g1+(g2-g1)*t), b=Math.round(b1+(b2-b1)*t);
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+}
+
+function darkenColor(hex, amt) { return blendColor(hex,'#000000',amt); }
+
+function highlightSelected() {
+  // Visual — redraw is cheap enough
+}
+
+// ============================================================
+// FEELING SELECTION
+// ============================================================
+function selectFeeling(id, label, color, core) {
+  const existing = selectedFeelings.find(f => f.id === id);
+  if (existing) {
+    selectedFeelings = selectedFeelings.filter(f => f.id !== id);
+  } else {
+    selectedFeelings.push({ id, label, color, core, intensity: 5 });
+  }
+  renderSelectionList();
+}
+
+function renderSelectionList() {
+  const list = document.getElementById('selection-list');
+  const empty = document.getElementById('sel-empty');
+  if (selectedFeelings.length === 0) {
+    list.innerHTML = '<div class="selection-empty" id="sel-empty">Tap any segment on the feelings wheel to begin.<br>You can select multiple feelings.</div>';
+    return;
+  }
+  list.innerHTML = selectedFeelings.map(f => `
+    <div class="sel-item">
+      <div class="sel-dot" style="background:${f.color}"></div>
+      <div class="sel-info">
+        <div class="sel-name">${f.label}</div>
+        <div class="sel-core" style="color:${f.color}">${f.core !== 'core' ? f.core : 'Core emotion'}</div>
+        <div class="intensity-row">
+          <span class="intensity-label">Intensity:</span>
+          ${[1,2,3,4,5,6,7,8,9,10].map(n => `
+            <div class="intensity-pip"
+              style="background:${n <= f.intensity ? f.color : 'transparent'};border-color:${f.color}"
+              onclick="setIntensity('${f.id}',${n})"></div>
+          `).join('')}
+          <span class="intensity-label" style="margin-left:2px">${f.intensity}/10</span>
+        </div>
+      </div>
+      <button class="sel-remove" onclick="selectFeeling('${f.id}','${f.label}','${f.color}','${f.core}')">×</button>
+    </div>
+  `).join('');
+}
+
+function setIntensity(id, val) {
+  const f = selectedFeelings.find(f => f.id === id);
+  if (f) { f.intensity = val; renderSelectionList(); }
+}
+
+// ============================================================
+// BODY MAP
+// ============================================================
+function selectSensationType(el) {
+  document.querySelectorAll('#sensation-type-chips .sensation-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  activeSensationType = { type: el.dataset.type, color: el.dataset.color };
+}
+
+function toggleBodyRegion(region, el) {
+  if (bodyRegions[region] && bodyRegions[region].type === activeSensationType.type) {
+    delete bodyRegions[region];
+    el.setAttribute('fill', '#EDE8E0');
+    el.setAttribute('stroke', '#C4BFB5');
+  } else {
+    bodyRegions[region] = { ...activeSensationType };
+    el.setAttribute('fill', activeSensationType.color + '55');
+    el.setAttribute('stroke', activeSensationType.color);
+  }
+  renderBodySelected();
+}
+
+function renderBodySelected() {
+  const wrap = document.getElementById('body-selected-list');
+  const keys = Object.keys(bodyRegions);
+  if (keys.length === 0) {
+    wrap.innerHTML = '<span style="font-size:11px;color:var(--text3)">None yet — tap body map</span>';
+    return;
+  }
+  const labels = {
+    'head':'Head','neck':'Neck','chest':'Chest','abdomen':'Abdomen',
+    'pelvis':'Pelvis','left-arm':'L arm','right-arm':'R arm',
+    'left-hand':'L hand','right-hand':'R hand','left-leg':'L leg',
+    'right-leg':'R leg','left-foot':'L foot','right-foot':'R foot',
+    'left-shoulder':'L shoulder','right-shoulder':'R shoulder'
+  };
+  wrap.innerHTML = keys.map(k => {
+    const r = bodyRegions[k];
+    return `<div class="sensation-chip selected" style="border-color:${r.color};color:${r.color};background:${r.color}22">${labels[k]||k}</div>`;
+  }).join('');
+}
+
+// ============================================================
+// UTILITY
+// ============================================================
+function toggleChip(el) { el.classList.toggle('selected'); }
+
+function setLayer(n, btn) {
+  currentLayer = n;
+  document.querySelectorAll('.layer-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  drawWheel();
+}
+
+function showTooltip(e, text) {
+  const t = document.getElementById('tooltip');
+  t.textContent = text;
+  t.style.left = (e.clientX + 12) + 'px';
+  t.style.top = (e.clientY - 28) + 'px';
+  t.classList.add('visible');
+}
+function hideTooltip() { document.getElementById('tooltip').classList.remove('visible'); }
+
+function generateSnapshot() {
+  const feelings = selectedFeelings.map(f => `${f.label} (${f.core !== 'core' ? f.core + ' > ' : ''}intensity ${f.intensity}/10)`).join(', ');
+  const bodySel = Object.entries(bodyRegions).map(([k,v]) => `${k}: ${v.type}`).join(', ');
+  const chips = [...document.querySelectorAll('#somatic-chips .sensation-chip.selected')].map(c=>c.textContent).join(', ');
+  const distress = document.getElementById('distress-slider').value;
+  const note = document.getElementById('clinical-note').value;
+  const now = new Date().toLocaleString('en-IN', {dateStyle:'medium', timeStyle:'short'});
+
+  const text = [
+    `AATMIYA HOSPITAL — EMOTIONAL STATE SNAPSHOT`,
+    `Date/Time: ${now}`,
+    ``,
+    `FEELINGS REPORTED:`,
+    feelings || 'None selected',
+    ``,
+    `BODY MAP:`,
+    bodySel || 'No regions marked',
+    ``,
+    `SOMATIC DESCRIPTORS:`,
+    chips || 'None selected',
+    ``,
+    `OVERALL DISTRESS: ${distress}/10`,
+    ``,
+    `CLINICAL NOTE:`,
+    note || '—'
+  ].join('\n');
+
+  const snap = document.getElementById('snapshot');
+  snap.textContent = text;
+  snap.classList.add('visible');
+  navigator.clipboard?.writeText(text);
+}
+
+function resetAll() {
+  selectedFeelings = [];
+  bodyRegions = {};
+  document.querySelectorAll('.body-region').forEach(el => {
+    el.setAttribute('fill','#EDE8E0');
+    el.setAttribute('stroke','#C4BFB5');
+  });
+  document.querySelectorAll('.sensation-chip.selected').forEach(el => el.classList.remove('selected'));
+  document.getElementById('sensation-type-chips').querySelector('[data-type="tension"]').classList.add('selected');
+  activeSensationType = {type:'tension',color:'#E53935'};
+  document.getElementById('distress-slider').value = 5;
+  document.getElementById('distress-val').textContent = '5';
+  document.getElementById('clinical-note').value = '';
+  document.getElementById('snapshot').classList.remove('visible');
+  renderSelectionList();
+  renderBodySelected();
+}
+
+// Init
+drawWheel();
+</script>
+</body>
+</html>

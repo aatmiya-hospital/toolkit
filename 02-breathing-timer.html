@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Breathing Timer — Aatmiya Hospital</title>
+<style>
+  :root {
+    --bg: #F0EDF8;
+    --surface: #FFFFFF;
+    --surface2: #F5F3FA;
+    --border: #DDD9EE;
+    --text: #1A1825;
+    --text2: #6B667A;
+    --text3: #A09BB0;
+    --accent: #5C3D9E;
+    --accent-light: #EDE8FB;
+    --accent2: #2D6E5E;
+    --radius: 14px;
+    --shadow: 0 2px 16px rgba(92,61,158,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    background: var(--accent);
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #fff;
+  }
+  .header-title { font-size: 16px; font-weight: 600; }
+  .header-sub { font-size: 11px; opacity: 0.7; margin-top: 1px; }
+
+  .content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  @media (max-width: 720px) {
+    .content { grid-template-columns: 1fr; }
+  }
+
+  /* Pattern selector */
+  .panel {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .panel-head {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel-head-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+  .pattern-list { padding: 10px; }
+  .pattern-item {
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    border: 1.5px solid transparent;
+    transition: all 0.15s;
+    background: var(--surface2);
+  }
+  .pattern-item:hover { border-color: var(--border); background: #fff; }
+  .pattern-item.active { border-color: var(--accent); background: var(--accent-light); }
+  .pattern-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .pattern-timing { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .pattern-use { font-size: 10px; color: var(--text3); margin-top: 2px; font-style: italic; }
+  .pattern-badge {
+    display: inline-block;
+    font-size: 9px; font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 20px;
+    margin-top: 3px;
+  }
+
+  /* Main pacer */
+  .pacer-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 24px;
+    gap: 24px;
+  }
+
+  .pacer-title { font-size: 22px; font-weight: 600; color: var(--text); text-align: center; }
+  .pacer-subtitle { font-size: 13px; color: var(--text2); text-align: center; margin-top: 4px; }
+
+  /* Circle pacer */
+  .circle-wrap {
+    position: relative;
+    width: 260px; height: 260px;
+    flex-shrink: 0;
+  }
+  #pacer-svg { width: 100%; height: 100%; }
+
+  .phase-label {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+  }
+  .phase-word {
+    font-size: 22px; font-weight: 700;
+    color: var(--accent);
+    display: block;
+    transition: color 0.3s;
+  }
+  .phase-count {
+    font-size: 40px; font-weight: 800;
+    color: var(--text);
+    display: block;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .phase-cycle {
+    font-size: 12px; color: var(--text3);
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* Controls */
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center; }
+  .btn-play {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 22px;
+    transition: background 0.15s;
+    box-shadow: 0 4px 16px rgba(92,61,158,0.3);
+  }
+  .btn-play:hover { background: #4a2f80; }
+  .btn-reset {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2);
+    font-size: 18px;
+    transition: all 0.15s;
+  }
+  .btn-reset:hover { background: var(--border); }
+
+  .cycle-counter {
+    text-align: center;
+    font-size: 13px; color: var(--text2);
+  }
+  .cycle-dots { display: flex; gap: 6px; justify-content: center; margin-top: 6px; flex-wrap: wrap; }
+  .cycle-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .cycle-dot.done { background: var(--accent); }
+
+  /* Info card */
+  .info-card {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    width: 100%;
+    max-width: 420px;
+  }
+  .info-card-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .phase-bar-wrap { display: flex; gap: 4px; margin-bottom: 6px; }
+  .phase-bar-item {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 3px;
+  }
+  .phase-bar-track {
+    width: 100%; height: 6px;
+    border-radius: 3px;
+    transition: background 0.3s;
+  }
+  .phase-bar-label { font-size: 9px; color: var(--text3); text-align: center; }
+
+  .use-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+  /* Session stats */
+  .stats-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; width: 100%; max-width: 420px; }
+  .stat-box {
+    flex: 1; min-width: 80px;
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .stat-val { font-size: 20px; font-weight: 700; color: var(--accent); }
+  .stat-lbl { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+  /* Cycles input */
+  .cycle-input-wrap { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
+  .cycle-input {
+    width: 50px; padding: 4px 8px;
+    border-radius: 8px; border: 1px solid var(--border);
+    font-size: 13px; font-weight: 600; text-align: center;
+    background: var(--surface2); color: var(--text);
+    font-family: inherit;
+  }
+  .cycle-input:focus { outline: none; border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">A</div>
+    <div>
+      <div class="header-title">Breathing Timer</div>
+      <div class="header-sub">Aatmiya Hospital · Clinical Tool 02</div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Pattern list -->
+  <div class="panel">
+    <div class="panel-head"><div class="panel-head-dot"></div> Choose pattern</div>
+    <div class="pattern-list" id="pattern-list"></div>
+  </div>
+
+  <!-- Pacer -->
+  <div class="panel">
+    <div class="pacer-panel">
+      <div>
+        <div class="pacer-title" id="pacer-title">Box Breathing</div>
+        <div class="pacer-subtitle" id="pacer-subtitle">Equal ratio · 4-4-4-4</div>
+      </div>
+
+      <div class="circle-wrap">
+        <svg id="pacer-svg" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="130" cy="130" r="110" fill="none" stroke="#EDE8FB" stroke-width="12"/>
+          <circle id="progress-ring" cx="130" cy="130" r="110" fill="none"
+            stroke="#5C3D9E" stroke-width="12" stroke-linecap="round"
+            stroke-dasharray="691.15" stroke-dashoffset="691.15"
+            transform="rotate(-90 130 130)"
+            style="transition: stroke-dashoffset 0.1s linear, stroke 0.4s"/>
+          <circle id="breath-circle" cx="130" cy="130" r="72"
+            fill="#EDE8FB" style="transition: r 0.1s linear, fill 0.4s"/>
+        </svg>
+        <div class="phase-label">
+          <span class="phase-word" id="phase-word">Ready</span>
+          <span class="phase-count" id="phase-count">—</span>
+          <span class="phase-cycle" id="phase-cycle">press play to begin</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn-reset" id="reset-btn" onclick="resetTimer()" title="Reset">↺</button>
+        <button class="btn-play" id="play-btn" onclick="togglePlay()">▶</button>
+        <div class="cycle-input-wrap">
+          <span>Cycles:</span>
+          <input class="cycle-input" type="number" id="cycle-input" value="6" min="1" max="30"
+            onchange="updateTargetCycles(this.value)">
+        </div>
+      </div>
+
+      <div class="cycle-counter">
+        <span id="cycle-text">0 of 6 cycles</span>
+        <div class="cycle-dots" id="cycle-dots"></div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-val" id="stat-time">0:00</div><div class="stat-lbl">Time elapsed</div></div>
+        <div class="stat-box"><div class="stat-val" id="stat-cycles">0</div><div class="stat-lbl">Cycles done</div></div>
+        <div class="stat-box"><div class="stat-val" id="stat-breaths">0</div><div class="stat-lbl">Breaths</div></div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">Phase guide</div>
+        <div class="phase-bar-wrap" id="phase-bars"></div>
+        <div class="use-text" id="use-text"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// PATTERNS
+// ============================================================
+const PATTERNS = [
+  {
+    id:'box', name:'Box breathing', ratio:'4-4-4-4',
+    phases:[{l:'Inhale',s:4,c:'#5C3D9E'},{l:'Hold',s:4,c:'#8B63CE'},{l:'Exhale',s:4,c:'#2D6E5E'},{l:'Hold',s:4,c:'#4A9E8B'}],
+    use:'Acute stress, grounding, attention regulation. Widely used in anxiety + PTSD.',
+    badge:'Anxiety · PTSD', badgeColor:'#5C3D9E', defaultCycles:6
+  },
+  {
+    id:'478', name:'4-7-8 breathing', ratio:'4-7-8',
+    phases:[{l:'Inhale',s:4,c:'#5C3D9E'},{l:'Hold',s:7,c:'#8B63CE'},{l:'Exhale',s:8,c:'#2D6E5E'}],
+    use:'Sleep onset, parasympathetic activation, acute craving suppression.',
+    badge:'Sleep · Cravings', badgeColor:'#2D6E5E', defaultCycles:4
+  },
+  {
+    id:'physio', name:'Physiological sigh', ratio:'2-1-8',
+    phases:[{l:'Inhale',s:2,c:'#5C3D9E'},{l:'2nd inhale',s:1,c:'#7B55B0'},{l:'Long exhale',s:8,c:'#2D6E5E'}],
+    use:'Fastest CO₂ clearance. Single or few cycles for acute panic or overwhelm.',
+    badge:'Panic · Acute', badgeColor:'#E53935', defaultCycles:3
+  },
+  {
+    id:'coherent', name:'Coherent breathing (6/min)', ratio:'5-5',
+    phases:[{l:'Inhale',s:5,c:'#5C3D9E'},{l:'Exhale',s:5,c:'#2D6E5E'}],
+    use:'HRV maximisation, autonomic balance, sustained calm. De-addiction adjunct.',
+    badge:'HRV · De-addiction', badgeColor:'#FF9800', defaultCycles:12
+  },
+  {
+    id:'resonant', name:'Resonant (5.5/min)', ratio:'5.5-5.5',
+    phases:[{l:'Inhale',s:5.5,c:'#5C3D9E'},{l:'Exhale',s:5.5,c:'#2D6E5E'}],
+    use:'Research-backed resonance frequency. Ideal for biofeedback-assisted sessions.',
+    badge:'Biofeedback', badgeColor:'#9C6EAD', defaultCycles:10
+  },
+  {
+    id:'long-exhale', name:'Long exhale (4-8)', ratio:'4-8',
+    phases:[{l:'Inhale',s:4,c:'#5C3D9E'},{l:'Exhale',s:8,c:'#2D6E5E'}],
+    use:'Parasympathetic dominance. Depression, burnout, chronic stress.',
+    badge:'Depression · Burnout', badgeColor:'#795548', defaultCycles:8
+  },
+  {
+    id:'22', name:'Equal breathing (2-2)', ratio:'2-2',
+    phases:[{l:'Inhale',s:2,c:'#5C3D9E'},{l:'Exhale',s:2,c:'#2D6E5E'}],
+    use:'Children, beginner patients, low tolerance for breath holding. HSM warm-up.',
+    badge:'Paediatric · Beginner', badgeColor:'#4CAF50', defaultCycles:10
+  },
+  {
+    id:'diaphragmatic', name:'Diaphragmatic slow', ratio:'4-0-6-2',
+    phases:[{l:'Inhale',s:4,c:'#5C3D9E'},{l:'Pause',s:0.5,c:'#9E9B96'},{l:'Exhale',s:6,c:'#2D6E5E'},{l:'Pause',s:2,c:'#9E9B96'}],
+    use:'Geriatric, COPD interface, somatic work. Slow and accessible.',
+    badge:'Geriatric · Somatic', badgeColor:'#607D8B', defaultCycles:8
+  },
+  {
+    id:'tipp', name:'TIPP cold water (4-6)', ratio:'4-6',
+    phases:[{l:'Inhale',s:4,c:'#2196F3'},{l:'Slow exhale',s:6,c:'#0D47A1'}],
+    use:'DBT TIPP skill component. Pairs with cold water exposure for acute crisis.',
+    badge:'DBT · Crisis', badgeColor:'#2196F3', defaultCycles:5
+  },
+];
+
+let activePattern = PATTERNS[0];
+let isPlaying = false;
+let currentPhaseIdx = 0;
+let phaseSecondsLeft = 0;
+let cyclesDone = 0;
+let breathsDone = 0;
+let targetCycles = 6;
+let sessionSeconds = 0;
+let animFrame = null;
+let lastTick = null;
+let phaseProgress = 0;
+let phaseDuration = 0;
+
+// ============================================================
+// RENDER PATTERN LIST
+// ============================================================
+function renderPatternList() {
+  const list = document.getElementById('pattern-list');
+  list.innerHTML = PATTERNS.map((p,i) => `
+    <div class="pattern-item${p.id===activePattern.id?' active':''}" onclick="selectPattern('${p.id}')">
+      <div class="pattern-name">${p.name}</div>
+      <div class="pattern-timing">${p.phases.map(ph=>ph.l+' '+ph.s+'s').join(' · ')}</div>
+      <div><span class="pattern-badge" style="background:${p.badgeColor}22;color:${p.badgeColor}">${p.badge}</span></div>
+    </div>
+  `).join('');
+}
+
+function selectPattern(id) {
+  if (isPlaying) stopTimer();
+  activePattern = PATTERNS.find(p => p.id === id);
+  targetCycles = activePattern.defaultCycles;
+  document.getElementById('cycle-input').value = targetCycles;
+  resetTimer();
+  renderPatternList();
+  renderInfo();
+  document.getElementById('pacer-title').textContent = activePattern.name;
+  document.getElementById('pacer-subtitle').textContent = 'Ratio · ' + activePattern.ratio;
+}
+
+function renderInfo() {
+  const bars = document.getElementById('phase-bars');
+  bars.innerHTML = activePattern.phases.map((ph,i) => `
+    <div class="phase-bar-item">
+      <div class="phase-bar-track" id="bar-${i}" style="background:${ph.c}33"></div>
+      <div class="phase-bar-label">${ph.l}<br>${ph.s}s</div>
+    </div>
+  `).join('');
+  document.getElementById('use-text').textContent = activePattern.use;
+}
+
+// ============================================================
+// TIMER LOGIC
+// ============================================================
+function togglePlay() {
+  if (isPlaying) { pauseTimer(); } else { startTimer(); }
+}
+
+function startTimer() {
+  isPlaying = true;
+  document.getElementById('play-btn').textContent = '⏸';
+  if (phaseSecondsLeft === 0 || phaseSecondsLeft === activePattern.phases[currentPhaseIdx].s) {
+    phaseSecondsLeft = activePattern.phases[currentPhaseIdx].s;
+    phaseDuration = activePattern.phases[currentPhaseIdx].s;
+    phaseProgress = 0;
+  }
+  lastTick = performance.now();
+  animFrame = requestAnimationFrame(tick);
+}
+
+function pauseTimer() {
+  isPlaying = false;
+  document.getElementById('play-btn').textContent = '▶';
+  if (animFrame) cancelAnimationFrame(animFrame);
+}
+
+function stopTimer() { pauseTimer(); }
+
+function resetTimer() {
+  stopTimer();
+  currentPhaseIdx = 0;
+  phaseSecondsLeft = activePattern.phases[0].s;
+  phaseDuration = activePattern.phases[0].s;
+  phaseProgress = 0;
+  cyclesDone = 0;
+  breathsDone = 0;
+  sessionSeconds = 0;
+  document.getElementById('play-btn').textContent = '▶';
+  updateDisplay();
+  updateCycleDots();
+  updateStats();
+  document.getElementById('phase-word').textContent = 'Ready';
+  document.getElementById('phase-count').textContent = '—';
+  document.getElementById('phase-cycle').textContent = 'press play to begin';
+  setCircle(0, activePattern.phases[0].c, false);
+}
+
+let elapsed = 0;
+function tick(now) {
+  if (!lastTick) lastTick = now;
+  const dt = (now - lastTick) / 1000;
+  lastTick = now;
+  elapsed += dt;
+  sessionSeconds += dt;
+
+  phaseProgress += dt;
+  if (phaseProgress >= phaseDuration) {
+    // Advance phase
+    const overshoot = phaseProgress - phaseDuration;
+    currentPhaseIdx++;
+    if (currentPhaseIdx >= activePattern.phases.length) {
+      currentPhaseIdx = 0;
+      cyclesDone++;
+      breathsDone++;
+      updateCycleDots();
+      if (cyclesDone >= targetCycles) {
+        // Done
+        phaseProgress = 0;
+        phaseSecondsLeft = 0;
+        updateDisplay();
+        updateStats();
+        document.getElementById('phase-word').textContent = 'Done';
+        document.getElementById('phase-count').textContent = '✓';
+        document.getElementById('phase-cycle').textContent = `${cyclesDone} cycles complete`;
+        document.getElementById('play-btn').textContent = '▶';
+        isPlaying = false;
+        return;
+      }
+    }
+    phaseDuration = activePattern.phases[currentPhaseIdx].s;
+    phaseProgress = overshoot;
+  }
+
+  phaseSecondsLeft = Math.max(0, phaseDuration - phaseProgress);
+  updateDisplay();
+  updateStats();
+
+  if (isPlaying) animFrame = requestAnimationFrame(tick);
+}
+
+function updateDisplay() {
+  const ph = activePattern.phases[currentPhaseIdx];
+  document.getElementById('phase-word').textContent = ph.l;
+  document.getElementById('phase-count').textContent = Math.ceil(phaseSecondsLeft);
+  document.getElementById('phase-cycle').textContent = `Cycle ${cyclesDone + 1} of ${targetCycles}`;
+  const progress = phaseProgress / phaseDuration;
+  setCircle(progress, ph.c, ph.l.toLowerCase().includes('inhale') || ph.l.includes('2nd'));
+  highlightPhaseBar();
+}
+
+function setCircle(progress, color, expanding) {
+  const circ = 2 * Math.PI * 110;
+  const offset = circ * (1 - progress);
+  const ring = document.getElementById('progress-ring');
+  ring.setAttribute('stroke-dashoffset', offset);
+  ring.setAttribute('stroke', color);
+
+  const circle = document.getElementById('breath-circle');
+  const minR = 52, maxR = 95;
+  const r = expanding
+    ? minR + (maxR - minR) * progress
+    : maxR - (maxR - minR) * progress;
+  circle.setAttribute('r', r);
+  circle.setAttribute('fill', color + '22');
+}
+
+function updateCycleDots() {
+  const dots = document.getElementById('cycle-dots');
+  dots.innerHTML = Array.from({length:targetCycles}, (_,i) =>
+    `<div class="cycle-dot${i < cyclesDone ? ' done' : ''}"></div>`
+  ).join('');
+  document.getElementById('cycle-text').textContent = `${cyclesDone} of ${targetCycles} cycles`;
+}
+
+function updateStats() {
+  const m = Math.floor(sessionSeconds / 60);
+  const s = Math.floor(sessionSeconds % 60);
+  document.getElementById('stat-time').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  document.getElementById('stat-cycles').textContent = cyclesDone;
+  document.getElementById('stat-breaths').textContent = breathsDone;
+}
+
+function highlightPhaseBar() {
+  activePattern.phases.forEach((ph, i) => {
+    const bar = document.getElementById('bar-' + i);
+    if (bar) {
+      bar.style.background = i === currentPhaseIdx ? ph.c : ph.c + '33';
+      bar.style.height = i === currentPhaseIdx ? '10px' : '6px';
+    }
+  });
+}
+
+function updateTargetCycles(v) {
+  targetCycles = Math.max(1, Math.min(30, parseInt(v)||6));
+  updateCycleDots();
+}
+
+// Init
+renderPatternList();
+renderInfo();
+updateCycleDots();
+updateStats();
+</script>
+</body>
+</html>

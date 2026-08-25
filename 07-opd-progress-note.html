@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPD Progress Note — Aatmiya Hospital</title>
+<style>
+  :root {
+    --bg:#F4F2EF;--surface:#FFF;--surface2:#EEEbE6;--border:#DDD9D1;
+    --text:#1A1714;--text2:#5A5450;--text3:#9A9690;
+    --accent:#5A3200;--accent-light:#FBF0E5;
+    --blue:#1A3D70;--blue-light:#E8EEF8;
+    --green:#1E5E32;--green-light:#E5F2E9;
+    --red:#7B1818;--red-light:#FBEBEB;
+    --radius:12px;--shadow:0 2px 12px rgba(90,50,0,.09);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .wrap{max-width:1100px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 360px;gap:16px}
+  @media(max-width:860px){.wrap{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:13px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:1px}
+  .pb{padding:14px 18px}
+  /* Form grid */
+  .fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:580px){.fg{grid-template-columns:1fr}}
+  .fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  @media(max-width:580px){.fg3{grid-template-columns:1fr}}
+  .fl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
+  .fi{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .fi:focus{outline:none;border-color:var(--accent);background:#fff}
+  .fi::placeholder{color:var(--text3);font-size:11px}
+  select.fi{cursor:pointer}
+  textarea.fi{resize:vertical;line-height:1.55}
+  .frow{margin-bottom:10px}
+  /* SOAP sections */
+  .soap-label{font-size:12px;font-weight:700;color:#fff;padding:4px 12px;border-radius:6px;margin-bottom:8px;display:inline-block}
+  /* Rx builder */
+  .rx-row{display:flex;gap:6px;margin-bottom:6px;align-items:center}
+  .rx-drug{flex:2;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .rx-drug:focus{outline:none;border-color:var(--accent);background:#fff}
+  .rx-dose{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .rx-dose:focus{outline:none;border-color:var(--accent);background:#fff}
+  .rx-freq{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);cursor:pointer}
+  .rx-rm{width:28px;height:28px;border-radius:6px;background:var(--red-light);border:1px solid var(--red);color:var(--red);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .add-rx{font-size:12px;color:var(--accent);cursor:pointer;border:none;background:none;font-family:inherit;font-weight:500;padding:4px 0;text-decoration:underline;text-underline-offset:2px}
+  /* Chips */
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+  .chip{padding:4px 10px;border-radius:20px;font-size:11px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .12s;user-select:none}
+  .chip:hover{border-color:var(--accent)}
+  .chip.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:500}
+  /* ICD search */
+  .icd-wrap{position:relative}
+  .icd-results{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;z-index:10;max-height:220px;overflow-y:auto;box-shadow:0 4px 20px rgba(0,0,0,.12);display:none}
+  .icd-item{padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--border);line-height:1.4}
+  .icd-item:last-child{border-bottom:none}
+  .icd-item:hover{background:var(--accent-light)}
+  .icd-code{font-size:10px;font-weight:700;color:var(--accent);margin-right:6px}
+  .icd-selected{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .icd-tag{background:var(--blue-light);color:var(--blue);border:1px solid #90B4D8;border-radius:6px;font-size:11px;padding:2px 8px;display:flex;align-items:center;gap:4px}
+  .icd-rm{cursor:pointer;font-size:12px;color:var(--blue);font-weight:700}
+  /* Output */
+  .note-out{background:var(--surface2);border-radius:8px;padding:14px;font-size:12px;line-height:1.8;color:var(--text);white-space:pre-wrap;font-family:'Courier New',monospace;display:none;border:1px solid var(--border)}
+  .note-out.visible{display:block}
+  .note-section-head{font-weight:700;color:var(--accent);font-family:'Segoe UI',sans-serif}
+  .act-row{display:flex;gap:8px;flex-wrap:wrap;padding:0 18px 14px}
+  .bp{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .bp:hover{background:#3e2200}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  /* MSE */
+  .mse-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:500px){.mse-grid{grid-template-columns:1fr}}
+  .mse-item{background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .mse-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:5px}
+  .mse-chips{display:flex;flex-wrap:wrap;gap:4px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">OPD Progress Note</div><div class="hs">Aatmiya Hospital · Clinical Tool 07</div></div>
+  </div>
+  <div class="ha">
+    <button class="bg" onclick="buildNote()">Build note</button>
+    <button class="bg" onclick="window.print()">Print</button>
+    <button class="bg" onclick="resetAll()">Reset</button>
+  </div>
+</div>
+
+<div class="wrap">
+<div>
+
+<!-- Patient header -->
+<div class="panel">
+  <div class="ph"><div class="phd" style="background:#5A3200"></div><div><div class="pht">Patient & visit</div></div></div>
+  <div class="pb">
+    <div class="fg">
+      <div><div class="fl">Patient code / initials</div><input class="fi" id="pat-id" placeholder="PT-2024-001"></div>
+      <div><div class="fl">Date</div><input class="fi" type="date" id="visit-date"></div>
+      <div><div class="fl">Visit type</div>
+        <select class="fi" id="visit-type">
+          <option>First OPD</option><option>Review</option><option>De-addiction review</option>
+          <option>Crisis / urgent</option><option>Psychotherapy session</option><option>Discharge planning</option>
+        </select>
+      </div>
+      <div><div class="fl">Session no.</div><input class="fi" id="session-num" placeholder="e.g. 3"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SUBJECTIVE -->
+<div class="panel">
+  <div class="ph"><span class="soap-label" style="background:#1A3D70">S</span><div><div class="pht">Subjective</div><div class="phs">Patient's account · presenting complaints · interval history</div></div></div>
+  <div class="pb" style="display:flex;flex-direction:column;gap:10px">
+    <div>
+      <div class="fl">Chief complaint / presenting concern</div>
+      <textarea class="fi" id="cc" rows="2" placeholder="Patient presents with…"></textarea>
+    </div>
+    <div>
+      <div class="fl">Interval history since last visit</div>
+      <textarea class="fi" id="interval" rows="3" placeholder="Sleep: … Appetite: … Medication compliance: … Substance use: … Stressors: …"></textarea>
+    </div>
+    <div>
+      <div class="fl">Mood in patient's words</div>
+      <input class="fi" id="mood-words" placeholder="e.g. 'Thoda better feel ho raha hoon' / 'Bahut tension hai'…">
+    </div>
+    <div>
+      <div class="fl">Sleep</div>
+      <div class="chips">
+        <div class="chip" onclick="toggleChip(this)">Normal</div>
+        <div class="chip" onclick="toggleChip(this)">Reduced</div>
+        <div class="chip" onclick="toggleChip(this)">Increased</div>
+        <div class="chip" onclick="toggleChip(this)">Insomnia initial</div>
+        <div class="chip" onclick="toggleChip(this)">Insomnia terminal</div>
+        <div class="chip" onclick="toggleChip(this)">Hypersomnia</div>
+        <div class="chip" onclick="toggleChip(this)">Nightmares</div>
+        <div class="chip" onclick="toggleChip(this)">Reversed cycle</div>
+      </div>
+    </div>
+    <div>
+      <div class="fl">Appetite</div>
+      <div class="chips">
+        <div class="chip" onclick="toggleChip(this)">Normal</div>
+        <div class="chip" onclick="toggleChip(this)">Reduced</div>
+        <div class="chip" onclick="toggleChip(this)">Increased</div>
+        <div class="chip" onclick="toggleChip(this)">Weight loss</div>
+        <div class="chip" onclick="toggleChip(this)">Weight gain</div>
+      </div>
+    </div>
+    <div>
+      <div class="fl">Medication adherence</div>
+      <div class="chips">
+        <div class="chip" onclick="toggleChip(this)">Full adherence</div>
+        <div class="chip" onclick="toggleChip(this)">Partial adherence</div>
+        <div class="chip" onclick="toggleChip(this)">Non-adherent</div>
+        <div class="chip" onclick="toggleChip(this)">Side effects reported</div>
+        <div class="chip" onclick="toggleChip(this)">Self-discontinued</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OBJECTIVE / MSE -->
+<div class="panel">
+  <div class="ph"><span class="soap-label" style="background:#1E5E32">O</span><div><div class="pht">Objective — MSE</div><div class="phs">Mental Status Examination findings</div></div></div>
+  <div class="pb">
+    <div class="mse-grid">
+      <div class="mse-item">
+        <div class="mse-label">Appearance</div>
+        <div class="mse-chips">
+          <div class="chip" onclick="toggleChip(this)">Well-kempt</div>
+          <div class="chip" onclick="toggleChip(this)">Dishevelled</div>
+          <div class="chip" onclick="toggleChip(this)">Appropriate dress</div>
+          <div class="chip" onclick="toggleChip(this)">Unkempt</div>
+          <div class="chip" onclick="toggleChip(this)">Agitated</div>
+          <div class="chip" onclick="toggleChip(this)">Withdrawn</div>
+        </div>
+      </div>
+      <div class="mse-item">
+        <div class="mse-label">Psychomotor</div>
+        <div class="mse-chips">
+          <div class="chip" onclick="toggleChip(this)">Normal</div>
+          <div class="chip" onclick="toggleChip(this)">Retarded</div>
+          <div class="chip" onclick="toggleChip(this)">Agitated</div>
+          <div class="chip" onclick="toggleChip(this)">Tremor</div>
+          <div class="chip" onclick="toggleChip(this)">EPS noted</div>
+          <div class="chip" onclick="toggleChip(this)">TD features</div>
+        </div>
+      </div>
+      <div class="mse-item">
+        <div class="mse-label">Speech</div>
+        <div class="mse-chips">
+          <div class="chip" onclick="toggleChip(this)">Normal rate/rhythm</div>
+          <div class="chip" onclick="toggleChip(this)">Pressured</div>
+          <div class="chip" onclick="toggleChip(this)">Reduced</div>
+          <div class="chip" onclick="toggleChip(this)">Monosyllabic</div>
+          <div class="chip" onclick="toggleChip(this)">Slurred</div>
+          <div class="chip" onclick="toggleChip(this)">Dysarthria</div>
+        </div>
+      </div>
+      <div class="mse-item">
+        <div class="mse-label">Mood (observed)</div>
+        <div class="mse-chips">
+          <div class="chip" onclick="toggleChip(this)">Euthymic</div>
+          <div class="chip" onclick="toggleChip(this)">Depressed</div>
+          <div class="chip" onclick="toggleChip(this)">Elevated</div>
+          <div class="chip" onclick="toggleChip(this)">Irritable</div>
+          <div class="chip" onclick="toggleChip(this)">Labile</div>
+          <div class="chip" onclick="toggleChip(this)">Anxious</div>
+          <div class="chip" onclick="toggleChip(this)">Dysphoric</div>
+        </div>
+      </div>
+      <div class="mse-item">
+        <div class="mse-label">Affect</div>
+        <div class="mse-chips">
+          <div class="chip" onclick="toggleChip(this)">Congruent</div>
+          <div class="chip" onclick="toggleChip(this)">Incongruent</div>
+          <div class="chip" onclick="toggleChip(this)">Flat</div>
+          <div class="chip" onclick="toggleChip(this)">Blunted</div>
+          <div class="chip" onclick="toggleChip(this)">Restricted</div>
+          <div class="chip" onclick="toggleChip(this)">Full range</div>
+        </div>
+      </div>
+      <div class="mse-item">
+        <div class="mse-label">Thought form</div>
+        <div class="mse-chips">
+          <div class="chip" onclick="toggleChip(this)">Normal</div>
+          <div class="chip" onclick="toggleChip(this)">Flight of ideas</div>
+          <div class="chip" onclick="toggleChip(this)">Loosening</div>
+          <div class="chip" onclick="toggleChip(this)">Perseveration</div>
+          <div class="chip" onclick="toggleChip(this)">Circumstantial</div>
+          <div class="chip" onclick="toggleChip(this)">Tangential</div>
+        </div>
+      </div>
+      <div class="mse-item">
+        <div class="mse-label">Thought content</div>
+        <div class="mse-chips">
+          <div class="chip" onclick="toggleChip(this)">No abnormality</div>
+          <div class="chip" onclick="toggleChip(this)">Delusions</div>
+          <div class="chip" onclick="toggleChip(this)">Suspiciousness</div>
+          <div class="chip" onclick="toggleChip(this)">Obsessions</div>
+          <div class="chip" onclick="toggleChip(this)">Suicidal ideation</div>
+          <div class="chip" onclick="toggleChip(this)">Homicidal ideation</div>
+          <div class="chip" onclick="toggleChip(this)">Hopelessness</div>
+        </div>
+      </div>
+      <div class="mse-item">
+        <div class="mse-label">Perceptions</div>
+        <div class="mse-chips">
+          <div class="chip" onclick="toggleChip(this)">No hallucinations</div>
+          <div class="chip" onclick="toggleChip(this)">Auditory hallucinations</div>
+          <div class="chip" onclick="toggleChip(this)">Visual hallucinations</div>
+          <div class="chip" onclick="toggleChip(this)">Illusions</div>
+          <div class="chip" onclick="toggleChip(this)">Derealization</div>
+          <div class="chip" onclick="toggleChip(this)">Depersonalization</div>
+        </div>
+      </div>
+      <div class="mse-item">
+        <div class="mse-label">Cognition</div>
+        <div class="mse-chips">
+          <div class="chip" onclick="toggleChip(this)">Intact</div>
+          <div class="chip" onclick="toggleChip(this)">Oriented ×3</div>
+          <div class="chip" onclick="toggleChip(this)">Attention impaired</div>
+          <div class="chip" onclick="toggleChip(this)">Memory impaired</div>
+          <div class="chip" onclick="toggleChip(this)">Disoriented</div>
+        </div>
+      </div>
+      <div class="mse-item">
+        <div class="mse-label">Insight</div>
+        <div class="mse-chips">
+          <div class="chip" onclick="toggleChip(this)">Full insight</div>
+          <div class="chip" onclick="toggleChip(this)">Partial insight</div>
+          <div class="chip" onclick="toggleChip(this)">No insight</div>
+          <div class="chip" onclick="toggleChip(this)">Improving</div>
+        </div>
+      </div>
+      <div class="mse-item">
+        <div class="mse-label">Judgment</div>
+        <div class="mse-chips">
+          <div class="chip" onclick="toggleChip(this)">Intact</div>
+          <div class="chip" onclick="toggleChip(this)">Impaired</div>
+          <div class="chip" onclick="toggleChip(this)">Poor</div>
+        </div>
+      </div>
+      <div class="mse-item">
+        <div class="mse-label">Risk assessment</div>
+        <div class="mse-chips">
+          <div class="chip" onclick="toggleChip(this)">No active SI/HI</div>
+          <div class="chip" onclick="toggleChip(this)">Passive SI</div>
+          <div class="chip" onclick="toggleChip(this)">Active SI</div>
+          <div class="chip" onclick="toggleChip(this)">Plan present</div>
+          <div class="chip" onclick="toggleChip(this)">Low risk</div>
+          <div class="chip" onclick="toggleChip(this)">High risk</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:10px">
+      <div class="fl">Additional MSE / physical notes</div>
+      <textarea class="fi" id="mse-extra" rows="2" placeholder="Vitals, relevant physical findings, EEG impression if done today…"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ASSESSMENT -->
+<div class="panel">
+  <div class="ph"><span class="soap-label" style="background:#8B5E00">A</span><div><div class="pht">Assessment</div><div class="phs">ICD-11 diagnosis · formulation · clinical impression</div></div></div>
+  <div class="pb" style="display:flex;flex-direction:column;gap:10px">
+    <div>
+      <div class="fl">ICD-11 diagnosis search</div>
+      <div class="icd-wrap">
+        <input class="fi" id="icd-search" placeholder="Type diagnosis name or code…" oninput="searchICD(this.value)" autocomplete="off">
+        <div class="icd-results" id="icd-results"></div>
+      </div>
+      <div class="icd-selected" id="icd-selected"></div>
+    </div>
+    <div>
+      <div class="fl">Clinical formulation / impression</div>
+      <textarea class="fi" id="formulation" rows="3" placeholder="Biopsychosocial formulation, differential, response to treatment, trajectory…"></textarea>
+    </div>
+    <div>
+      <div class="fl">Compared to last visit</div>
+      <div class="chips">
+        <div class="chip" onclick="toggleChip(this)">Improved</div>
+        <div class="chip" onclick="toggleChip(this)">Same</div>
+        <div class="chip" onclick="toggleChip(this)">Worse</div>
+        <div class="chip" onclick="toggleChip(this)">Fluctuating</div>
+        <div class="chip" onclick="toggleChip(this)">First visit</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PLAN -->
+<div class="panel">
+  <div class="ph"><span class="soap-label" style="background:#7B1818">P</span><div><div class="pht">Plan</div><div class="phs">Pharmacotherapy · psychotherapy · investigations · follow-up</div></div></div>
+  <div class="pb" style="display:flex;flex-direction:column;gap:12px">
+    <div>
+      <div class="fl">Prescription (Rx)</div>
+      <div id="rx-list"></div>
+      <button class="add-rx" onclick="addRxRow()">+ Add medication</button>
+    </div>
+    <div>
+      <div class="fl">Psychotherapy / interventions this session</div>
+      <div class="chips">
+        <div class="chip" onclick="toggleChip(this)">Supportive psychotherapy</div>
+        <div class="chip" onclick="toggleChip(this)">CBT techniques</div>
+        <div class="chip" onclick="toggleChip(this)">Psychoeducation</div>
+        <div class="chip" onclick="toggleChip(this)">Motivational interviewing</div>
+        <div class="chip" onclick="toggleChip(this)">Relaxation / breathing</div>
+        <div class="chip" onclick="toggleChip(this)">Family counselling</div>
+        <div class="chip" onclick="toggleChip(this)">Crisis counselling</div>
+        <div class="chip" onclick="toggleChip(this)">HSM / meditation guidance</div>
+        <div class="chip" onclick="toggleChip(this)">Problem-solving therapy</div>
+        <div class="chip" onclick="toggleChip(this)">Relapse prevention</div>
+      </div>
+    </div>
+    <div>
+      <div class="fl">Investigations ordered</div>
+      <div class="chips">
+        <div class="chip" onclick="toggleChip(this)">EEG</div>
+        <div class="chip" onclick="toggleChip(this)">LFT</div>
+        <div class="chip" onclick="toggleChip(this)">RFT</div>
+        <div class="chip" onclick="toggleChip(this)">CBC</div>
+        <div class="chip" onclick="toggleChip(this)">FBS / PPBS</div>
+        <div class="chip" onclick="toggleChip(this)">TFT</div>
+        <div class="chip" onclick="toggleChip(this)">Lithium level</div>
+        <div class="chip" onclick="toggleChip(this)">Valproate level</div>
+        <div class="chip" onclick="toggleChip(this)">ECG</div>
+        <div class="chip" onclick="toggleChip(this)">UDS</div>
+        <div class="chip" onclick="toggleChip(this)">HIV / HBsAg / HCV</div>
+        <div class="chip" onclick="toggleChip(this)">S. electrolytes</div>
+      </div>
+    </div>
+    <div class="fg">
+      <div>
+        <div class="fl">Follow-up</div>
+        <select class="fi" id="followup">
+          <option>1 week</option><option>2 weeks</option><option>3 weeks</option>
+          <option>1 month</option><option>6 weeks</option><option>3 months</option>
+          <option>As needed / SOS</option><option>Next day (crisis)</option>
+        </select>
+      </div>
+      <div>
+        <div class="fl">Mode</div>
+        <select class="fi" id="mode">
+          <option>In-person OPD</option><option>Teleconsult</option><option>Home visit</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <div class="fl">Additional plan / instructions</div>
+      <textarea class="fi" id="plan-extra" rows="2" placeholder="Safety planning discussed, caregiver instructions, referral, etc…"></textarea>
+    </div>
+  </div>
+</div>
+
+</div><!-- end left col -->
+
+<!-- RIGHT: note output -->
+<div>
+  <div class="panel" style="position:sticky;top:16px">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Generated note</div><div class="phs">Click "Build note" to compile</div></div></div>
+    <div style="padding:14px 18px">
+      <div class="note-out" id="note-out"></div>
+      <div style="margin-top:10px;font-size:11px;color:var(--text3)">Note auto-copies to clipboard when generated.</div>
+    </div>
+    <div class="act-row">
+      <button class="bp" onclick="buildNote()">Build note</button>
+      <button class="bpo" onclick="copyNote()">Copy text</button>
+      <button class="bpo" onclick="window.print()">Print</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end wrap -->
+
+<script>
+// ICD-11 database (psychiatric subset)
+const ICD11 = [
+  {code:'6A00',name:'Schizophrenia'},{code:'6A01',name:'Schizoaffective disorder'},
+  {code:'6A02',name:'Schizotypal disorder'},{code:'6A20',name:'Bipolar type I disorder'},
+  {code:'6A21',name:'Bipolar type II disorder'},{code:'6A22',name:'Cyclothymia'},
+  {code:'6A40',name:'Single episode depressive disorder, mild'},{code:'6A41',name:'Single episode depressive disorder, moderate'},
+  {code:'6A42',name:'Single episode depressive disorder, severe without psychotic features'},
+  {code:'6A43',name:'Single episode depressive disorder, severe with psychotic features'},
+  {code:'6A70',name:'Generalised anxiety disorder'},{code:'6A71',name:'Panic disorder'},
+  {code:'6A72',name:'Agoraphobia'},{code:'6A73',name:'Specific phobia'},{code:'6A74',name:'Social anxiety disorder'},
+  {code:'6B00',name:'Obsessive-compulsive disorder'},{code:'6B01',name:'Body dysmorphic disorder'},
+  {code:'6B20',name:'Post-traumatic stress disorder'},{code:'6B21',name:'Complex PTSD'},
+  {code:'6B40',name:'Adjustment disorder'},
+  {code:'6C40',name:'Alcohol dependence'},{code:'6C41',name:'Alcohol harmful use episode'},
+  {code:'6C43',name:'Cannabis dependence'},{code:'6C44',name:'Synthetic cannabinoid dependence'},
+  {code:'6C45',name:'Opioid dependence'},{code:'6C46',name:'Sedative dependence'},
+  {code:'6C48',name:'Tobacco dependence'},
+  {code:'6D10',name:'Alzheimer disease'},{code:'6D11',name:'Vascular dementia'},
+  {code:'6D80',name:'Attention deficit hyperactivity disorder'},
+  {code:'6A01.1',name:'Schizoaffective disorder, manic type'},
+  {code:'6A80',name:'Delusional disorder'},
+  {code:'6E20',name:'Secondary psychotic syndrome'},
+  {code:'F41.1',name:'Generalised anxiety (ICD-10)'},{code:'F32.0',name:'Mild depressive episode (ICD-10)'},
+  {code:'HA00',name:'Migraine without aura'},{code:'HA01',name:'Migraine with aura'},
+  {code:'QE84',name:'Burn-out state'},
+];
+
+let selectedICDs = [];
+let rxRows = [];
+
+function searchICD(q) {
+  const res = document.getElementById('icd-results');
+  if (!q || q.length < 2) { res.style.display='none'; return; }
+  const matches = ICD11.filter(d =>
+    d.name.toLowerCase().includes(q.toLowerCase()) || d.code.toLowerCase().includes(q.toLowerCase())
+  ).slice(0,10);
+  if (!matches.length) { res.style.display='none'; return; }
+  res.innerHTML = matches.map(d =>
+    `<div class="icd-item" onclick="addICD('${d.code}','${d.name.replace(/'/g,"\\'")}')">
+      <span class="icd-code">${d.code}</span>${d.name}
+    </div>`
+  ).join('');
+  res.style.display='block';
+}
+
+function addICD(code, name) {
+  if (!selectedICDs.find(d=>d.code===code)) selectedICDs.push({code,name});
+  document.getElementById('icd-search').value='';
+  document.getElementById('icd-results').style.display='none';
+  renderICDSelected();
+}
+
+function removeICD(code) {
+  selectedICDs = selectedICDs.filter(d=>d.code!==code);
+  renderICDSelected();
+}
+
+function renderICDSelected() {
+  document.getElementById('icd-selected').innerHTML = selectedICDs.map(d =>
+    `<div class="icd-tag">
+      <span>${d.code} — ${d.name}</span>
+      <span class="icd-rm" onclick="removeICD('${d.code}')">×</span>
+    </div>`
+  ).join('');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.icd-wrap')) document.getElementById('icd-results').style.display='none';
+});
+
+// Rx
+const RX_FREQ = ['OD','BD','TDS','QID','HS','SOS','OD morning','OD night','Alternate days','Weekly'];
+const COMMON_DRUGS = [
+  'Tab. Escitalopram (Stalopam/Nexito)','Tab. Sertraline (Daxid/Zoloft)','Tab. Fluoxetine (Fludac/Prozac)',
+  'Tab. Mirtazapine (Mirtaz)','Tab. Bupropion (Bupron)','Tab. Venlafaxine (Veniz/Effexor)',
+  'Tab. Duloxetine (Duzela/Cymbalta)','Tab. Amitriptyline (Tryptomer)',
+  'Tab. Clonazepam (Clonapax/Rivotril)','Tab. Lorazepam (Ativan/Lopez)',
+  'Tab. Alprazolam (Alprax)','Tab. Diazepam (Valium)',
+  'Tab. Olanzapine (Oleanz/Oliza)','Tab. Risperidone (Sizodon/Risnia)',
+  'Tab. Quetiapine (Seroquel/Qutan)','Tab. Aripiprazole (Arip/Abilify)',
+  'Tab. Clozapine (Sizopin/Clozaril)','Tab. Haloperidol (Serenace)',
+  'Tab. Lithium carbonate (Licab/Lithosun)','Tab. Sodium valproate (Valparin/Depakote)',
+  'Tab. Carbamazepine (Tegretol/Mazetol)','Tab. Lamotrigine (Lamictal/Lametec)',
+  'Tab. Buprenorphine+Naloxone (Addnok/Subuxone)','Tab. Naltrexone (Nodict/Naltima)',
+  'Tab. Acamprosate (Campral)','Tab. Disulfiram (Antabuse/Esperal)',
+  'Tab. Metformin (Glycomet)','Tab. Propranolol (Inderal)',
+  'Tab. Modafinil (Modalert)','Tab. Methylphenidate (Ritalin/Concerta)',
+  'Tab. Donepezil (Aricept/Donecept)','Tab. Memantine (Admenta)',
+  'Tab. Chlorpromazine (Largactil)','Inj. Fluphenazine decanoate (Prolixin)',
+  'Inj. Zuclopenthixol decanoate (Clopixol)','Tab. Trihexyphenidyl (Pacitane)',
+];
+
+function addRxRow() {
+  const id = 'rx_' + Date.now();
+  rxRows.push(id);
+  const div = document.createElement('div');
+  div.className='rx-row'; div.id=id;
+  div.innerHTML=`
+    <input class="rx-drug" list="drug-list" placeholder="Drug name / brand…" id="${id}_drug">
+    <datalist id="drug-list">${COMMON_DRUGS.map(d=>`<option value="${d}">`).join('')}</datalist>
+    <input class="rx-dose" placeholder="Dose" id="${id}_dose">
+    <select class="rx-freq" id="${id}_freq">${RX_FREQ.map(f=>`<option>${f}</option>`).join('')}</select>
+    <div class="rx-rm" onclick="removeRx('${id}')">×</div>`;
+  document.getElementById('rx-list').appendChild(div);
+}
+
+function removeRx(id) {
+  rxRows = rxRows.filter(r=>r!==id);
+  document.getElementById(id).remove();
+}
+
+function toggleChip(el) { el.classList.toggle('on'); }
+
+function getChipsOn(container) {
+  return [...container.querySelectorAll('.chip.on')].map(c=>c.textContent.trim());
+}
+
+function buildNote() {
+  const now = new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const patId = document.getElementById('pat-id').value||'—';
+  const date = document.getElementById('visit-date').value||now;
+  const vtype = document.getElementById('visit-type').value;
+  const sessNum = document.getElementById('session-num').value;
+
+  // Collect MSE panel chips by section
+  const mseItems = document.querySelectorAll('.mse-item');
+  const mseParts = [...mseItems].map(item=>{
+    const label = item.querySelector('.mse-label').textContent;
+    const chips = [...item.querySelectorAll('.chip.on')].map(c=>c.textContent.trim());
+    return chips.length ? `${label}: ${chips.join(', ')}` : null;
+  }).filter(Boolean);
+
+  // Plan chips by section
+  const planPanelChips = [...document.querySelectorAll('#rx-list + button ~ .chips, .panel:last-child .chips')];
+
+  const rxText = rxRows.map(id=>{
+    const drug = document.getElementById(id+'_drug')?.value||'';
+    const dose = document.getElementById(id+'_dose')?.value||'';
+    const freq = document.getElementById(id+'_freq')?.value||'';
+    return drug ? `  • ${drug} ${dose} ${freq}` : null;
+  }).filter(Boolean).join('\n');
+
+  // Get all panel sections' chips
+  const allPanels = document.querySelectorAll('.panel');
+  const subj = allPanels[1];
+  const plan = allPanels[4];
+
+  const subjChips = {
+    sleep: getChipsOn(subj.querySelectorAll('.frow, div')[6]||subj),
+    appetite: [],
+    adherence:[]
+  };
+  // simpler: scan all chips in each panel
+  const allSubjChips = [...subj.querySelectorAll('.chip.on')].map(c=>c.textContent);
+  const allPlanChips = [...plan.querySelectorAll('.chip.on')].map(c=>c.textContent);
+
+  const diagnoses = selectedICDs.length
+    ? selectedICDs.map(d=>`  ${d.code} — ${d.name}`).join('\n')
+    : '  (not specified)';
+
+  const note = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AATMIYA HOSPITAL — OPD PROGRESS NOTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Patient: ${patId}    Date: ${date}
+Visit: ${vtype}${sessNum?' (Session '+sessNum+')':''}
+Clinician: Dr. Dhaivat Mehta
+
+━━━━ S — SUBJECTIVE ━━━━
+Presenting: ${document.getElementById('cc').value||'—'}
+
+Interval history:
+${document.getElementById('interval').value||'—'}
+
+Mood (patient's words): "${document.getElementById('mood-words').value||'—'}"
+${allSubjChips.length ? 'Reported: '+allSubjChips.join(' · ') : ''}
+
+━━━━ O — MENTAL STATUS EXAMINATION ━━━━
+${mseParts.join('\n') || '(not completed)'}
+${document.getElementById('mse-extra').value ? '\nAdditional: '+document.getElementById('mse-extra').value : ''}
+
+━━━━ A — ASSESSMENT ━━━━
+Diagnoses (ICD-11):
+${diagnoses}
+
+Formulation:
+${document.getElementById('formulation').value||'—'}
+
+━━━━ P — PLAN ━━━━
+Prescription (Rx):
+${rxText||'  (unchanged / not modified)'}
+
+Interventions this session:
+${allPlanChips.slice(0,10).join(', ')||'—'}
+
+Follow-up: ${document.getElementById('followup').value} (${document.getElementById('mode').value})
+${document.getElementById('plan-extra').value ? 'Additional: '+document.getElementById('plan-extra').value : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Generated: ${now} · Aatmiya Hospital, Gandhidham
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+
+  const out = document.getElementById('note-out');
+  out.textContent = note;
+  out.classList.add('visible');
+  navigator.clipboard?.writeText(note);
+  out.scrollIntoView({behavior:'smooth'});
+}
+
+function copyNote() {
+  const text = document.getElementById('note-out').textContent;
+  if (text) navigator.clipboard?.writeText(text);
+}
+
+function resetAll() {
+  document.querySelectorAll('input:not([type=date]),textarea,select').forEach(el=>{
+    if(el.tagName==='SELECT') el.selectedIndex=0;
+    else el.value='';
+  });
+  document.querySelectorAll('.chip.on').forEach(c=>c.classList.remove('on'));
+  selectedICDs=[];rxRows=[];
+  document.getElementById('icd-selected').innerHTML='';
+  document.getElementById('rx-list').innerHTML='';
+  document.getElementById('note-out').classList.remove('visible');
+  document.getElementById('visit-date').value=new Date().toISOString().split('T')[0];
+}
+
+// Init
+document.getElementById('visit-date').value=new Date().toISOString().split('T')[0];
+addRxRow();
+</script>
+</body>
+</html>

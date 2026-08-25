@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4P Case Formulation — Aatmiya Hospital</title>
+<style>
+  :root{
+    --bg:#F4F2F8;--surface:#FFF;--surface2:#EEEAF3;--border:#DAD5EC;
+    --text:#16122A;--text2:#4A4660;--text3:#9A96B0;
+    --accent:#3D2080;--accent-light:#EAE4FA;
+    --p1:#1A3D70;--p1l:#E8EEF8;
+    --p2:#7B3500;--p2l:#FAEEE5;
+    --p3:#7B1818;--p3l:#FBEBEB;
+    --p4:#1E5E32;--p4l:#E5F2E9;
+    --radius:12px;--shadow:0 2px 14px rgba(61,32,128,.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .wrap{max-width:1060px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 320px;gap:16px}
+  @media(max-width:840px){.wrap{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .p-badge{font-size:13px;font-weight:800;padding:4px 12px;border-radius:6px;color:#fff;letter-spacing:.02em}
+  .pht{font-size:13px;font-weight:600}
+  .phs{font-size:11px;color:var(--text3);margin-top:1px}
+  .pb{padding:14px 18px}
+  .fl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
+  .fi{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .fi:focus{outline:none;border-color:var(--accent);background:#fff}
+  textarea.fi{resize:vertical;line-height:1.55}
+  .frow{margin-bottom:10px}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+  .chip{padding:5px 10px;border-radius:20px;font-size:11px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .12s;user-select:none}
+  .chip:hover{border-color:var(--accent)}
+  .chip.on{font-weight:600}
+  .chip.on.p1{background:var(--p1l);border-color:var(--p1);color:var(--p1)}
+  .chip.on.p2{background:var(--p2l);border-color:var(--p2);color:var(--p2)}
+  .chip.on.p3{background:var(--p3l);border-color:var(--p3);color:var(--p3)}
+  .chip.on.p4{background:var(--p4l);border-color:var(--p4);color:var(--p4)}
+  .subsection{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+  .subsection:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+  .sub-label{font-size:11px;font-weight:600;margin-bottom:5px}
+  .fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:540px){.fg{grid-template-columns:1fr}}
+  /* Right panel output */
+  .summary-p{border-radius:10px;padding:10px 12px;margin-bottom:8px;border-left:4px solid var(--border)}
+  .summary-p-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+  .summary-p-content{font-size:12px;line-height:1.6;color:var(--text2)}
+  .out-text{background:var(--surface2);border-radius:8px;padding:12px;font-size:11px;line-height:1.8;white-space:pre-wrap;color:var(--text);border:1px solid var(--border);display:none;margin:14px 18px}
+  .out-text.visible{display:block}
+  .act-row{display:flex;gap:8px;padding:14px 18px;flex-wrap:wrap;border-top:1px solid var(--border)}
+  .bp{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">4P Case Formulation</div><div class="hs">Aatmiya Hospital · Clinician Tool 10</div></div>
+  </div>
+  <div class="ha">
+    <button class="bg" onclick="buildSummary()">Build summary</button>
+    <button class="bg" onclick="window.print()">Print</button>
+    <button class="bg" onclick="resetAll()">Reset</button>
+  </div>
+</div>
+
+<div class="wrap">
+<div>
+
+<!-- Patient info -->
+<div class="panel">
+  <div class="ph"><div class="p-badge" style="background:var(--accent)">Pt</div><div><div class="pht">Patient context</div></div></div>
+  <div class="pb">
+    <div class="fg">
+      <div class="frow"><div class="fl">Patient code</div><input class="fi" id="pat-id" placeholder="PT-2024-001 / Initials"></div>
+      <div class="frow"><div class="fl">Date</div><input class="fi" type="date" id="f-date"></div>
+      <div class="frow"><div class="fl">Age / gender / occupation</div><input class="fi" id="f-demo" placeholder="42M, daily wage worker"></div>
+      <div class="frow"><div class="fl">Presenting problem</div><input class="fi" id="f-problem" placeholder="Chief complaint in one line"></div>
+    </div>
+    <div class="frow">
+      <div class="fl">Referral source / cultural context</div>
+      <input class="fi" id="f-context" placeholder="e.g. Referred by GP; Gujarati Hindu joint family, Kutch; migrant worker from UP…">
+    </div>
+  </div>
+</div>
+
+<!-- Predisposing -->
+<div class="panel">
+  <div class="ph"><div class="p-badge" style="background:var(--p1)">P1</div><div><div class="pht">Predisposing factors</div><div class="phs">Vulnerability — what made this person susceptible?</div></div></div>
+  <div class="pb">
+    <div class="subsection">
+      <div class="sub-label" style="color:var(--p1)">Biological</div>
+      <textarea class="fi" id="p1-bio" rows="2" placeholder="Genetic loading, family psychiatric history, perinatal factors, chronic illness, neurological…"></textarea>
+      <div class="chips">
+        <div class="chip p1" onclick="appendArea('p1-bio',this)">Family Hx depression</div>
+        <div class="chip p1" onclick="appendArea('p1-bio',this)">Family Hx substance use</div>
+        <div class="chip p1" onclick="appendArea('p1-bio',this)">Family Hx schizophrenia</div>
+        <div class="chip p1" onclick="appendArea('p1-bio',this)">Birth complications</div>
+        <div class="chip p1" onclick="appendArea('p1-bio',this)">Childhood illness</div>
+        <div class="chip p1" onclick="appendArea('p1-bio',this)">Head injury</div>
+        <div class="chip p1" onclick="appendArea('p1-bio',this)">Epilepsy</div>
+        <div class="chip p1" onclick="appendArea('p1-bio',this)">Chronic pain / illness</div>
+      </div>
+    </div>
+    <div class="subsection">
+      <div class="sub-label" style="color:var(--p1)">Psychological</div>
+      <textarea class="fi" id="p1-psy" rows="2" placeholder="Attachment style, early trauma, adverse childhood experiences, personality traits, negative schemas…"></textarea>
+      <div class="chips">
+        <div class="chip p1" onclick="appendArea('p1-psy',this)">Childhood trauma / ACE</div>
+        <div class="chip p1" onclick="appendArea('p1-psy',this)">Insecure attachment</div>
+        <div class="chip p1" onclick="appendArea('p1-psy',this)">Low self-esteem</div>
+        <div class="chip p1" onclick="appendArea('p1-psy',this)">Anxious temperament</div>
+        <div class="chip p1" onclick="appendArea('p1-psy',this)">Maladaptive coping</div>
+        <div class="chip p1" onclick="appendArea('p1-psy',this)">Prior mental illness</div>
+        <div class="chip p1" onclick="appendArea('p1-psy',this)">Academic difficulties</div>
+      </div>
+    </div>
+    <div class="subsection">
+      <div class="sub-label" style="color:var(--p1)">Social / cultural (Indian context)</div>
+      <textarea class="fi" id="p1-soc" rows="2" placeholder="Family structure, gender role, caste/community pressures, migration, early marriage, poverty, stigma exposure…"></textarea>
+      <div class="chips">
+        <div class="chip p1" onclick="appendArea('p1-soc',this)">Dysfunctional family of origin</div>
+        <div class="chip p1" onclick="appendArea('p1-soc',this)">Early marriage</div>
+        <div class="chip p1" onclick="appendArea('p1-soc',this)">Financial poverty</div>
+        <div class="chip p1" onclick="appendArea('p1-soc',this)">Migration / displacement</div>
+        <div class="chip p1" onclick="appendArea('p1-soc',this)">Domestic violence exposure</div>
+        <div class="chip p1" onclick="appendArea('p1-soc',this)">Stigmatised community</div>
+        <div class="chip p1" onclick="appendArea('p1-soc',this)">Limited education</div>
+        <div class="chip p1" onclick="appendArea('p1-soc',this)">Child labour history</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Precipitating -->
+<div class="panel">
+  <div class="ph"><div class="p-badge" style="background:var(--p2)">P2</div><div><div class="pht">Precipitating factors</div><div class="phs">Triggers — what started this episode?</div></div></div>
+  <div class="pb">
+    <div class="frow">
+      <div class="fl">Biological precipitants</div>
+      <textarea class="fi" id="p2-bio" rows="2" placeholder="Medical illness, substance use onset, medication change, sleep deprivation, substance withdrawal…"></textarea>
+      <div class="chips">
+        <div class="chip p2" onclick="appendArea('p2-bio',this)">Medical illness onset</div>
+        <div class="chip p2" onclick="appendArea('p2-bio',this)">Substance use escalation</div>
+        <div class="chip p2" onclick="appendArea('p2-bio',this)">Medication stopped</div>
+        <div class="chip p2" onclick="appendArea('p2-bio',this)">Chronic pain worsening</div>
+        <div class="chip p2" onclick="appendArea('p2-bio',this)">Sleep disruption</div>
+        <div class="chip p2" onclick="appendArea('p2-bio',this)">Post-partum period</div>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fl">Psychological precipitants</div>
+      <textarea class="fi" id="p2-psy" rows="2" placeholder="Loss, humiliation, trauma, anniversary reaction, identity threat…"></textarea>
+      <div class="chips">
+        <div class="chip p2" onclick="appendArea('p2-psy',this)">Bereavement / loss</div>
+        <div class="chip p2" onclick="appendArea('p2-psy',this)">Relationship breakdown</div>
+        <div class="chip p2" onclick="appendArea('p2-psy',this)">Humiliation / shame event</div>
+        <div class="chip p2" onclick="appendArea('p2-psy',this)">Recent trauma</div>
+        <div class="chip p2" onclick="appendArea('p2-psy',this)">Anniversary reaction</div>
+        <div class="chip p2" onclick="appendArea('p2-psy',this)">Academic / exam failure</div>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fl">Social / environmental precipitants</div>
+      <textarea class="fi" id="p2-soc" rows="2" placeholder="Job loss, financial crisis, family conflict, domestic violence, land/legal dispute, natural disaster…"></textarea>
+      <div class="chips">
+        <div class="chip p2" onclick="appendArea('p2-soc',this)">Job loss / unemployment</div>
+        <div class="chip p2" onclick="appendArea('p2-soc',this)">Financial crisis / debt</div>
+        <div class="chip p2" onclick="appendArea('p2-soc',this)">Family / marital conflict</div>
+        <div class="chip p2" onclick="appendArea('p2-soc',this)">Domestic violence</div>
+        <div class="chip p2" onclick="appendArea('p2-soc',this)">Legal dispute / land issue</div>
+        <div class="chip p2" onclick="appendArea('p2-soc',this)">Migration stress</div>
+        <div class="chip p2" onclick="appendArea('p2-soc',this)">Earthquake / disaster</div>
+        <div class="chip p2" onclick="appendArea('p2-soc',this)">COVID-19 impact</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Perpetuating -->
+<div class="panel">
+  <div class="ph"><div class="p-badge" style="background:var(--p3)">P3</div><div><div class="pht">Perpetuating factors</div><div class="phs">Maintenance — what keeps the problem going?</div></div></div>
+  <div class="pb">
+    <div class="frow">
+      <div class="fl">Biological</div>
+      <textarea class="fi" id="p3-bio" rows="2" placeholder="Ongoing substance use, untreated medical comorbidity, medication non-adherence, poor sleep…"></textarea>
+      <div class="chips">
+        <div class="chip p3" onclick="appendArea('p3-bio',this)">Ongoing substance use</div>
+        <div class="chip p3" onclick="appendArea('p3-bio',this)">Medication non-adherence</div>
+        <div class="chip p3" onclick="appendArea('p3-bio',this)">Untreated comorbidity</div>
+        <div class="chip p3" onclick="appendArea('p3-bio',this)">Chronic sleep disturbance</div>
+        <div class="chip p3" onclick="appendArea('p3-bio',this)">Nutritional deficiency</div>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fl">Psychological</div>
+      <textarea class="fi" id="p3-psy" rows="2" placeholder="Avoidance, rumination, cognitive distortions, low self-efficacy, safety behaviours, secondary gain…"></textarea>
+      <div class="chips">
+        <div class="chip p3" onclick="appendArea('p3-psy',this)">Avoidance behaviour</div>
+        <div class="chip p3" onclick="appendArea('p3-psy',this)">Rumination</div>
+        <div class="chip p3" onclick="appendArea('p3-psy',this)">Cognitive distortions</div>
+        <div class="chip p3" onclick="appendArea('p3-psy',this)">Helplessness / hopelessness</div>
+        <div class="chip p3" onclick="appendArea('p3-psy',this)">Secondary gain</div>
+        <div class="chip p3" onclick="appendArea('p3-psy',this)">Poor insight</div>
+        <div class="chip p3" onclick="appendArea('p3-psy',this)">Safety behaviours</div>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fl">Social / systemic</div>
+      <textarea class="fi" id="p3-soc" rows="2" placeholder="Enabling family, high EE environment, caregiver burnout, social isolation, stigma preventing treatment, financial barriers…"></textarea>
+      <div class="chips">
+        <div class="chip p3" onclick="appendArea('p3-soc',this)">Enabling family members</div>
+        <div class="chip p3" onclick="appendArea('p3-soc',this)">High expressed emotion (EE)</div>
+        <div class="chip p3" onclick="appendArea('p3-soc',this)">Social isolation</div>
+        <div class="chip p3" onclick="appendArea('p3-soc',this)">Stigma / shame</div>
+        <div class="chip p3" onclick="appendArea('p3-soc',this)">Financial barriers to care</div>
+        <div class="chip p3" onclick="appendArea('p3-soc',this)">Treatment access</div>
+        <div class="chip p3" onclick="appendArea('p3-soc',this)">Caregiver burnout</div>
+        <div class="chip p3" onclick="appendArea('p3-soc',this)">Ongoing domestic violence</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Protective -->
+<div class="panel">
+  <div class="ph"><div class="p-badge" style="background:var(--p4)">P4</div><div><div class="pht">Protective factors</div><div class="phs">Strengths and resources that support recovery</div></div></div>
+  <div class="pb">
+    <div class="frow">
+      <div class="fl">Internal / personal strengths</div>
+      <textarea class="fi" id="p4-int" rows="2" placeholder="Insight, motivation, intelligence, coping skills, spirituality, past resilience, employment…"></textarea>
+      <div class="chips">
+        <div class="chip p4" onclick="appendArea('p4-int',this)">Good insight</div>
+        <div class="chip p4" onclick="appendArea('p4-int',this)">Motivated for change</div>
+        <div class="chip p4" onclick="appendArea('p4-int',this)">Employment / occupation</div>
+        <div class="chip p4" onclick="appendArea('p4-int',this)">Spiritual / religious faith</div>
+        <div class="chip p4" onclick="appendArea('p4-int',this)">HSM / meditation practice</div>
+        <div class="chip p4" onclick="appendArea('p4-int',this)">Physical fitness</div>
+        <div class="chip p4" onclick="appendArea('p4-int',this)">Past recovery</div>
+        <div class="chip p4" onclick="appendArea('p4-int',this)">Intelligence / skills</div>
+        <div class="chip p4" onclick="appendArea('p4-int',this)">Sense of responsibility</div>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fl">Social / family supports (Indian context)</div>
+      <textarea class="fi" id="p4-soc" rows="2" placeholder="Supportive joint family, trusted spouse, stable finances, community/caste support, religious community…"></textarea>
+      <div class="chips">
+        <div class="chip p4" onclick="appendArea('p4-soc',this)">Supportive family</div>
+        <div class="chip p4" onclick="appendArea('p4-soc',this)">Supportive spouse / partner</div>
+        <div class="chip p4" onclick="appendArea('p4-soc',this)">Financial stability</div>
+        <div class="chip p4" onclick="appendArea('p4-soc',this)">Religious / community network</div>
+        <div class="chip p4" onclick="appendArea('p4-soc',this)">AA / NA participation</div>
+        <div class="chip p4" onclick="appendArea('p4-soc',this)">Good therapeutic alliance</div>
+        <div class="chip p4" onclick="appendArea('p4-soc',this)">Stable housing</div>
+        <div class="chip p4" onclick="appendArea('p4-soc',this)">Children / dependants as motivation</div>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fl">Treatment / service factors</div>
+      <textarea class="fi" id="p4-tx" rows="2" placeholder="Engagement with Aatmiya, medication response, prior helpful therapy, Param Lab access…"></textarea>
+      <div class="chips">
+        <div class="chip p4" onclick="appendArea('p4-tx',this)">Engaged with treatment</div>
+        <div class="chip p4" onclick="appendArea('p4-tx',this)">Good medication response</div>
+        <div class="chip p4" onclick="appendArea('p4-tx',this)">Regular OPD attendance</div>
+        <div class="chip p4" onclick="appendArea('p4-tx',this)">Aatmiya day-care access</div>
+        <div class="chip p4" onclick="appendArea('p4-tx',this)">Param Lab monitoring</div>
+        <div class="chip p4" onclick="appendArea('p4-tx',this)">Safety plan in place</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end left col -->
+
+<!-- Right panel: live summary -->
+<div>
+  <div class="panel" style="position:sticky;top:16px">
+    <div class="ph"><div class="lm" style="background:var(--accent);color:#fff;font-size:14px;width:28px;height:28px">Σ</div><div><div class="pht">Formulation summary</div><div class="phs">Updates as you type</div></div></div>
+    <div class="pb" id="live-summary">
+      <div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">Complete the 4P fields to generate summary</div>
+    </div>
+    <div class="act-row">
+      <button class="bp" onclick="buildSummary()">Export text</button>
+      <button class="bpo" onclick="window.print()">Print</button>
+      <button class="bpo" onclick="resetAll()">Reset</button>
+    </div>
+    <div class="out-text" id="out-text"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const FIELDS = [
+  {id:'p1-bio',p:'P1',sub:'Biological'},{id:'p1-psy',p:'P1',sub:'Psychological'},{id:'p1-soc',p:'P1',sub:'Social'},
+  {id:'p2-bio',p:'P2',sub:'Biological'},{id:'p2-psy',p:'P2',sub:'Psychological'},{id:'p2-soc',p:'P2',sub:'Social'},
+  {id:'p3-bio',p:'P3',sub:'Biological'},{id:'p3-psy',p:'P3',sub:'Psychological'},{id:'p3-soc',p:'P3',sub:'Social'},
+  {id:'p4-int',p:'P4',sub:'Internal'},{id:'p4-soc',p:'P4',sub:'Social'},{id:'p4-tx',p:'P4',sub:'Treatment'},
+];
+const P_META = {
+  P1:{label:'Predisposing',color:'var(--p1)',bg:'var(--p1l)'},
+  P2:{label:'Precipitating',color:'var(--p2)',bg:'var(--p2l)'},
+  P3:{label:'Perpetuating',color:'var(--p3)',bg:'var(--p3l)'},
+  P4:{label:'Protective',color:'var(--p4)',bg:'var(--p4l)'},
+};
+
+document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+
+// Live update on every keyup
+document.querySelectorAll('textarea,input').forEach(el => {
+  el.addEventListener('input', updateLiveSummary);
+});
+
+function appendArea(id, el) {
+  const field = document.getElementById(id);
+  const val = el.textContent.trim();
+  if (field.value && !field.value.endsWith('\n')) field.value += '; ';
+  field.value += val;
+  el.classList.toggle('on');
+  updateLiveSummary();
+}
+
+function updateLiveSummary() {
+  const ps = {};
+  FIELDS.forEach(f => {
+    const val = document.getElementById(f.id).value.trim();
+    if (val) {
+      if (!ps[f.p]) ps[f.p] = [];
+      ps[f.p].push({sub:f.sub, val});
+    }
+  });
+
+  let html = '';
+  ['P1','P2','P3','P4'].forEach(p => {
+    const meta = P_META[p];
+    const items = ps[p]||[];
+    html += `<div class="summary-p" style="border-left-color:${meta.color};background:${meta.bg}">
+      <div class="summary-p-label" style="color:${meta.color}">${p} — ${meta.label}</div>
+      <div class="summary-p-content">${
+        items.length
+          ? items.map(i=>`<strong>${i.sub}:</strong> ${i.val}`).join('<br>')
+          : '<em style="color:var(--text3)">Not yet completed</em>'
+      }</div>
+    </div>`;
+  });
+  document.getElementById('live-summary').innerHTML = html;
+}
+
+function buildSummary() {
+  const now = new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const pat = document.getElementById('pat-id').value||'—';
+  const demo = document.getElementById('f-demo').value;
+  const prob = document.getElementById('f-problem').value;
+  const ctx = document.getElementById('f-context').value;
+
+  const get = id => document.getElementById(id).value.trim()||'Not specified';
+
+  const text = `AATMIYA HOSPITAL — 4P CASE FORMULATION
+Generated: ${now}
+Patient: ${pat} | ${demo}
+Presenting problem: ${prob}
+Context: ${ctx}
+
+━━━━ P1 — PREDISPOSING ━━━━
+Biological: ${get('p1-bio')}
+Psychological: ${get('p1-psy')}
+Social / Cultural: ${get('p1-soc')}
+
+━━━━ P2 — PRECIPITATING ━━━━
+Biological: ${get('p2-bio')}
+Psychological: ${get('p2-psy')}
+Social / Environmental: ${get('p2-soc')}
+
+━━━━ P3 — PERPETUATING ━━━━
+Biological: ${get('p3-bio')}
+Psychological: ${get('p3-psy')}
+Social / Systemic: ${get('p3-soc')}
+
+━━━━ P4 — PROTECTIVE ━━━━
+Internal strengths: ${get('p4-int')}
+Social / Family: ${get('p4-soc')}
+Treatment factors: ${get('p4-tx')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Clinician: Dr. Dhaivat Mehta · Aatmiya Hospital, Gandhidham`;
+
+  const out = document.getElementById('out-text');
+  out.textContent = text;
+  out.classList.add('visible');
+  navigator.clipboard?.writeText(text);
+}
+
+function resetAll() {
+  document.querySelectorAll('textarea,input').forEach(el => {
+    if (el.type==='date') el.value = new Date().toISOString().split('T')[0];
+    else if (!el.closest('.header')) el.value='';
+  });
+  document.querySelectorAll('.chip.on').forEach(c=>c.classList.remove('on'));
+  document.getElementById('out-text').classList.remove('visible');
+  updateLiveSummary();
+}
+
+updateLiveSummary();
+</script>
+</body>
+</html>

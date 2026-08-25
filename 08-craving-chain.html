@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Craving Chain — Aatmiya Hospital</title>
+<style>
+  :root{
+    --bg:#F5F0EB;--surface:#FFF;--surface2:#EEE8E1;--border:#DDD5CC;
+    --text:#1A140E;--text2:#5A5048;--text3:#9A9088;
+    --accent:#7B3500;--accent-light:#FAEEE5;
+    --green:#1E5E32;--green-light:#E5F2E9;
+    --blue:#1A3D6E;--blue-light:#E8EEF8;
+    --red:#7B1818;--red-light:#FBEBEB;
+    --amber:#8B5E00;--amber-light:#FFF8E1;
+    --radius:12px;--shadow:0 2px 14px rgba(123,53,0,.09);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .wrap{max-width:960px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:13px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:1px}
+  .pb{padding:14px 18px}
+  .fl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
+  .fi{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .fi:focus{outline:none;border-color:var(--accent);background:#fff}
+  textarea.fi{resize:vertical;line-height:1.55}
+  .chips{display:flex;flex-wrap:wrap;gap:5px}
+  .chip{padding:5px 11px;border-radius:20px;font-size:11px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .12s;user-select:none}
+  .chip.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600}
+  .chip:hover{border-color:var(--accent)}
+
+  /* Chain visualiser */
+  .chain{display:flex;flex-direction:column;gap:0}
+  .chain-step{display:flex;gap:0}
+  .chain-left{display:flex;flex-direction:column;align-items:center;width:48px;flex-shrink:0}
+  .chain-node{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;z-index:1}
+  .chain-line{width:2px;flex:1;min-height:12px;background:var(--border)}
+  .chain-body{flex:1;padding:0 0 16px 14px}
+  .chain-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+  .chain-desc{font-size:11px;color:var(--text3);margin-bottom:8px;font-style:italic}
+  .chain-input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .chain-input:focus{outline:none;border-color:var(--accent);background:#fff}
+  .chain-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+
+  /* HRS calendar */
+  .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .cal-header{font-size:9px;font-weight:700;text-align:center;color:var(--text3);text-transform:uppercase;padding:2px}
+  .cal-day{padding:6px 4px;border-radius:6px;text-align:center;font-size:11px;border:1.5px solid transparent;background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .12s;user-select:none;line-height:1.3}
+  .cal-day:hover{border-color:var(--accent)}
+  .cal-day.high-risk{background:var(--red-light);border-color:var(--red);color:var(--red);font-weight:700}
+  .cal-day.medium-risk{background:var(--amber-light);border-color:var(--amber);color:var(--amber);font-weight:600}
+  .cal-day.safe{background:var(--green-light);border-color:var(--green);color:var(--green);font-weight:600}
+  .cal-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .cal-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+  .cal-dot{width:10px;height:10px;border-radius:3px}
+  .risk-sel{display:flex;gap:6px;margin-bottom:8px}
+  .risk-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-family:inherit;transition:all .12s}
+  .risk-btn.active-high{background:var(--red-light);border-color:var(--red);color:var(--red)}
+  .risk-btn.active-medium{background:var(--amber-light);border-color:var(--amber);color:var(--amber)}
+  .risk-btn.active-safe{background:var(--green-light);border-color:var(--green);color:var(--green)}
+
+  /* Coping bank */
+  .coping-bank{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:540px){.coping-bank{grid-template-columns:1fr}}
+  .coping-card{background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
+  .coping-cat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:5px}
+  .coping-chips{display:flex;flex-wrap:wrap;gap:4px}
+
+  /* Output */
+  .out-area{background:var(--surface2);border-radius:8px;padding:14px;font-size:12px;line-height:1.8;color:var(--text);white-space:pre-wrap;display:none;border:1px solid var(--border)}
+  .out-area.visible{display:block}
+  .act-row{display:flex;gap:8px;padding:14px 18px;flex-wrap:wrap;border-top:1px solid var(--border)}
+  .bp{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Craving Chain + HRS Planner</div><div class="hs">Aatmiya Hospital · De-addiction Tool 08</div></div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="bg" onclick="buildReport()">Generate report</button>
+    <button class="bg" onclick="resetAll()">Reset</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- Substance -->
+<div class="panel">
+  <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Substance / behaviour</div></div></div>
+  <div class="pb">
+    <div class="fl">Primary substance of concern</div>
+    <div class="chips" style="margin-bottom:10px">
+      <div class="chip" onclick="selectSub(this,'Alcohol (Desi/country liquor)')">Alcohol (desi)</div>
+      <div class="chip" onclick="selectSub(this,'Alcohol (IMFL/beer)')">Alcohol (IMFL)</div>
+      <div class="chip" onclick="selectSub(this,'Tobacco / Gutka / Pan masala')">Tobacco / Gutka</div>
+      <div class="chip" onclick="selectSub(this,'Bidi / Cigarette')">Bidi / Cigarette</div>
+      <div class="chip" onclick="selectSub(this,'Buprenorphine (misuse)')">Buprenorphine</div>
+      <div class="chip" onclick="selectSub(this,'Opioids / Smack')">Opioids / Smack</div>
+      <div class="chip" onclick="selectSub(this,'Cannabis / Ganja / Charas')">Cannabis / Ganja</div>
+      <div class="chip" onclick="selectSub(this,'Benzodiazepines / Tablets')">Benzos / Tablets</div>
+      <div class="chip" onclick="selectSub(this,'Inhalants / Whitener')">Inhalants</div>
+      <div class="chip" onclick="selectSub(this,'Multiple substances')">Multiple</div>
+    </div>
+    <div class="fl">Pattern of use (quantity / frequency / duration)</div>
+    <input class="fi" id="use-pattern" placeholder="e.g. 180ml desi daily for 8 years; 4 cigarettes/day for 5 years…">
+  </div>
+</div>
+
+<!-- Chain visualiser -->
+<div class="panel">
+  <div class="ph"><div class="phd" style="background:#1A3D6E"></div><div><div class="pht">Craving chain map</div><div class="phs">Walk through each link with the patient</div></div></div>
+  <div class="pb">
+    <div class="chain" id="chain-map">
+
+      <div class="chain-step">
+        <div class="chain-left">
+          <div class="chain-node" style="background:#1A3D6E">1</div>
+          <div class="chain-line"></div>
+        </div>
+        <div class="chain-body">
+          <div class="chain-title">External trigger</div>
+          <div class="chain-desc">"Where were you? Who were you with? What was happening?"</div>
+          <textarea class="chain-input" id="c1-external" rows="2" placeholder="e.g. After work, saw friends drinking at the dhaba…"></textarea>
+          <div class="chain-chips">
+            <div class="fl" style="width:100%;margin-bottom:4px">Common triggers</div>
+            <div class="chip" onclick="appendChain('c1-external',this)">Workplace stress</div>
+            <div class="chip" onclick="appendChain('c1-external',this)">Family conflict</div>
+            <div class="chip" onclick="appendChain('c1-external',this)">Seeing others use</div>
+            <div class="chip" onclick="appendChain('c1-external',this)">Passing liquor shop</div>
+            <div class="chip" onclick="appendChain('c1-external',this)">Festival / celebration</div>
+            <div class="chip" onclick="appendChain('c1-external',this)">Pay day</div>
+            <div class="chip" onclick="appendChain('c1-external',this)">Being alone</div>
+            <div class="chip" onclick="appendChain('c1-external',this)">Financial stress</div>
+            <div class="chip" onclick="appendChain('c1-external',this)">Physical pain</div>
+            <div class="chip" onclick="appendChain('c1-external',this)">Smell / sight of substance</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chain-step">
+        <div class="chain-left">
+          <div class="chain-node" style="background:#5C3D9E">2</div>
+          <div class="chain-line"></div>
+        </div>
+        <div class="chain-body">
+          <div class="chain-title">Internal state at trigger</div>
+          <div class="chain-desc">"What were you thinking? What were you feeling?"</div>
+          <textarea class="chain-input" id="c2-internal" rows="2" placeholder="e.g. Felt stressed, thought 'just one drink to relax'…"></textarea>
+          <div class="chain-chips">
+            <div class="chip" onclick="appendChain('c2-internal',this)">Stressed / tense</div>
+            <div class="chip" onclick="appendChain('c2-internal',this)">Bored</div>
+            <div class="chip" onclick="appendChain('c2-internal',this)">Angry</div>
+            <div class="chip" onclick="appendChain('c2-internal',this)">Lonely / empty</div>
+            <div class="chip" onclick="appendChain('c2-internal',this)">Sad / hopeless</div>
+            <div class="chip" onclick="appendChain('c2-internal',this)">Celebratory</div>
+            <div class="chip" onclick="appendChain('c2-internal',this)">Social pressure</div>
+            <div class="chip" onclick="appendChain('c2-internal',this)">Craving (physical)</div>
+            <div class="chip" onclick="appendChain('c2-internal',this)">"Just this once" thought</div>
+            <div class="chip" onclick="appendChain('c2-internal',this)">"I can control it" thought</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chain-step">
+        <div class="chain-left">
+          <div class="chain-node" style="background:#8B5E00">3</div>
+          <div class="chain-line"></div>
+        </div>
+        <div class="chain-body">
+          <div class="chain-title">Urge / craving</div>
+          <div class="chain-desc">"How strong was the urge? Where did you feel it in your body?"</div>
+          <textarea class="chain-input" id="c3-urge" rows="2" placeholder="e.g. Urge 8/10, felt restless, mouth watering…"></textarea>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+            <span style="font-size:11px;color:var(--text2)">Urge strength:</span>
+            <input type="range" min="0" max="10" value="7" id="urge-strength" oninput="document.getElementById('urge-val').textContent=this.value" style="accent-color:var(--accent);flex:1">
+            <span id="urge-val" style="font-size:16px;font-weight:800;color:var(--accent)">7</span>
+            <span style="font-size:11px;color:var(--text3)">/10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chain-step">
+        <div class="chain-left">
+          <div class="chain-node" style="background:#C62828">4</div>
+          <div class="chain-line"></div>
+        </div>
+        <div class="chain-body">
+          <div class="chain-title">Decision point / missed exit</div>
+          <div class="chain-desc">"What happened just before you used? What could you have done differently here?"</div>
+          <textarea class="chain-input" id="c4-decision" rows="2" placeholder="e.g. Sat down at dhaba instead of going home…"></textarea>
+          <div class="chain-chips">
+            <div class="chip" onclick="appendChain('c4-decision',this)">Went to high-risk place</div>
+            <div class="chip" onclick="appendChain('c4-decision',this)">Stayed with users</div>
+            <div class="chip" onclick="appendChain('c4-decision',this)">Didn't call support person</div>
+            <div class="chip" onclick="appendChain('c4-decision',this)">Had money on hand</div>
+            <div class="chip" onclick="appendChain('c4-decision',this)">Was alone</div>
+            <div class="chip" onclick="appendChain('c4-decision',this)">Skipped medication</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chain-step">
+        <div class="chain-left">
+          <div class="chain-node" style="background:#1E5E32">5</div>
+          <div class="chain-line"></div>
+        </div>
+        <div class="chain-body">
+          <div class="chain-title">Use episode</div>
+          <div class="chain-desc">"What happened? How much? How long?"</div>
+          <textarea class="chain-input" id="c5-use" rows="2" placeholder="e.g. Drank 360ml over 3 hours with two friends…"></textarea>
+        </div>
+      </div>
+
+      <div class="chain-step">
+        <div class="chain-left">
+          <div class="chain-node" style="background:#37474F">6</div>
+        </div>
+        <div class="chain-body">
+          <div class="chain-title">Aftermath / consequences</div>
+          <div class="chain-desc">"How did you feel after? What happened next?"</div>
+          <textarea class="chain-input" id="c6-aftermath" rows="2" placeholder="e.g. Guilt, argument with wife, missed work next day…"></textarea>
+          <div class="chain-chips">
+            <div class="chip" onclick="appendChain('c6-aftermath',this)">Guilt / shame</div>
+            <div class="chip" onclick="appendChain('c6-aftermath',this)">Family conflict</div>
+            <div class="chip" onclick="appendChain('c6-aftermath',this)">Financial loss</div>
+            <div class="chip" onclick="appendChain('c6-aftermath',this)">Missed work</div>
+            <div class="chip" onclick="appendChain('c6-aftermath',this)">Physical illness</div>
+            <div class="chip" onclick="appendChain('c6-aftermath',this)">Deeper despair</div>
+            <div class="chip" onclick="appendChain('c6-aftermath',this)">Resolved to quit again</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end chain -->
+  </div>
+</div>
+
+<!-- High-risk situation planner -->
+<div class="panel">
+  <div class="ph"><div class="phd" style="background:#C62828"></div><div><div class="pht">High-risk situation (HRS) calendar</div><div class="phs">Mark upcoming high-risk dates for proactive planning</div></div></div>
+  <div class="pb">
+    <div class="risk-sel">
+      <button class="risk-btn active-high" id="rb-high" onclick="setRiskMode('high',this)">🔴 High risk</button>
+      <button class="risk-btn" id="rb-medium" onclick="setRiskMode('medium',this)">🟡 Medium</button>
+      <button class="risk-btn" id="rb-safe" onclick="setRiskMode('safe',this)">🟢 Safe / planned activity</button>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Tap a date to mark it. Common high-risk: festivals, paydays, anniversaries, social events.</div>
+
+    <!-- Quick-mark festival chips -->
+    <div class="chips" style="margin-bottom:10px">
+      <div class="fl" style="width:100%;margin-bottom:4px">Quick-mark known HRS events</div>
+      <div class="chip" onclick="toggleChip(this)">Navratri</div>
+      <div class="chip" onclick="toggleChip(this)">Diwali</div>
+      <div class="chip" onclick="toggleChip(this)">Holi</div>
+      <div class="chip" onclick="toggleChip(this)">Eid</div>
+      <div class="chip" onclick="toggleChip(this)">Christmas / New Year</div>
+      <div class="chip" onclick="toggleChip(this)">Payday (1st/30th)</div>
+      <div class="chip" onclick="toggleChip(this)">Weekly market day</div>
+      <div class="chip" onclick="toggleChip(this)">Wedding / party</div>
+      <div class="chip" onclick="toggleChip(this)">Anniversary of loss</div>
+      <div class="chip" onclick="toggleChip(this)">Work deadline</div>
+      <div class="chip" onclick="toggleChip(this)">End of month stress</div>
+    </div>
+
+    <div id="calendar-wrap" style="overflow-x:auto"></div>
+    <div class="cal-legend" style="margin-top:10px">
+      <div class="cal-leg"><div class="cal-dot" style="background:#FBEBEB;border:1px solid var(--red)"></div>High risk</div>
+      <div class="cal-leg"><div class="cal-dot" style="background:var(--amber-light);border:1px solid var(--amber)"></div>Medium</div>
+      <div class="cal-leg"><div class="cal-dot" style="background:var(--green-light);border:1px solid var(--green)"></div>Safe / planned</div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="fl">HRS survival plan for marked dates</div>
+      <textarea class="fi" id="hrs-plan" rows="3" placeholder="e.g. Diwali: attend with sober family member, leave by 9pm, call sponsor if craving…"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- Coping bank -->
+<div class="panel">
+  <div class="ph"><div class="phd" style="background:#1E5E32"></div><div><div class="pht">Personalised coping bank</div><div class="phs">Build the patient's go-to craving coping toolkit</div></div></div>
+  <div class="pb">
+    <div class="coping-bank">
+      <div class="coping-card">
+        <div class="coping-cat">Distraction / activity</div>
+        <div class="coping-chips">
+          <div class="chip" onclick="toggleChip(this)">Walk / exercise</div>
+          <div class="chip" onclick="toggleChip(this)">Call a sober friend</div>
+          <div class="chip" onclick="toggleChip(this)">Watch a film</div>
+          <div class="chip" onclick="toggleChip(this)">Help at home</div>
+          <div class="chip" onclick="toggleChip(this)">Temple / masjid / church</div>
+          <div class="chip" onclick="toggleChip(this)">HSM meditation</div>
+          <div class="chip" onclick="toggleChip(this)">Hobby / craft</div>
+          <div class="chip" onclick="toggleChip(this)">Play with children</div>
+        </div>
+      </div>
+      <div class="coping-card">
+        <div class="coping-cat">Urge surfing / mindfulness</div>
+        <div class="coping-chips">
+          <div class="chip" onclick="toggleChip(this)">4-7-8 breathing</div>
+          <div class="chip" onclick="toggleChip(this)">Box breathing</div>
+          <div class="chip" onclick="toggleChip(this)">5-4-3-2-1 grounding</div>
+          <div class="chip" onclick="toggleChip(this)">Notice and name the urge</div>
+          <div class="chip" onclick="toggleChip(this)">Urge surfing (ride the wave)</div>
+          <div class="chip" onclick="toggleChip(this)">Cold water on face</div>
+        </div>
+      </div>
+      <div class="coping-card">
+        <div class="coping-cat">Social support</div>
+        <div class="coping-chips">
+          <div class="chip" onclick="toggleChip(this)">Call family member</div>
+          <div class="chip" onclick="toggleChip(this)">AA / NA meeting</div>
+          <div class="chip" onclick="toggleChip(this)">Call sponsor</div>
+          <div class="chip" onclick="toggleChip(this)">Text support group</div>
+          <div class="chip" onclick="toggleChip(this)">Visit trusted person</div>
+          <div class="chip" onclick="toggleChip(this)">Come to Aatmiya OPD</div>
+        </div>
+      </div>
+      <div class="coping-card">
+        <div class="coping-cat">Cognitive strategies</div>
+        <div class="coping-chips">
+          <div class="chip" onclick="toggleChip(this)">Play the tape forward</div>
+          <div class="chip" onclick="toggleChip(this)">Think of consequences</div>
+          <div class="chip" onclick="toggleChip(this)">Read reasons to quit</div>
+          <div class="chip" onclick="toggleChip(this)">Remember last relapse cost</div>
+          <div class="chip" onclick="toggleChip(this)">Delay 30 minutes</div>
+          <div class="chip" onclick="toggleChip(this)">Recall family / goals</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:10px">
+      <div class="fl">Patient's own coping strategies</div>
+      <textarea class="fi" id="own-coping" rows="2" placeholder="Things this patient has said help them…"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- Output -->
+<div class="panel">
+  <div class="act-row" style="border-top:none;padding:14px 18px 10px">
+    <button class="bp" onclick="buildReport()">Generate relapse prevention summary</button>
+    <button class="bpo" onclick="resetAll()">Reset</button>
+  </div>
+  <div id="out-area" class="out-area" style="margin:0 18px 14px"></div>
+</div>
+
+</div>
+
+<script>
+let selectedSub = 'Substance';
+let riskMode = 'high';
+let calendarData = {};
+
+function selectSub(el, name) {
+  selectedSub = name;
+  document.querySelectorAll('.panel:first-of-type .chips .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function appendChain(id, el) {
+  const field = document.getElementById(id);
+  const val = el.textContent.trim();
+  if (field.value && !field.value.endsWith('\n')) field.value += ', ';
+  field.value += val;
+}
+
+function toggleChip(el) { el.classList.toggle('on'); }
+
+// Calendar
+function setRiskMode(mode, btn) {
+  riskMode = mode;
+  document.querySelectorAll('.risk-btn').forEach(b=>{b.className='risk-btn'});
+  btn.classList.add('active-' + mode);
+}
+
+function buildCalendar() {
+  const now = new Date();
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html = `<div class="calendar-grid">${days.map(d=>`<div class="cal-header">${d}</div>`).join('')}`;
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startDay = start.getDay();
+  for (let i=0;i<startDay;i++) html += '<div></div>';
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  for (let d=1;d<=daysInMonth;d++) {
+    const key = `${now.getFullYear()}-${now.getMonth()+1}-${d}`;
+    const risk = calendarData[key]||'';
+    html += `<div class="cal-day${risk?' '+risk+'-risk':''}" onclick="toggleCalDay('${key}',this)">${d}</div>`;
+  }
+  html += '</div>';
+  document.getElementById('calendar-wrap').innerHTML = html;
+}
+
+function toggleCalDay(key, el) {
+  const current = calendarData[key];
+  if (current === riskMode) {
+    delete calendarData[key];
+    el.className='cal-day';
+  } else {
+    calendarData[key] = riskMode;
+    el.className=`cal-day ${riskMode}-risk`;
+  }
+}
+
+function buildReport() {
+  const chain = [
+    {label:'External trigger', id:'c1-external'},
+    {label:'Internal state', id:'c2-internal'},
+    {label:'Urge / craving', id:'c3-urge'},
+    {label:'Decision point', id:'c4-decision'},
+    {label:'Use episode', id:'c5-use'},
+    {label:'Aftermath', id:'c6-aftermath'},
+  ];
+  const chainText = chain.map(c=>`  ${c.label}: ${document.getElementById(c.id).value||'—'}`).join('\n');
+  const urgeStr = document.getElementById('urge-strength').value;
+  const hrsEvents = [...document.querySelectorAll('.panel:nth-child(3) .chip.on')].map(c=>c.textContent).join(', ');
+  const hrsPlan = document.getElementById('hrs-plan').value;
+  const copingSelected = [...document.querySelectorAll('.coping-bank .chip.on')].map(c=>c.textContent).join(', ');
+  const ownCoping = document.getElementById('own-coping').value;
+  const hrsDates = Object.entries(calendarData).filter(([k,v])=>v).map(([k,v])=>`${k} (${v})`).join(', ');
+  const now = new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+
+  const report = `AATMIYA HOSPITAL — CRAVING CHAIN & RELAPSE PREVENTION SUMMARY
+Generated: ${now}
+Substance: ${selectedSub}
+Use pattern: ${document.getElementById('use-pattern').value||'—'}
+
+━━━━ CRAVING CHAIN ANALYSIS ━━━━
+${chainText}
+Urge strength at peak: ${urgeStr}/10
+
+━━━━ HIGH-RISK SITUATIONS ━━━━
+Events identified: ${hrsEvents||'—'}
+Marked dates: ${hrsDates||'None marked'}
+HRS survival plan:
+${hrsPlan||'  (not completed)'}
+
+━━━━ COPING BANK ━━━━
+Selected strategies: ${copingSelected||'—'}
+Patient's own strategies: ${ownCoping||'—'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Aatmiya Hospital De-addiction OPD · Dr. Dhaivat Mehta`;
+
+  const out = document.getElementById('out-area');
+  out.textContent = report;
+  out.classList.add('visible');
+  navigator.clipboard?.writeText(report);
+  out.scrollIntoView({behavior:'smooth'});
+}
+
+function resetAll() {
+  document.querySelectorAll('textarea,input[type=text]').forEach(el=>el.value='');
+  document.querySelectorAll('.chip.on').forEach(c=>c.classList.remove('on'));
+  document.getElementById('urge-strength').value=7;
+  document.getElementById('urge-val').textContent='7';
+  calendarData={};
+  buildCalendar();
+  document.getElementById('out-area').classList.remove('visible');
+}
+
+buildCalendar();
+</script>
+</body>
+</html>

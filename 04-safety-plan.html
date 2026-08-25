@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safety Plan — Aatmiya Hospital</title>
+<style>
+  :root {
+    --bg: #F4F7F5;
+    --surface: #FFFFFF;
+    --surface2: #EEF3F0;
+    --border: #D5E0DA;
+    --text: #141E1A;
+    --text2: #4A5E56;
+    --text3: #8A9E98;
+    --accent: #1A5C42;
+    --accent-light: #E2F0EB;
+    --red: #B71C1C;
+    --red-light: #FFEBEE;
+    --amber: #E65100;
+    --amber-light: #FFF3E0;
+    --blue: #0D47A1;
+    --blue-light: #E8EAF6;
+    --radius: 12px;
+    --shadow: 0 2px 14px rgba(26,92,66,0.09);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .header { background: var(--accent); color: #fff; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-mark { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; }
+  .header-title { font-size: 16px; font-weight: 600; }
+  .header-sub { font-size: 11px; opacity: 0.7; margin-top: 1px; }
+  .header-actions { display: flex; gap: 8px; }
+  .btn-ghost { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+  .btn-ghost:hover { background: rgba(255,255,255,0.25); }
+
+  .crisis-bar { background: var(--red); color: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .crisis-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.8; }
+  .crisis-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .crisis-chip { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; }
+
+  .wrapper { max-width: 900px; margin: 0 auto; padding: 16px; }
+
+  .patient-row { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 18px; margin-bottom: 16px; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
+  .field { display: flex; flex-direction: column; gap: 4px; min-width: 140px; flex: 1; }
+  .field-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); }
+  .field-input { padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; background: var(--surface2); color: var(--text); }
+  .field-input:focus { outline: none; border-color: var(--accent); background: #fff; }
+
+  /* Steps */
+  .step-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 14px; overflow: hidden; }
+  .step-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 14px; }
+  .step-num-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; flex-shrink: 0; }
+  .step-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; }
+  .step-badge { font-size: 9px; font-weight: 600; padding: 1px 6px; border-radius: 20px; white-space: nowrap; }
+  .step-info { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .step-desc { font-size: 12px; color: var(--text2); line-height: 1.5; margin-top: 3px; }
+  .step-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+
+  .input-line { display: flex; gap: 8px; align-items: center; }
+  .input-num { font-size: 11px; font-weight: 600; color: var(--text3); min-width: 18px; }
+  .input-field { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; background: var(--surface2); color: var(--text); }
+  .input-field:focus { outline: none; border-color: var(--accent); background: #fff; }
+  .input-field::placeholder { color: var(--text3); font-size: 12px; }
+
+  .contact-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 600px) { .contact-row { grid-template-columns: 1fr; } }
+
+  .contact-card { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; background: var(--surface2); }
+  .contact-type { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text3); margin-bottom: 5px; }
+  .contact-name-input { width: 100%; border: none; background: transparent; font-size: 13px; font-weight: 500; font-family: inherit; color: var(--text); margin-bottom: 3px; outline: none; }
+  .contact-name-input::placeholder { color: var(--text3); font-weight: 400; }
+  .contact-tel-input { width: 100%; border: none; background: transparent; font-size: 12px; font-family: inherit; color: var(--text2); outline: none; }
+  .contact-tel-input::placeholder { color: var(--text3); }
+
+  /* Reasons to live */
+  .reasons-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 550px) { .reasons-wrap { grid-template-columns: 1fr; } }
+  .reason-input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; background: var(--surface2); color: var(--text); width: 100%; }
+  .reason-input:focus { outline: none; border-color: var(--accent); background: #fff; }
+
+  /* Crisis resources */
+  .resources-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 550px) { .resources-grid { grid-template-columns: 1fr; } }
+  .resource-card { border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; }
+  .resource-name { font-size: 12px; font-weight: 600; }
+  .resource-num { font-size: 14px; font-weight: 800; }
+  .resource-note { font-size: 10px; }
+
+  /* Print card */
+  .print-preview { background: #fff; border: 2px dashed var(--border); border-radius: var(--radius); padding: 20px; margin-top: 16px; display: none; }
+  .print-preview.visible { display: block; }
+  .print-title { font-size: 16px; font-weight: 700; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 8px; margin-bottom: 12px; }
+  .print-section { margin-bottom: 12px; }
+  .print-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); margin-bottom: 5px; }
+  .print-item { font-size: 12px; color: var(--text); line-height: 1.7; padding-left: 12px; border-left: 2px solid var(--accent-light); margin-bottom: 3px; }
+  .print-contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .print-contact-box { border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; }
+  .print-contact-label { font-size: 9px; color: var(--text3); text-transform: uppercase; font-weight: 600; }
+  .print-contact-name { font-size: 12px; font-weight: 600; }
+  .print-contact-tel { font-size: 11px; color: var(--text2); }
+  .print-crisis { background: var(--red-light); border-radius: 6px; padding: 8px 12px; }
+  .print-crisis-title { font-size: 10px; font-weight: 700; color: var(--red); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .print-crisis-item { font-size: 11px; color: var(--red); font-weight: 600; line-height: 1.7; }
+
+  .btn-primary { background: var(--accent); color: #fff; border: none; padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+  .btn-primary:hover { background: #134a34; }
+  .btn-outline { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .btn-outline:hover { background: var(--accent-light); }
+  .action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+  @media print {
+    .header-actions, .action-row, .crisis-bar, .patient-row .btn-primary, .header { display: none !important; }
+    .print-preview { border: none; display: block !important; }
+    body { background: white; }
+    .step-card { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">A</div>
+    <div>
+      <div class="header-title">Safety Plan</div>
+      <div class="header-sub">Aatmiya Hospital · Adapted Stanley-Brown · Tool 04</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn-ghost" onclick="generatePrint()">Preview card</button>
+    <button class="btn-ghost" onclick="window.print()">Print</button>
+    <button class="btn-ghost" onclick="resetAll()">Reset</button>
+  </div>
+</div>
+
+<!-- Crisis bar -->
+<div class="crisis-bar">
+  <span class="crisis-label">Crisis lines</span>
+  <div class="crisis-links">
+    <span class="crisis-chip">iCall: 9152987821</span>
+    <span class="crisis-chip">Vandrevala: 1860-2662-345</span>
+    <span class="crisis-chip">iMind: 080-46110007</span>
+    <span class="crisis-chip">SNEHI: 044-24640050</span>
+    <span class="crisis-chip">Police: 100</span>
+    <span class="crisis-chip">Ambulance: 108</span>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <!-- Patient info -->
+  <div class="patient-row">
+    <div class="field">
+      <div class="field-label">Patient code / initials</div>
+      <input class="field-input" id="pat-code" placeholder="e.g. DM / PT-24-001">
+    </div>
+    <div class="field">
+      <div class="field-label">Date</div>
+      <input class="field-input" type="date" id="pat-date">
+    </div>
+    <div class="field">
+      <div class="field-label">Clinician</div>
+      <input class="field-input" id="pat-clinician" value="Dr. Dhaivat Mehta">
+    </div>
+    <div class="field">
+      <div class="field-label">Review date</div>
+      <input class="field-input" type="date" id="pat-review">
+    </div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="step-card">
+    <div class="step-head">
+      <div class="step-num-wrap">
+        <div class="step-num" style="background:#1A5C42">1</div>
+        <span class="step-badge" style="background:#E2F0EB;color:#1A5C42">Warning signs</span>
+      </div>
+      <div class="step-info">
+        <div class="step-title">Warning signs that a crisis may be developing</div>
+        <div class="step-desc">Thoughts, images, moods, situations, or behaviours that indicate a crisis may be developing. Ask: "How do you know when you're starting to struggle?"</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="input-line"><div class="input-num">1</div><input class="input-field" placeholder="e.g. I start feeling hopeless about the future…"></div>
+      <div class="input-line"><div class="input-num">2</div><input class="input-field" placeholder="e.g. I withdraw from family and stop answering calls…"></div>
+      <div class="input-line"><div class="input-num">3</div><input class="input-field" placeholder="e.g. I start using again or thinking about using…"></div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step-card">
+    <div class="step-head">
+      <div class="step-num-wrap">
+        <div class="step-num" style="background:#2E7D52">2</div>
+        <span class="step-badge" style="background:#E8F5EE;color:#2E7D52">Internal coping</span>
+      </div>
+      <div class="step-info">
+        <div class="step-title">Internal coping strategies — things I can do alone</div>
+        <div class="step-desc">Activities that can take my mind off the crisis without contacting another person. Ask: "What can you do on your own to distract yourself or feel better?"</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="input-line"><div class="input-num">1</div><input class="input-field" placeholder="e.g. Breathing exercises / pranayama…"></div>
+      <div class="input-line"><div class="input-num">2</div><input class="input-field" placeholder="e.g. Going for a walk outside…"></div>
+      <div class="input-line"><div class="input-num">3</div><input class="input-field" placeholder="e.g. Listening to bhajans / music…"></div>
+      <div class="input-line"><div class="input-num">4</div><input class="input-field" placeholder="e.g. HSM meditation practice…"></div>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step-card">
+    <div class="step-head">
+      <div class="step-num-wrap">
+        <div class="step-num" style="background:#1565C0">3</div>
+        <span class="step-badge" style="background:#E3F2FD;color:#1565C0">Social distraction</span>
+      </div>
+      <div class="step-info">
+        <div class="step-title">Social settings and people that provide distraction</div>
+        <div class="step-desc">People I can be around — not necessarily to talk about the crisis, but just to not be alone.</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="contact-row">
+        <div class="contact-card">
+          <div class="contact-type">Person 1</div>
+          <input class="contact-name-input" placeholder="Name…">
+          <div style="height:1px;background:var(--border);margin:5px 0"></div>
+          <input class="contact-tel-input" placeholder="Place or context (e.g. neighbour, masjid, temple)…">
+        </div>
+        <div class="contact-card">
+          <div class="contact-type">Person 2</div>
+          <input class="contact-name-input" placeholder="Name…">
+          <div style="height:1px;background:var(--border);margin:5px 0"></div>
+          <input class="contact-tel-input" placeholder="Place or context…">
+        </div>
+        <div class="contact-card">
+          <div class="contact-type">Place / setting 1</div>
+          <input class="contact-name-input" placeholder="Place name…">
+          <div style="height:1px;background:var(--border);margin:5px 0"></div>
+          <input class="contact-tel-input" placeholder="Why this place helps…">
+        </div>
+        <div class="contact-card">
+          <div class="contact-type">Place / setting 2</div>
+          <input class="contact-name-input" placeholder="Place name…">
+          <div style="height:1px;background:var(--border);margin:5px 0"></div>
+          <input class="contact-tel-input" placeholder="Why this place helps…">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step-card">
+    <div class="step-head">
+      <div class="step-num-wrap">
+        <div class="step-num" style="background:#6A1B9A">4</div>
+        <span class="step-badge" style="background:#F3E5F5;color:#6A1B9A">Trusted people</span>
+      </div>
+      <div class="step-info">
+        <div class="step-title">People I can ask for help</div>
+        <div class="step-desc">People I trust and can contact directly when I am in distress. Include family, friends, and community members.</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="contact-row">
+        <div class="contact-card">
+          <div class="contact-type">Trusted person 1</div>
+          <input class="contact-name-input" id="tp1-name" placeholder="Name…">
+          <div style="height:1px;background:var(--border);margin:5px 0"></div>
+          <input class="contact-tel-input" id="tp1-tel" placeholder="Phone number…">
+        </div>
+        <div class="contact-card">
+          <div class="contact-type">Trusted person 2</div>
+          <input class="contact-name-input" id="tp2-name" placeholder="Name…">
+          <div style="height:1px;background:var(--border);margin:5px 0"></div>
+          <input class="contact-tel-input" id="tp2-tel" placeholder="Phone number…">
+        </div>
+        <div class="contact-card">
+          <div class="contact-type">Trusted person 3</div>
+          <input class="contact-name-input" id="tp3-name" placeholder="Name…">
+          <div style="height:1px;background:var(--border);margin:5px 0"></div>
+          <input class="contact-tel-input" id="tp3-tel" placeholder="Phone number…">
+        </div>
+        <div class="contact-card">
+          <div class="contact-type">My clinician</div>
+          <input class="contact-name-input" value="Dr. Dhaivat Mehta">
+          <div style="height:1px;background:var(--border);margin:5px 0"></div>
+          <input class="contact-tel-input" id="clinic-tel" placeholder="Aatmiya Hospital number…">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step-card">
+    <div class="step-head">
+      <div class="step-num-wrap">
+        <div class="step-num" style="background:#B71C1C">5</div>
+        <span class="step-badge" style="background:#FFEBEE;color:#B71C1C">Crisis resources</span>
+      </div>
+      <div class="step-info">
+        <div class="step-title">Professional and emergency crisis resources</div>
+        <div class="step-desc">If I cannot keep myself safe and need immediate help from a professional.</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="resources-grid">
+        <div class="resource-card" style="background:#FFEBEE">
+          <div class="resource-name" style="color:#B71C1C">iCall (TISS) — India</div>
+          <div class="resource-num" style="color:#B71C1C">9152987821</div>
+          <div class="resource-note" style="color:#E57373">Mon–Sat 8am–10pm · Multilingual · Free</div>
+        </div>
+        <div class="resource-card" style="background:#FFEBEE">
+          <div class="resource-name" style="color:#B71C1C">Vandrevala Foundation</div>
+          <div class="resource-num" style="color:#B71C1C">1860-2662-345</div>
+          <div class="resource-note" style="color:#E57373">24/7 · Free · Pan-India</div>
+        </div>
+        <div class="resource-card" style="background:#FFEBEE">
+          <div class="resource-name" style="color:#B71C1C">iMind (NIMHANS) — Karnataka</div>
+          <div class="resource-num" style="color:#B71C1C">080-46110007</div>
+          <div class="resource-note" style="color:#E57373">Mon–Sat 8am–10pm</div>
+        </div>
+        <div class="resource-card" style="background:#FFF3E0">
+          <div class="resource-name" style="color:#E65100">SNEHI India</div>
+          <div class="resource-num" style="color:#E65100">044-24640050</div>
+          <div class="resource-note" style="color:#FF8A65">Emotional support · Free</div>
+        </div>
+        <div class="resource-card" style="background:#E8EAF6">
+          <div class="resource-name" style="color:#0D47A1">Emergency / Police</div>
+          <div class="resource-num" style="color:#0D47A1">100</div>
+          <div class="resource-note" style="color:#5C6BC0">24/7 Emergency</div>
+        </div>
+        <div class="resource-card" style="background:#E8EAF6">
+          <div class="resource-name" style="color:#0D47A1">Ambulance</div>
+          <div class="resource-num" style="color:#0D47A1">108</div>
+          <div class="resource-note" style="color:#5C6BC0">24/7 Emergency · Free</div>
+        </div>
+      </div>
+      <div style="padding:10px 12px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text2)">
+        <strong>Local Gandhidham contact:</strong>
+        <input class="input-field" style="margin-top:6px;width:100%" placeholder="Add local hospital / emergency contact number…">
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 6 -->
+  <div class="step-card">
+    <div class="step-head">
+      <div class="step-num-wrap">
+        <div class="step-num" style="background:#F5A623">6</div>
+        <span class="step-badge" style="background:#FEF3DC;color:#A06000">Reasons to live</span>
+      </div>
+      <div class="step-info">
+        <div class="step-title">The most important reasons to live</div>
+        <div class="step-desc">The things that matter most to me and that I want to protect. Ask: "What are the most important reasons you have for staying alive?" Include people, values, responsibilities, hopes.</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="reasons-wrap">
+        <input class="reason-input" placeholder="e.g. My children…">
+        <input class="reason-input" placeholder="e.g. My faith and practice…">
+        <input class="reason-input" placeholder="e.g. My work and purpose…">
+        <input class="reason-input" placeholder="e.g. My family who loves me…">
+        <input class="reason-input" placeholder="e.g. …">
+        <input class="reason-input" placeholder="e.g. …">
+      </div>
+    </div>
+  </div>
+
+  <!-- Means safety -->
+  <div class="step-card">
+    <div class="step-head">
+      <div class="step-num-wrap">
+        <div class="step-num" style="background:#37474F">+</div>
+        <span class="step-badge" style="background:#ECEFF1;color:#37474F">Means safety</span>
+      </div>
+      <div class="step-info">
+        <div class="step-title">Making the environment safer</div>
+        <div class="step-desc">Reducing access to means during a crisis period. Document agreed steps.</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="input-line"><div class="input-num">1</div><input class="input-field" placeholder="e.g. Medications kept with family member / dispensed weekly…"></div>
+      <div class="input-line"><div class="input-num">2</div><input class="input-field" placeholder="e.g. Access to alcohol removed from home…"></div>
+      <div class="input-line"><div class="input-num">3</div><input class="input-field" placeholder="e.g. Other agreed step…"></div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-primary" onclick="generatePrint()">Generate printable card</button>
+    <button class="btn-outline" onclick="window.print()">Print directly</button>
+    <button class="btn-outline" onclick="resetAll()">Clear all</button>
+  </div>
+
+  <!-- Print preview -->
+  <div class="print-preview" id="print-preview"></div>
+
+</div>
+
+<script>
+document.getElementById('pat-date').value = new Date().toISOString().split('T')[0];
+
+function gv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function getAllInputs(stepCard) {
+  return [...stepCard.querySelectorAll('input.input-field')].map(i => i.value.trim()).filter(Boolean);
+}
+
+function getAllContactCards(stepCard) {
+  return [...stepCard.querySelectorAll('.contact-card')].map(card => ({
+    type: card.querySelector('.contact-type')?.textContent || '',
+    name: card.querySelector('.contact-name-input')?.value.trim() || '',
+    detail: card.querySelector('.contact-tel-input')?.value.trim() || ''
+  })).filter(c => c.name);
+}
+
+function generatePrint() {
+  const cards = document.querySelectorAll('.step-card');
+  const patCode = gv('pat-code') || 'Anonymous';
+  const patDate = gv('pat-date') || new Date().toLocaleDateString('en-IN');
+  const clinician = gv('pat-clinician') || 'Dr. Dhaivat Mehta';
+  const review = gv('pat-review') || '—';
+
+  // Step 1 warnings
+  const warnings = getAllInputs(cards[0]);
+  // Step 2 internal coping
+  const coping = getAllInputs(cards[1]);
+  // Step 3 social
+  const social = [...cards[2].querySelectorAll('.contact-card')].map(card => {
+    const name = card.querySelector('.contact-name-input')?.value.trim();
+    const context = card.querySelector('.contact-tel-input')?.value.trim();
+    return name ? `${name}${context ? ' — ' + context : ''}` : null;
+  }).filter(Boolean);
+  // Step 4 trusted people
+  const trusted = getAllContactCards(cards[3]);
+  // Step 6 reasons
+  const reasons = [...cards[5].querySelectorAll('.reason-input')].map(i => i.value.trim()).filter(Boolean);
+  // Means safety
+  const means = getAllInputs(cards[6]);
+
+  const html = `
+    <div class="print-title">Safety Plan — Aatmiya Hospital</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:14px">
+      Patient: ${patCode} &nbsp;·&nbsp; Date: ${patDate} &nbsp;·&nbsp; Clinician: ${clinician} &nbsp;·&nbsp; Review: ${review}
+    </div>
+
+    ${warnings.length ? `<div class="print-section">
+      <div class="print-section-title">⚠ Step 1 — Warning signs</div>
+      ${warnings.map(w => `<div class="print-item">${w}</div>`).join('')}
+    </div>` : ''}
+
+    ${coping.length ? `<div class="print-section">
+      <div class="print-section-title">🧘 Step 2 — Internal coping</div>
+      ${coping.map(c => `<div class="print-item">${c}</div>`).join('')}
+    </div>` : ''}
+
+    ${social.length ? `<div class="print-section">
+      <div class="print-section-title">👥 Step 3 — Social distractions</div>
+      ${social.map(s => `<div class="print-item">${s}</div>`).join('')}
+    </div>` : ''}
+
+    ${trusted.length ? `<div class="print-section">
+      <div class="print-section-title">📞 Step 4 — Trusted contacts</div>
+      <div class="print-contact-grid">
+        ${trusted.map(t => `<div class="print-contact-box">
+          <div class="print-contact-label">${t.type}</div>
+          <div class="print-contact-name">${t.name}</div>
+          <div class="print-contact-tel">${t.detail}</div>
+        </div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <div class="print-section">
+      <div class="print-crisis">
+        <div class="print-crisis-title">🆘 Step 5 — Crisis lines (always available)</div>
+        <div class="print-crisis-item">iCall: 9152987821 &nbsp;·&nbsp; Vandrevala: 1860-2662-345 &nbsp;·&nbsp; iMind: 080-46110007</div>
+        <div class="print-crisis-item">Police: 100 &nbsp;·&nbsp; Ambulance: 108</div>
+      </div>
+    </div>
+
+    ${reasons.length ? `<div class="print-section">
+      <div class="print-section-title">💛 Step 6 — Reasons to live</div>
+      ${reasons.map(r => `<div class="print-item">${r}</div>`).join('')}
+    </div>` : ''}
+
+    ${means.length ? `<div class="print-section">
+      <div class="print-section-title">🔒 Means safety</div>
+      ${means.map(m => `<div class="print-item">${m}</div>`).join('')}
+    </div>` : ''}
+
+    <div style="margin-top:16px;padding-top:10px;border-top:1px solid var(--border);font-size:10px;color:var(--text3)">
+      Generated by Aatmiya Hospital Safety Plan Tool · ${new Date().toLocaleDateString('en-IN')} · For clinical use only
+    </div>
+  `;
+
+  const preview = document.getElementById('print-preview');
+  preview.innerHTML = html;
+  preview.classList.add('visible');
+  preview.scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetAll() {
+  document.querySelectorAll('input').forEach(i => {
+    if (i.id === 'pat-clinician') i.value = 'Dr. Dhaivat Mehta';
+    else if (i.id === 'pat-date') i.value = new Date().toISOString().split('T')[0];
+    else i.value = '';
+  });
+  document.getElementById('print-preview').classList.remove('visible');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workplace Stress Assessment — Aatmiya Wellness</title>
+<style>
+  :root{
+    --bg:#F0EEF8;--surface:#FFF;--surface2:#E8E6F3;--border:#D5D1EC;
+    --text:#16122A;--text2:#4A4660;--text3:#9A96B0;
+    --accent:#3D2080;--accent-light:#EAE4FA;
+    --green:#1E5E32;--green-light:#E5F2E9;
+    --amber:#8B5E00;--amber-light:#FFF8E1;
+    --red:#7B1818;--red-light:#FBEBEB;
+    --radius:14px;--shadow:0 2px 16px rgba(61,32,128,.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:40px;height:40px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800}
+  .ht{font-size:18px;font-weight:700}.hs{font-size:11px;opacity:.7;margin-top:2px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 16px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .wrap{max-width:720px;margin:0 auto;padding:20px 16px;display:flex;flex-direction:column;gap:16px}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .ph{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:14px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:2px}
+  .pb{padding:16px 18px}
+  /* Progress */
+  .prog-track{height:6px;background:var(--border);border-radius:3px;margin-bottom:6px}
+  .prog-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s}
+  .prog-label{font-size:11px;color:var(--text3);margin-bottom:18px}
+  /* Sections */
+  .section-divider{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin:16px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+  /* Questions */
+  .q-block{margin-bottom:20px}
+  .q-num{font-size:10px;font-weight:700;color:var(--text3);margin-bottom:3px}
+  .q-text{font-size:14px;color:var(--text);margin-bottom:10px;line-height:1.5;font-weight:500}
+  .q-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  @media(max-width:480px){.q-opts{grid-template-columns:repeat(2,1fr)}}
+  .q-opt{padding:9px 6px;border-radius:10px;font-size:11px;font-weight:500;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;text-align:center;transition:all .12s;line-height:1.3}
+  .q-opt:hover{border-color:var(--accent)}
+  .q-opt.sel{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:700}
+  /* Result card */
+  .result-card{border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;border:2px solid transparent;transition:all .3s}
+  .result-score{font-size:52px;font-weight:900;line-height:1}
+  .result-label{font-size:20px;font-weight:700;margin-top:6px}
+  .result-sub{font-size:13px;margin-top:6px;line-height:1.6;max-width:420px;margin-left:auto;margin-right:auto}
+  /* Sub-scores */
+  .sub-scores{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+  @media(max-width:480px){.sub-scores{grid-template-columns:1fr}}
+  .sub-card{border-radius:10px;padding:12px;text-align:center}
+  .sub-val{font-size:24px;font-weight:800}
+  .sub-name{font-size:11px;margin-top:3px}
+  .sub-label{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:5px;display:inline-block}
+  /* Tip card */
+  .tip-card{border-radius:12px;padding:16px;margin-bottom:10px;border-left:4px solid var(--accent)}
+  .tip-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+  .tip-list{font-size:13px;line-height:1.8;color:var(--text2)}
+  .tip-list li{margin-left:18px;margin-bottom:2px}
+  /* Buttons */
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .bp{background:var(--accent);color:#fff;border:none;padding:11px 24px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+  .bpo{background:transparent;color:var(--accent);border:2px solid var(--accent);padding:11px 24px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+  /* Group mode */
+  .group-bar{background:var(--surface2);padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .group-stat{text-align:center}
+  .group-val{font-size:18px;font-weight:800;color:var(--accent)}
+  .group-lbl{font-size:10px;color:var(--text3)}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Workplace Stress Assessment</div><div class="hs">Aatmiya Wellness · Corporate Tool 11 · 3 minutes</div></div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="bg" onclick="resetAll()">New person</button>
+    <button class="bg" onclick="window.print()">Print result</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- Intro -->
+<div class="panel" id="intro-panel">
+  <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">About this assessment</div></div></div>
+  <div class="pb">
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px">
+      This 3-minute, 9-question check looks at <strong>depression</strong>, <strong>anxiety</strong>, and <strong>workplace stress</strong>. Your answers are completely private — nothing is sent anywhere. At the end you'll receive a personal feedback card with practical tips.
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div style="flex:1;min-width:120px;background:var(--surface2);border-radius:8px;padding:10px 12px;text-align:center">
+        <div style="font-size:20px;font-weight:800;color:var(--accent)">9</div>
+        <div style="font-size:11px;color:var(--text3)">Questions</div>
+      </div>
+      <div style="flex:1;min-width:120px;background:var(--surface2);border-radius:8px;padding:10px 12px;text-align:center">
+        <div style="font-size:20px;font-weight:800;color:var(--accent)">3</div>
+        <div style="font-size:11px;color:var(--text3)">Minutes</div>
+      </div>
+      <div style="flex:1;min-width:120px;background:var(--surface2);border-radius:8px;padding:10px 12px;text-align:center">
+        <div style="font-size:20px;font-weight:800;color:var(--accent)">100%</div>
+        <div style="font-size:11px;color:var(--text3)">Private</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Questions -->
+<div class="panel" id="q-panel">
+  <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Your answers</div><div class="phs">Over the last 2 weeks, how often have you been bothered by each of the following?</div></div></div>
+  <div class="pb">
+    <div class="prog-track"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-lbl">0 of 9 answered</div>
+    <div id="q-container"></div>
+  </div>
+</div>
+
+<!-- Result -->
+<div class="panel" id="result-panel" style="display:none">
+  <div class="ph"><div class="phd" style="background:var(--green)"></div><div><div class="pht">Your personal feedback</div></div></div>
+  <div class="pb" id="result-body"></div>
+  <div class="btn-row" style="padding:0 18px 18px">
+    <button class="bp" onclick="resetAll()">Take again / new person</button>
+    <button class="bpo" onclick="window.print()">Print this result</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const PHQ_OPTS = [
+  {label:'Not at all',val:0},
+  {label:'Several days',val:1},
+  {label:'More than half the days',val:2},
+  {label:'Nearly every day',val:3},
+];
+
+const QUESTIONS = [
+  // PHQ-2
+  {id:'phq1',domain:'phq',text:'Little interest or pleasure in doing things you usually enjoy.'},
+  {id:'phq2',domain:'phq',text:'Feeling down, depressed, or hopeless.'},
+  // GAD-2
+  {id:'gad1',domain:'gad',text:'Feeling nervous, anxious, or on edge.'},
+  {id:'gad2',domain:'gad',text:'Not being able to stop or control worrying.'},
+  // Burnout / stress — 5 items (0–3 scale)
+  {id:'bo1',domain:'bo',text:'I feel emotionally exhausted and drained by my work.'},
+  {id:'bo2',domain:'bo',text:'I have too much work and not enough time to do it properly.'},
+  {id:'bo3',domain:'bo',text:'I find it hard to switch off and relax after work.'},
+  {id:'bo4',domain:'bo',text:'I feel that my efforts at work are not recognised or valued.'},
+  {id:'bo5',domain:'bo',text:'I wake up in the morning feeling tired and dreading the day ahead.'},
+];
+
+let answers = {};
+
+function renderQuestions() {
+  document.getElementById('q-container').innerHTML = QUESTIONS.map((q,i) => `
+    <div class="q-block" id="qblock-${q.id}">
+      <div class="q-num">Question ${i+1} of ${QUESTIONS.length}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="q-opts">
+        ${PHQ_OPTS.map(o => `
+          <div class="q-opt${answers[q.id]===o.val?' sel':''}"
+            onclick="setAns('${q.id}',${o.val},this)">${o.label}</div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+  updateProgress();
+}
+
+function setAns(id, val, el) {
+  answers[id] = val;
+  el.closest('.q-opts').querySelectorAll('.q-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  updateProgress();
+  // Auto-scroll to next question
+  const idx = QUESTIONS.findIndex(q=>q.id===id);
+  if (idx < QUESTIONS.length - 1) {
+    const next = document.getElementById('qblock-' + QUESTIONS[idx+1].id);
+    if (next) setTimeout(()=>next.scrollIntoView({behavior:'smooth',block:'nearest'}),150);
+  }
+  if (Object.keys(answers).length === QUESTIONS.length) {
+    setTimeout(showResult, 400);
+  }
+}
+
+function updateProgress() {
+  const n = Object.keys(answers).length;
+  document.getElementById('prog').style.width = (n/QUESTIONS.length*100)+'%';
+  document.getElementById('prog-lbl').textContent = `${n} of ${QUESTIONS.length} answered`;
+}
+
+function showResult() {
+  const phq = (answers.phq1||0)+(answers.phq2||0);
+  const gad = (answers.gad1||0)+(answers.gad2||0);
+  const bo = (answers.bo1||0)+(answers.bo2||0)+(answers.bo3||0)+(answers.bo4||0)+(answers.bo5||0);
+  const boNorm = Math.round(bo/15*6); // normalise to 0-6
+  const total = phq + gad + boNorm;
+
+  // Tier
+  let tier, tierColor, tierBg, tierLabel;
+  if (phq >= 3 || gad >= 3 || bo >= 9) {
+    tier='red'; tierColor='#7B1818'; tierBg='#FBEBEB'; tierLabel='Support recommended';
+  } else if (phq >= 2 || gad >= 2 || bo >= 5) {
+    tier='amber'; tierColor='#8B5E00'; tierBg='#FFF8E1'; tierLabel='Some concern — take action';
+  } else {
+    tier='green'; tierColor='#1E5E32'; tierBg='#E5F2E9'; tierLabel='Doing well — keep it up';
+  }
+
+  // Sub-labels
+  const phqLabel = phq >= 3 ? 'Concern' : phq >= 1 ? 'Mild' : 'Low';
+  const gadLabel = gad >= 3 ? 'Concern' : gad >= 1 ? 'Mild' : 'Low';
+  const boLabel = bo >= 9 ? 'High' : bo >= 5 ? 'Moderate' : 'Low';
+  const labelColor = (l) => l==='Concern'||l==='High' ? '#7B1818' : l==='Mild'||l==='Moderate' ? '#8B5E00' : '#1E5E32';
+  const labelBg = (l) => l==='Concern'||l==='High' ? '#FBEBEB' : l==='Mild'||l==='Moderate' ? '#FFF8E1' : '#E5F2E9';
+
+  const tips = getTips(tier, phq, gad, bo);
+
+  document.getElementById('result-body').innerHTML = `
+    <div class="result-card" style="background:${tierBg};border-color:${tierColor}">
+      <div class="result-score" style="color:${tierColor}">${tier==='red'?'⚠':tier==='amber'?'🟡':'✓'}</div>
+      <div class="result-label" style="color:${tierColor}">${tierLabel}</div>
+      <div class="result-sub" style="color:${tierColor}">${getResultDesc(tier,phq,gad,bo)}</div>
+    </div>
+    <div class="sub-scores">
+      <div class="sub-card" style="background:${labelBg(phqLabel)}">
+        <div class="sub-val" style="color:${labelColor(phqLabel)}">${phq}/6</div>
+        <div class="sub-name" style="color:${labelColor(phqLabel)}">Mood (PHQ-2)</div>
+        <div class="sub-label" style="background:${labelBg(phqLabel)};color:${labelColor(phqLabel)};border:1px solid ${labelColor(phqLabel)}44">${phqLabel}</div>
+      </div>
+      <div class="sub-card" style="background:${labelBg(gadLabel)}">
+        <div class="sub-val" style="color:${labelColor(gadLabel)}">${gad}/6</div>
+        <div class="sub-name" style="color:${labelColor(gadLabel)}">Worry (GAD-2)</div>
+        <div class="sub-label" style="background:${labelBg(gadLabel)};color:${labelColor(gadLabel)};border:1px solid ${labelColor(gadLabel)}44">${gadLabel}</div>
+      </div>
+      <div class="sub-card" style="background:${labelBg(boLabel)}">
+        <div class="sub-val" style="color:${labelColor(boLabel)}">${bo}/15</div>
+        <div class="sub-name" style="color:${labelColor(boLabel)}">Work stress</div>
+        <div class="sub-label" style="background:${labelBg(boLabel)};color:${labelColor(boLabel)};border:1px solid ${labelColor(boLabel)}44">${boLabel}</div>
+      </div>
+    </div>
+    ${tips}
+    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:10px">
+      This is a screening tool, not a clinical diagnosis. If you're struggling, please speak with a counsellor or the Aatmiya team.
+    </div>
+  `;
+
+  document.getElementById('result-panel').style.display='block';
+  document.getElementById('result-panel').scrollIntoView({behavior:'smooth'});
+}
+
+function getResultDesc(tier, phq, gad, bo) {
+  if (tier==='red') return 'Your scores suggest you may be experiencing significant stress, low mood, or anxiety. Speaking with a mental health professional would be a helpful next step.';
+  if (tier==='amber') return 'You\'re showing some signs of stress and strain. A few focused changes to your routine and work habits can make a real difference.';
+  return 'Your wellbeing scores are in a healthy range. Keep prioritising rest, connection, and the habits that are working for you.';
+}
+
+function getTips(tier, phq, gad, bo) {
+  const cards = [];
+  if (tier === 'red') {
+    cards.push({
+      color:'#7B1818', bg:'#FBEBEB',
+      title:'💬 Talk to someone',
+      tips:['Speak with the Aatmiya Hospital counsellor or your GP','iCall helpline: 9152987821 (Mon–Sat, 8am–10pm)','You don\'t need to manage this alone — support works']
+    });
+  }
+  if (phq >= 2) {
+    cards.push({
+      color:'#1A3D70', bg:'#E8EEF8',
+      title:'🌤 Mood: small steps first',
+      tips:['Schedule one enjoyable activity every day — even 15 minutes','Go outside for at least 10 minutes of natural light','Limit social media use before bed','Reach out to one person you trust this week']
+    });
+  }
+  if (gad >= 2) {
+    cards.push({
+      color:'#4C2D8E', bg:'#EDE8FA',
+      title:'🧘 Anxiety: calm the nervous system',
+      tips:['Try box breathing: 4 counts in, hold 4, out 4, hold 4','Write down your worries — brain dump before bed','Challenge "what if" thoughts: what is actually likely?','Limit caffeine after 2pm']
+    });
+  }
+  if (bo >= 5) {
+    cards.push({
+      color:'#8B5E00', bg:'#FFF8E1',
+      title:'⚡ Work stress: protect your recovery',
+      tips:['Set a clear end-of-work time and stick to it today','Take all your breaks — step away from your desk','Identify one task you can delegate or drop this week','Switch off work notifications after hours']
+    });
+  }
+  if (tier === 'green') {
+    cards.push({
+      color:'#1E5E32', bg:'#E5F2E9',
+      title:'✅ Keep going — what\'s working',
+      tips:['Continue whatever is helping you rest and recharge','Maintain your social connections','Consider a brief daily mindfulness or breathing practice to stay on track','Notice early warning signs: irritability, poor sleep, low motivation']
+    });
+  }
+  return cards.map(c => `
+    <div class="tip-card" style="background:${c.bg};border-left-color:${c.color}">
+      <div class="tip-title" style="color:${c.color}">${c.title}</div>
+      <ul class="tip-list">${c.tips.map(t=>`<li>${t}</li>`).join('')}</ul>
+    </div>
+  `).join('');
+}
+
+function resetAll() {
+  answers = {};
+  document.getElementById('result-panel').style.display='none';
+  renderQuestions();
+  document.getElementById('q-panel').scrollIntoView({behavior:'smooth'});
+}
+
+renderQuestions();
+</script>
+</body>
+</html>

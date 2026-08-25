@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSM Practice Companion — Aatmiya</title>
+<style>
+  :root{
+    --bg:#F2EFF8;--surface:#FFF;--surface2:#EAE7F3;--border:#D8D4EC;
+    --text:#16122A;--text2:#4A4660;--text3:#9A97B0;
+    --deep:#2A1660;--deep-light:#EAE4FA;
+    --gold:#7B5A00;--gold-light:#FFF8E1;
+    --teal:#1A5E52;--teal-light:#E3F0EC;
+    --radius:16px;--shadow:0 4px 24px rgba(42,22,96,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+  /* Header */
+  .header{background:linear-gradient(135deg,#2A1660 0%,#4C2D8E 60%,#6A3DAE 100%);color:#fff;padding:20px 24px 16px;position:relative;overflow:hidden}
+  .header::before{content:'🕉';position:absolute;right:20px;top:10px;font-size:80px;opacity:.08;line-height:1}
+  .hl{display:flex;align-items:center;gap:12px;position:relative}
+  .lm{width:40px;height:40px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+  .ht{font-size:18px;font-weight:700;letter-spacing:-.2px}
+  .hs{font-size:11px;opacity:.7;margin-top:2px}
+  .header-quote{position:relative;margin-top:14px;font-size:12px;opacity:.8;font-style:italic;line-height:1.5;border-left:2px solid rgba(255,255,255,.4);padding-left:12px}
+
+  /* Nav tabs */
+  .tabs{background:#2A1660;display:flex;overflow-x:auto}
+  .tab{flex:1;min-width:80px;padding:11px 8px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.6);cursor:pointer;border:none;background:transparent;font-family:inherit;transition:all .15s;white-space:nowrap}
+  .tab.active{color:#fff;border-bottom:2.5px solid #A08AEE}
+
+  .wrap{max-width:680px;margin:0 auto;padding:16px}
+
+  /* Cards */
+  .practice-card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px;border:1.5px solid var(--border);cursor:pointer;transition:all .15s}
+  .practice-card:hover{border-color:#6A3DAE;transform:translateY(-2px)}
+  .practice-card.active-card{border-color:#4C2D8E}
+  .pc-head{padding:14px 16px;display:flex;align-items:center;gap:12px}
+  .pc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+  .pc-info{flex:1}
+  .pc-name{font-size:14px;font-weight:600;color:var(--text)}
+  .pc-meta{font-size:11px;color:var(--text3);margin-top:2px}
+  .pc-arrow{font-size:16px;color:var(--text3);transition:transform .2s}
+  .practice-card.active-card .pc-arrow{transform:rotate(90deg);color:#4C2D8E}
+  .pc-body{padding:0 16px 16px;display:none}
+  .practice-card.active-card .pc-body{display:block}
+  .pc-desc{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px}
+
+  /* Practice player */
+  .player{background:var(--deep);border-radius:12px;padding:20px;text-align:center;color:#fff}
+  .player-phase{font-size:22px;font-weight:700;margin-bottom:4px;min-height:32px;transition:all .3s}
+  .player-instruction{font-size:13px;opacity:.8;margin-bottom:16px;line-height:1.5;min-height:36px}
+  .player-circle-wrap{position:relative;width:140px;height:140px;margin:0 auto 16px}
+  #player-svg{width:100%;height:100%}
+  .player-countdown{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  .player-num{font-size:36px;font-weight:900;color:#fff;line-height:1}
+  .player-unit{font-size:11px;opacity:.6}
+  .player-btns{display:flex;gap:10px;justify-content:center}
+  .p-btn{padding:9px 22px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+  .p-play{background:#A08AEE;color:#fff}
+  .p-play:hover{background:#8A6FD8}
+  .p-reset{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2)}
+  .player-cycles{font-size:11px;opacity:.6;margin-top:10px}
+
+  /* Steps list */
+  .steps-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+  .step-item{display:flex;gap:10px;padding:8px 10px;background:var(--surface2);border-radius:8px;align-items:flex-start}
+  .step-bullet{width:20px;height:20px;border-radius:50%;background:#4C2D8E;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  .step-text{font-size:12px;color:var(--text2);line-height:1.55;flex:1}
+
+  /* Tags */
+  .tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+  .tag{font-size:10px;padding:3px 8px;border-radius:20px;background:var(--deep-light);color:var(--deep);font-weight:500}
+
+  /* Benefits section */
+  .benefits-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:480px){.benefits-grid{grid-template-columns:1fr}}
+  .benefit-card{background:var(--surface);border-radius:10px;padding:12px;border:1px solid var(--border)}
+  .benefit-icon{font-size:22px;margin-bottom:5px}
+  .benefit-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px}
+  .benefit-text{font-size:11px;color:var(--text2);line-height:1.5}
+
+  /* Journal */
+  .journal-entry{background:var(--surface);border-radius:12px;padding:14px;border:1px solid var(--border);margin-bottom:10px;box-shadow:var(--shadow)}
+  .je-date{font-size:10px;color:var(--text3);margin-bottom:4px}
+  .je-mood{font-size:18px}
+  .je-text{font-size:12px;color:var(--text2);line-height:1.5;margin-top:4px}
+  .fi{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .fi:focus{outline:none;border-color:#4C2D8E;background:#fff}
+  textarea.fi{resize:none;line-height:1.55}
+  .emoji-sel{display:flex;gap:8px;margin:8px 0}
+  .em-btn{font-size:22px;cursor:pointer;padding:6px;border-radius:8px;border:2px solid transparent;transition:all .12s}
+  .em-btn.sel{border-color:#4C2D8E;background:var(--deep-light)}
+  .bp{background:#4C2D8E;color:#fff;border:none;padding:9px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;margin-top:6px}
+  .bp:hover{background:#3a2070}
+  .empty-j{text-align:center;font-size:13px;color:var(--text3);padding:24px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">🕉</div>
+    <div><div class="ht">HSM Practice Companion</div><div class="hs">Himalayan Samarpan Meditation · Aatmiya Hospital · Tool 12</div></div>
+  </div>
+  <div class="header-quote">"The mind that is at peace is the greatest gift one can give to oneself and the world."<br>— HSM Teaching</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('practices',this)">Practices</button>
+  <button class="tab" onclick="switchTab('breathing',this)">Breathing</button>
+  <button class="tab" onclick="switchTab('benefits',this)">Benefits</button>
+  <button class="tab" onclick="switchTab('journal',this)">Journal</button>
+</div>
+
+<!-- PRACTICES TAB -->
+<div class="wrap" id="tab-practices">
+
+  <div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.5">
+    Tap any practice to expand. Each is drawn from HSM principles — suitable for patients, caregivers, and corporate wellness sessions.
+  </div>
+
+  <!-- Sahaj Pranayama -->
+  <div class="practice-card" id="pc1" onclick="toggleCard('pc1')">
+    <div class="pc-head">
+      <div class="pc-icon" style="background:#EAE4FA">🌬️</div>
+      <div class="pc-info">
+        <div class="pc-name">Sahaj Pranayama — Natural Breath Awareness</div>
+        <div class="pc-meta">5–10 min · Beginner-friendly · Any time</div>
+      </div>
+      <div class="pc-arrow">›</div>
+    </div>
+    <div class="pc-body">
+      <div class="pc-desc">The foundational HSM breath practice. Simply observing the natural breath without controlling it — bringing awareness to the sensation of air entering and leaving the nostrils. Calms the fluctuating mind and develops sustained attention.</div>
+      <div class="steps-list">
+        <div class="step-item"><div class="step-bullet">1</div><div class="step-text">Sit comfortably — on a chair or floor. Spine naturally upright. Hands resting in the lap.</div></div>
+        <div class="step-item"><div class="step-bullet">2</div><div class="step-text">Close your eyes gently. Take one slow, deliberate breath to settle.</div></div>
+        <div class="step-item"><div class="step-bullet">3</div><div class="step-text">Bring your attention to the nostrils. Simply observe the cool sensation of air entering, the brief pause, and the warm sensation as it leaves.</div></div>
+        <div class="step-item"><div class="step-bullet">4</div><div class="step-text">When the mind wanders — which is natural — gently notice this and return to the breath sensation. No judgment. Every return is a success.</div></div>
+        <div class="step-item"><div class="step-bullet">5</div><div class="step-text">Continue for 5–10 minutes. End by sitting quietly for one minute before opening your eyes.</div></div>
+      </div>
+      <div class="tag-row"><div class="tag">Anxiety</div><div class="tag">Concentration</div><div class="tag">Sleep</div><div class="tag">Any level</div></div>
+    </div>
+  </div>
+
+  <!-- So-Hum -->
+  <div class="practice-card" id="pc2" onclick="toggleCard('pc2')">
+    <div class="pc-head">
+      <div class="pc-icon" style="background:#E3F0EC">🔔</div>
+      <div class="pc-info">
+        <div class="pc-name">So-Hum Mantra with Breath</div>
+        <div class="pc-meta">10–20 min · Intermediate · Morning / evening</div>
+      </div>
+      <div class="pc-arrow">›</div>
+    </div>
+    <div class="pc-body">
+      <div class="pc-desc">So-Hum (Sanskrit: "I am That") is a natural sound of the breath — "So" on inhalation, "Hum" on exhalation. Syncing this ancient mantra with the breath creates a bridge between conscious attention and deeper awareness. Used in HSM for de-identification with mental noise.</div>
+      <div class="steps-list">
+        <div class="step-item"><div class="step-bullet">1</div><div class="step-text">Settle into a comfortable seated position. Close your eyes and take three slow breaths to arrive.</div></div>
+        <div class="step-item"><div class="step-bullet">2</div><div class="step-text">Begin to hear "So" silently as you inhale. Feel the chest and abdomen expand.</div></div>
+        <div class="step-item"><div class="step-bullet">3</div><div class="step-text">Hear "Hum" silently as you exhale. Feel the body soften and release.</div></div>
+        <div class="step-item"><div class="step-bullet">4</div><div class="step-text">Let the breath be natural — don't force its pace. The mantra follows the breath, not the reverse.</div></div>
+        <div class="step-item"><div class="step-bullet">5</div><div class="step-text">When thoughts arise, neither push them away nor follow them. Let them pass like clouds. Return to So-Hum.</div></div>
+        <div class="step-item"><div class="step-bullet">6</div><div class="step-text">After 10–20 minutes, let the mantra dissolve. Rest in silence for 2 minutes before opening your eyes.</div></div>
+      </div>
+      <div class="tag-row"><div class="tag">Depression</div><div class="tag">Trauma recovery</div><div class="tag">Deep stress</div><div class="tag">Spiritual</div></div>
+    </div>
+  </div>
+
+  <!-- Body scan -->
+  <div class="practice-card" id="pc3" onclick="toggleCard('pc3')">
+    <div class="pc-head">
+      <div class="pc-icon" style="background:#FFF8E1">🧘</div>
+      <div class="pc-info">
+        <div class="pc-name">Pratyahara Body Scan</div>
+        <div class="pc-meta">10–15 min · All levels · Evening / pre-sleep</div>
+      </div>
+      <div class="pc-arrow">›</div>
+    </div>
+    <div class="pc-body">
+      <div class="pc-desc">Pratyahara means "withdrawal of the senses" — systematically releasing physical tension by bringing and then withdrawing attention from each part of the body. Highly effective for somatisation, chronic pain, sleep disorders, and post-trauma grounding.</div>
+      <div class="steps-list">
+        <div class="step-item"><div class="step-bullet">1</div><div class="step-text">Lie down comfortably. Cover yourself with a light blanket if needed. Allow the body to be completely still.</div></div>
+        <div class="step-item"><div class="step-bullet">2</div><div class="step-text">Begin with three deep breaths. Let the body sink into the surface beneath you.</div></div>
+        <div class="step-item"><div class="step-bullet">3</div><div class="step-text">Bring attention to the top of your head. Just feel whatever is there — warmth, tingling, nothing. Then release that area.</div></div>
+        <div class="step-item"><div class="step-bullet">4</div><div class="step-text">Slowly move down: forehead, eyes, jaw (where we hold so much tension), neck, shoulders, chest, abdomen, hands, lower back, hips, thighs, knees, calves, feet.</div></div>
+        <div class="step-item"><div class="step-bullet">5</div><div class="step-text">At each area: notice → breathe → release. No judgment about what you find.</div></div>
+        <div class="step-item"><div class="step-bullet">6</div><div class="step-text">At the end, rest in whole-body awareness for 2–5 minutes. Drift into sleep or slowly return to wakefulness.</div></div>
+      </div>
+      <div class="tag-row"><div class="tag">Sleep</div><div class="tag">Somatisation</div><div class="tag">Chronic pain</div><div class="tag">PTSD grounding</div></div>
+    </div>
+  </div>
+
+  <!-- Loving-kindness -->
+  <div class="practice-card" id="pc4" onclick="toggleCard('pc4')">
+    <div class="pc-head">
+      <div class="pc-icon" style="background:#FBEBEB">💛</div>
+      <div class="pc-info">
+        <div class="pc-name">Metta — Loving Kindness Radiation</div>
+        <div class="pc-meta">10–15 min · All levels · Morning / anytime</div>
+      </div>
+      <div class="pc-arrow">›</div>
+    </div>
+    <div class="pc-body">
+      <div class="pc-desc">Metta (loving-kindness) is cultivated in concentric circles — beginning with oneself, expanding to loved ones, neutral people, difficult people, and finally all beings. Core to HSM's non-dual teachings. Particularly powerful for guilt, grief, interpersonal conflict, and depression.</div>
+      <div class="steps-list">
+        <div class="step-item"><div class="step-bullet">1</div><div class="step-text">Sit comfortably. Bring one hand gently to the heart. Take three slow breaths.</div></div>
+        <div class="step-item"><div class="step-bullet">2</div><div class="step-text"><strong>To yourself:</strong> Silently repeat — "May I be well. May I be safe. May I be at peace. May I be happy." Feel each phrase rather than just thinking it.</div></div>
+        <div class="step-item"><div class="step-bullet">3</div><div class="step-text"><strong>To a loved one:</strong> Picture someone you love. Send the same wishes: "May you be well. May you be safe. May you be at peace. May you be happy."</div></div>
+        <div class="step-item"><div class="step-bullet">4</div><div class="step-text"><strong>To a neutral person:</strong> Someone you see regularly but have no strong feeling for. Same phrases.</div></div>
+        <div class="step-item"><div class="step-bullet">5</div><div class="step-text"><strong>To a difficult person:</strong> Someone who challenges you. Extend the same wishes — not because they deserve it, but because your heart benefits from the expansion.</div></div>
+        <div class="step-item"><div class="step-bullet">6</div><div class="step-text"><strong>To all beings:</strong> Expand awareness to your city, your country, the world. "May all beings be well, safe, peaceful, and happy."</div></div>
+      </div>
+      <div class="tag-row"><div class="tag">Depression</div><div class="tag">Grief</div><div class="tag">Guilt</div><div class="tag">Conflict</div><div class="tag">Forgiveness</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BREATHING TAB -->
+<div class="wrap" id="tab-breathing" style="display:none">
+
+  <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Guided breath practices from HSM tradition. Select a technique, set your cycles, and follow the circle pacer.</div>
+
+  <div class="practice-card" style="cursor:default;margin-bottom:10px">
+    <div class="pc-head" style="flex-wrap:wrap;gap:8px">
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:5px">Choose technique</div>
+        <select style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);cursor:pointer" id="hsm-technique" onchange="initHSMPlayer()">
+          <option value="natural">Natural breath (4-4) — Sahaj</option>
+          <option value="nadi">Nadi Shodhana (5-5 alternate) — Purifying</option>
+          <option value="478">4-7-8 — Deep calm</option>
+          <option value="coherent">Coherent 5.5/min — HRV balance</option>
+          <option value="ujjayi">Ujjayi-rhythm (4-2-6-2) — Ocean breath</option>
+        </select>
+      </div>
+      <div style="min-width:100px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:5px">Rounds</div>
+        <input type="number" id="hsm-rounds" value="8" min="3" max="30"
+          style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);text-align:center"
+          onchange="initHSMPlayer()">
+      </div>
+    </div>
+  </div>
+
+  <div class="player" id="hsm-player">
+    <div class="player-phase" id="hsm-phase">Ready</div>
+    <div class="player-instruction" id="hsm-instruction">Press Play to begin your practice</div>
+    <div class="player-circle-wrap">
+      <svg id="player-svg" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="70" cy="70" r="58" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="8"/>
+        <circle id="hsm-ring" cx="70" cy="70" r="58" fill="none" stroke="#A08AEE" stroke-width="8"
+          stroke-linecap="round" stroke-dasharray="364.4" stroke-dashoffset="364.4"
+          transform="rotate(-90 70 70)" style="transition:stroke-dashoffset .1s linear,stroke .4s"/>
+        <circle id="hsm-inner" cx="70" cy="70" r="38" fill="rgba(160,138,238,.15)" style="transition:r .1s linear"/>
+      </svg>
+      <div class="player-countdown">
+        <div class="player-num" id="hsm-num">—</div>
+        <div class="player-unit">sec</div>
+      </div>
+    </div>
+    <div class="player-btns">
+      <button class="p-btn p-reset" onclick="resetHSM()">↺ Reset</button>
+      <button class="p-btn p-play" id="hsm-play-btn" onclick="toggleHSM()">▶ Play</button>
+    </div>
+    <div class="player-cycles" id="hsm-cycle-info">Round 0 of 8</div>
+  </div>
+</div>
+
+<!-- BENEFITS TAB -->
+<div class="wrap" id="tab-benefits" style="display:none">
+  <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">
+    HSM practices combine ancient Himalayan wisdom with modern understanding of the autonomic nervous system. Here is what the evidence and tradition tell us.
+  </div>
+  <div class="benefits-grid">
+    <div class="benefit-card"><div class="benefit-icon">🧠</div><div class="benefit-title">Neurological</div><div class="benefit-text">Sustained meditation practice increases prefrontal cortical thickness, reduces amygdala reactivity, and improves attentional networks (Davidson et al.; Lazar et al.).</div></div>
+    <div class="benefit-card"><div class="benefit-icon">❤️</div><div class="benefit-title">Cardiovascular</div><div class="benefit-text">Slow coherent breathing (5–6/min) maximises heart rate variability — a strong marker of cardiovascular health and stress resilience.</div></div>
+    <div class="benefit-card"><div class="benefit-icon">😴</div><div class="benefit-title">Sleep</div><div class="benefit-text">Body scan and 4-7-8 breathing activate the parasympathetic system, reduce cortisol, and facilitate sleep onset. CBT-I compatible.</div></div>
+    <div class="benefit-card"><div class="benefit-icon">🔥</div><div class="benefit-title">Stress & burnout</div><div class="benefit-text">Regular practice lowers perceived stress scores (PSS) and salivary cortisol within 4–8 weeks. Strong evidence in healthcare worker burnout populations.</div></div>
+    <div class="benefit-card"><div class="benefit-icon">🤝</div><div class="benefit-title">Relationships</div><div class="benefit-text">Metta (loving-kindness) practice reduces interpersonal conflict, increases prosocial behaviour, and improves self-compassion — a mediator in depression treatment.</div></div>
+    <div class="benefit-card"><div class="benefit-icon">🧘</div><div class="benefit-title">De-addiction support</div><div class="benefit-text">Urge surfing through breath awareness reduces craving intensity and frequency. Mindfulness-based relapse prevention (MBRP) has strong evidence in SUD.</div></div>
+    <div class="benefit-card"><div class="benefit-icon">🌱</div><div class="benefit-title">Spiritual growth</div><div class="benefit-text">HSM teachings emphasise that mental health is inseparable from the inner life. Practices support a gradual shift from reactivity to witnessing awareness.</div></div>
+    <div class="benefit-card"><div class="benefit-icon">👶</div><div class="benefit-title">For all ages</div><div class="benefit-text">2-2 breathing and natural breath awareness are safe and beneficial from childhood. Adapted versions are used in child/adolescent mental health and geriatric care.</div></div>
+  </div>
+</div>
+
+<!-- JOURNAL TAB -->
+<div class="wrap" id="tab-journal" style="display:none">
+  <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Track your practice and post-meditation mood. All entries stay only on your device.</div>
+
+  <div class="practice-card" style="cursor:default">
+    <div class="pc-head" style="border-bottom:1px solid var(--border)">
+      <div class="pc-icon" style="background:var(--deep-light)">✍️</div>
+      <div class="pc-info"><div class="pc-name">Today's entry</div><div class="pc-meta" id="j-today-date"></div></div>
+    </div>
+    <div style="padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Practice done today</div>
+        <select class="fi" id="j-practice">
+          <option value="">Select practice…</option>
+          <option>Sahaj Pranayama — Natural Breath</option>
+          <option>So-Hum Mantra</option>
+          <option>Pratyahara Body Scan</option>
+          <option>Metta — Loving Kindness</option>
+          <option>Breathing — 4-7-8</option>
+          <option>Breathing — Nadi Shodhana</option>
+          <option>Breathing — Coherent</option>
+          <option>Combined / other</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Duration</div>
+        <select class="fi" id="j-duration">
+          <option>5 min</option><option>10 min</option><option>15 min</option>
+          <option>20 min</option><option>30 min</option><option>45 min</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">How did you feel after?</div>
+        <div class="emoji-sel" id="j-mood-sel">
+          <div class="em-btn" onclick="selectJMood('😔',this)">😔</div>
+          <div class="em-btn" onclick="selectJMood('😐',this)">😐</div>
+          <div class="em-btn" onclick="selectJMood('🙂',this)">🙂</div>
+          <div class="em-btn" onclick="selectJMood('😊',this)">😊</div>
+          <div class="em-btn" onclick="selectJMood('✨',this)">✨</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Notes / insight</div>
+        <textarea class="fi" id="j-note" rows="2" placeholder="What arose? What shifted? What was difficult?"></textarea>
+      </div>
+      <button class="bp" onclick="saveJEntry()">Save entry</button>
+    </div>
+  </div>
+
+  <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:8px 0 10px">Past entries</div>
+  <div id="j-list"></div>
+</div>
+
+<script>
+let jMood = '';
+const jEntries = JSON.parse(localStorage.getItem('aatmiya-hsm-journal')||'[]');
+
+document.getElementById('j-today-date').textContent =
+  new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// TABS
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['practices','breathing','benefits','journal'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display = t===name?'block':'none';
+  });
+  if (name==='journal') renderJournal();
+  if (name==='breathing') initHSMPlayer();
+}
+
+// CARDS
+function toggleCard(id) {
+  const card = document.getElementById(id);
+  const wasActive = card.classList.contains('active-card');
+  document.querySelectorAll('.practice-card').forEach(c=>c.classList.remove('active-card'));
+  if (!wasActive) card.classList.add('active-card');
+}
+
+// ===== HSM PLAYER =====
+const TECHNIQUES = {
+  natural:{name:'Natural Breath',phases:[{l:'Inhale',s:4,c:'#A08AEE',expand:true},{l:'Exhale',s:4,c:'#6A3DAE',expand:false}]},
+  nadi:{name:'Nadi Shodhana',phases:[{l:'Left nostril in',s:5,c:'#A08AEE',expand:true},{l:'Hold',s:2,c:'#7A6ACE',expand:true},{l:'Right nostril out',s:5,c:'#6A3DAE',expand:false},{l:'Right nostril in',s:5,c:'#A08AEE',expand:true},{l:'Hold',s:2,c:'#7A6ACE',expand:true},{l:'Left nostril out',s:5,c:'#6A3DAE',expand:false}]},
+  '478':{name:'4-7-8 Breath',phases:[{l:'Inhale',s:4,c:'#A08AEE',expand:true},{l:'Hold',s:7,c:'#7A6ACE',expand:true},{l:'Exhale',s:8,c:'#6A3DAE',expand:false}]},
+  coherent:{name:'Coherent Breath',phases:[{l:'Inhale',s:5.5,c:'#A08AEE',expand:true},{l:'Exhale',s:5.5,c:'#6A3DAE',expand:false}]},
+  ujjayi:{name:'Ujjayi Rhythm',phases:[{l:'Inhale',s:4,c:'#A08AEE',expand:true},{l:'Hold',s:2,c:'#7A6ACE',expand:true},{l:'Exhale (long)',s:6,c:'#6A3DAE',expand:false},{l:'Hold out',s:2,c:'#5A2DAE',expand:false}]},
+};
+
+let hsmPlaying=false, hsmPhaseIdx=0, hsmRound=0, hsmTargetRounds=8;
+let hsmProgress=0, hsmDuration=0, hsmLastTick=null, hsmAnimFrame=null;
+let hsmTechnique='natural';
+
+function initHSMPlayer() {
+  if (hsmPlaying) { hsmPlaying=false; cancelAnimationFrame(hsmAnimFrame); document.getElementById('hsm-play-btn').textContent='▶ Play'; }
+  hsmTechnique = document.getElementById('hsm-technique').value;
+  hsmTargetRounds = parseInt(document.getElementById('hsm-rounds').value)||8;
+  resetHSM();
+}
+
+function resetHSM() {
+  if (hsmAnimFrame) cancelAnimationFrame(hsmAnimFrame);
+  hsmPlaying=false; hsmPhaseIdx=0; hsmRound=0; hsmProgress=0;
+  const tech = TECHNIQUES[hsmTechnique];
+  hsmDuration = tech.phases[0].s;
+  document.getElementById('hsm-play-btn').textContent='▶ Play';
+  document.getElementById('hsm-phase').textContent='Ready';
+  document.getElementById('hsm-instruction').textContent='Press Play to begin your practice';
+  document.getElementById('hsm-num').textContent='—';
+  document.getElementById('hsm-cycle-info').textContent=`Round 0 of ${hsmTargetRounds}`;
+  setHSMCircle(0,'#A08AEE',false);
+}
+
+function toggleHSM() {
+  if (hsmPlaying) {
+    hsmPlaying=false;
+    document.getElementById('hsm-play-btn').textContent='▶ Resume';
+    cancelAnimationFrame(hsmAnimFrame);
+  } else {
+    hsmPlaying=true;
+    document.getElementById('hsm-play-btn').textContent='⏸ Pause';
+    hsmLastTick=null;
+    hsmAnimFrame=requestAnimationFrame(hsmTick);
+  }
+}
+
+function hsmTick(now) {
+  if (!hsmLastTick) hsmLastTick=now;
+  const dt=(now-hsmLastTick)/1000; hsmLastTick=now;
+  hsmProgress+=dt;
+  const tech=TECHNIQUES[hsmTechnique];
+  const phase=tech.phases[hsmPhaseIdx];
+  if (hsmProgress>=hsmDuration) {
+    hsmProgress-=hsmDuration;
+    hsmPhaseIdx++;
+    if (hsmPhaseIdx>=tech.phases.length) {
+      hsmPhaseIdx=0; hsmRound++;
+      if (hsmRound>=hsmTargetRounds) {
+        hsmPlaying=false;
+        document.getElementById('hsm-phase').textContent='Complete ✓';
+        document.getElementById('hsm-instruction').textContent='Rest in stillness for a moment.');
+        document.getElementById('hsm-play-btn').textContent='▶ Play';
+        document.getElementById('hsm-num').textContent='✓';
+        setHSMCircle(1,'#1E5E32',false);
+        return;
+      }
+    }
+    hsmDuration=tech.phases[hsmPhaseIdx].s;
+  }
+  const currentPhase=tech.phases[hsmPhaseIdx];
+  const pct=hsmProgress/hsmDuration;
+  document.getElementById('hsm-phase').textContent=currentPhase.l;
+  document.getElementById('hsm-num').textContent=Math.ceil(hsmDuration-hsmProgress);
+  document.getElementById('hsm-cycle-info').textContent=`Round ${hsmRound+1} of ${hsmTargetRounds}`;
+  setHSMCircle(pct,currentPhase.c,currentPhase.expand);
+  if (hsmPlaying) hsmAnimFrame=requestAnimationFrame(hsmTick);
+}
+
+function setHSMCircle(pct, color, expanding) {
+  const circ=2*Math.PI*58;
+  document.getElementById('hsm-ring').setAttribute('stroke-dashoffset', circ*(1-pct));
+  document.getElementById('hsm-ring').setAttribute('stroke', color);
+  const minR=22, maxR=42;
+  const r = expanding ? minR+(maxR-minR)*pct : maxR-(maxR-minR)*pct;
+  document.getElementById('hsm-inner').setAttribute('r', r);
+  document.getElementById('hsm-inner').setAttribute('fill', color+'33');
+}
+
+// ===== JOURNAL =====
+function selectJMood(em, el) {
+  jMood=em;
+  document.querySelectorAll('.em-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function saveJEntry() {
+  const practice=document.getElementById('j-practice').value;
+  const duration=document.getElementById('j-duration').value;
+  const note=document.getElementById('j-note').value.trim();
+  if (!practice) { alert('Please select a practice'); return; }
+  const entry={
+    date: new Date().toISOString().split('T')[0],
+    practice, duration, mood: jMood, note,
+    time: new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+  };
+  jEntries.unshift(entry);
+  localStorage.setItem('aatmiya-hsm-journal', JSON.stringify(jEntries.slice(0,60)));
+  document.getElementById('j-practice').value='';
+  document.getElementById('j-note').value='';
+  jMood='';
+  document.querySelectorAll('.em-btn').forEach(b=>b.classList.remove('sel'));
+  renderJournal();
+}
+
+function renderJournal() {
+  const list = document.getElementById('j-list');
+  if (!jEntries.length) { list.innerHTML='<div class="empty-j">No entries yet. Complete your first practice and log it here.</div>'; return; }
+  list.innerHTML = jEntries.slice(0,20).map(e => `
+    <div class="journal-entry">
+      <div class="je-date">${new Date(e.date).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})} · ${e.time||''} · ${e.duration}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="je-mood">${e.mood||'—'}</div>
+        <div style="font-size:12px;font-weight:500;color:var(--text)">${e.practice}</div>
+      </div>
+      ${e.note ? `<div class="je-text">${e.note}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// Prevent literal text rendering issue in setHSMCircle
+document.getElementById('hsm-instruction').textContent = 'Press Play to begin your practice';
+
+initHSMPlayer();
+</script>
+</body>
+</html>

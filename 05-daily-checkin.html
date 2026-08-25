@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Check-in — Aatmiya Hospital</title>
+<style>
+  :root {
+    --bg: #F6F4FB;
+    --surface: #FFFFFF;
+    --surface2: #EFECF8;
+    --border: #DAD6EE;
+    --text: #1A1730;
+    --text2: #5A5670;
+    --text3: #9A97B0;
+    --accent: #4C3A9E;
+    --accent-light: #EBE8FA;
+    --green: #2E7D52;
+    --amber: #B85C00;
+    --red: #B71C1C;
+    --radius: 14px;
+    --shadow: 0 2px 14px rgba(76,58,158,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .header { background: var(--accent); color: #fff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-mark { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; }
+  .header-title { font-size: 16px; font-weight: 600; }
+  .header-sub { font-size: 11px; opacity: 0.7; margin-top: 1px; }
+  .btn-ghost { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: inherit; }
+
+  .tabs { display: flex; background: var(--accent); border-top: 1px solid rgba(255,255,255,0.15); }
+  .tab { flex: 1; padding: 10px; text-align: center; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.65); cursor: pointer; border: none; background: transparent; font-family: inherit; transition: all 0.15s; }
+  .tab.active { color: #fff; border-bottom: 3px solid #fff; }
+
+  .wrapper { max-width: 680px; margin: 0 auto; padding: 16px; }
+
+  /* TODAY CHECK-IN */
+  .panel { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px; }
+  .panel-head { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* Mood emoji selector */
+  .mood-section { padding: 20px 18px; }
+  .section-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 14px; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; }
+  .emoji-row { display: flex; justify-content: space-around; gap: 4px; }
+  .emoji-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; padding: 10px 8px; border-radius: 12px; border: 2px solid transparent; transition: all 0.15s; flex: 1; background: var(--surface2); }
+  .emoji-btn:hover { border-color: var(--border); background: #fff; }
+  .emoji-btn.selected { border-color: var(--accent); background: var(--accent-light); }
+  .emoji-icon { font-size: 30px; line-height: 1; }
+  .emoji-label { font-size: 10px; color: var(--text3); font-weight: 500; text-align: center; }
+  .emoji-btn.selected .emoji-label { color: var(--accent); }
+
+  /* Energy slider */
+  .slider-section { padding: 0 18px 18px; }
+  .slider-row { display: flex; align-items: center; gap: 12px; }
+  .slider-label { font-size: 11px; color: var(--text3); min-width: 40px; }
+  .slider-label.right { text-align: right; }
+  input[type=range] { flex: 1; accent-color: var(--accent); }
+  .slider-val { font-size: 18px; font-weight: 800; color: var(--accent); min-width: 28px; text-align: center; }
+
+  /* Sleep */
+  .sleep-section { padding: 0 18px 18px; }
+  .sleep-options { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sleep-chip { padding: 8px 14px; border-radius: 20px; font-size: 12px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; transition: all 0.15s; }
+  .sleep-chip:hover { border-color: var(--accent); }
+  .sleep-chip.selected { background: var(--accent-light); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+  /* Meds */
+  .meds-section { padding: 0 18px 18px; }
+  .med-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--surface2); border-radius: 10px; margin-bottom: 6px; border: 1.5px solid transparent; }
+  .med-row.taken { background: #E8F5EE; border-color: #A5D6B8; }
+  .med-row.missed { background: #FFEBEE; border-color: #EF9A9A; }
+  .med-name { font-size: 13px; font-weight: 500; }
+  .med-time { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .med-btns { display: flex; gap: 6px; }
+  .med-btn { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: #fff; font-family: inherit; transition: all 0.15s; }
+  .med-btn.yes { background: var(--green); color: #fff; border-color: var(--green); }
+  .med-btn.partial { background: #FF9800; color: #fff; border-color: #FF9800; }
+  .med-btn.no { background: var(--red); color: #fff; border-color: var(--red); }
+  .add-med { display: flex; gap: 8px; margin-top: 8px; }
+  .add-med input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; font-family: inherit; background: var(--surface2); color: var(--text); }
+  .add-med input:focus { outline: none; border-color: var(--accent); background: #fff; }
+  .add-med button { padding: 8px 14px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: inherit; }
+
+  /* Note */
+  .note-section { padding: 0 18px 18px; }
+  .note-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; background: var(--surface2); color: var(--text); resize: none; line-height: 1.5; }
+  .note-input:focus { outline: none; border-color: var(--accent); background: #fff; }
+
+  /* Submit */
+  .submit-section { padding: 0 18px 18px; }
+  .btn-submit { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s; letter-spacing: 0.02em; }
+  .btn-submit:hover { background: #3a2b7e; }
+  .success-msg { display: none; text-align: center; padding: 16px; background: #E8F5EE; border-radius: 10px; color: var(--green); font-size: 14px; font-weight: 600; }
+  .success-msg.visible { display: block; }
+
+  /* TREND VIEW */
+  .trend-panel { padding: 16px; }
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat-box { background: var(--surface); border-radius: 10px; padding: 12px; text-align: center; box-shadow: var(--shadow); }
+  .stat-val { font-size: 22px; font-weight: 800; color: var(--accent); }
+  .stat-lbl { font-size: 10px; color: var(--text3); margin-top: 3px; }
+
+  .chart-wrap { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 16px; }
+  .chart-title { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  #mood-chart { display: flex; align-items: flex-end; gap: 4px; height: 80px; }
+  .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .chart-bar { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.3s; min-height: 4px; }
+  .chart-day { font-size: 9px; color: var(--text3); }
+  .chart-emoji { font-size: 12px; }
+
+  .log-list { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .log-item { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .log-item:last-child { border-bottom: none; }
+  .log-date { font-size: 11px; color: var(--text3); min-width: 70px; }
+  .log-emoji { font-size: 20px; }
+  .log-detail { flex: 1; font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .log-meds-ok { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+
+  /* Tabs */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">A</div>
+    <div>
+      <div class="header-title">Daily Check-in</div>
+      <div class="header-sub">Aatmiya Hospital · Clinical Tool 05</div>
+    </div>
+  </div>
+  <button class="btn-ghost" onclick="clearData()">Clear data</button>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('today', this)">Today</button>
+  <button class="tab" onclick="switchTab('trend', this)">14-day trend</button>
+</div>
+
+<!-- TODAY TAB -->
+<div class="tab-content active" id="tab-today">
+<div class="wrapper">
+
+  <div class="panel">
+    <div class="panel-head"><div class="dot" style="background:var(--accent)"></div>How are you feeling today?</div>
+    <div class="mood-section">
+      <div class="section-label" id="today-date-label"></div>
+      <div class="emoji-row">
+        <div class="emoji-btn" onclick="selectMood(1,this)" data-val="1">
+          <div class="emoji-icon">😔</div><div class="emoji-label">Very low</div>
+        </div>
+        <div class="emoji-btn" onclick="selectMood(2,this)" data-val="2">
+          <div class="emoji-icon">😕</div><div class="emoji-label">Low</div>
+        </div>
+        <div class="emoji-btn" onclick="selectMood(3,this)" data-val="3">
+          <div class="emoji-icon">😐</div><div class="emoji-label">Okay</div>
+        </div>
+        <div class="emoji-btn" onclick="selectMood(4,this)" data-val="4">
+          <div class="emoji-icon">🙂</div><div class="emoji-label">Good</div>
+        </div>
+        <div class="emoji-btn" onclick="selectMood(5,this)" data-val="5">
+          <div class="emoji-icon">😊</div><div class="emoji-label">Great</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slider-section">
+      <div class="section-label" style="text-align:left;margin-bottom:8px">Energy level</div>
+      <div class="slider-row">
+        <span class="slider-label">Drained</span>
+        <input type="range" id="energy-slider" min="1" max="5" value="3"
+          oninput="document.getElementById('energy-val').textContent=this.value">
+        <span class="slider-val" id="energy-val">3</span>
+        <span class="slider-label right">Full energy</span>
+      </div>
+    </div>
+
+    <div class="sleep-section">
+      <div class="section-label" style="text-align:left;margin-bottom:8px">Sleep last night</div>
+      <div class="sleep-options">
+        <div class="sleep-chip" onclick="selectSleep(this,'< 4 hrs')">Under 4 hrs</div>
+        <div class="sleep-chip" onclick="selectSleep(this,'4–6 hrs')">4–6 hrs</div>
+        <div class="sleep-chip" onclick="selectSleep(this,'6–8 hrs')">6–8 hrs</div>
+        <div class="sleep-chip" onclick="selectSleep(this,'> 8 hrs')">Over 8 hrs</div>
+        <div class="sleep-chip" onclick="selectSleep(this,'Broken')">Broken/interrupted</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Medications -->
+  <div class="panel">
+    <div class="panel-head"><div class="dot" style="background:var(--green)"></div>Medications today</div>
+    <div class="meds-section">
+      <div id="med-list"></div>
+      <div class="add-med">
+        <input id="new-med-name" placeholder="Add medication name…" onkeydown="if(event.key==='Enter')addMed()">
+        <button onclick="addMed()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note -->
+  <div class="panel">
+    <div class="panel-head"><div class="dot" style="background:var(--amber)"></div>Anything else to note?</div>
+    <div class="note-section">
+      <textarea class="note-input" id="today-note" rows="3" placeholder="e.g. Felt anxious in the morning, side effects, any events today…"></textarea>
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <div class="submit-section">
+    <button class="btn-submit" onclick="submitCheckin()">Save today's check-in ✓</button>
+    <div class="success-msg" id="success-msg">✓ Check-in saved! See your trend in the 14-day view.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- TREND TAB -->
+<div class="tab-content" id="tab-trend">
+<div class="wrapper">
+  <div class="trend-panel" id="trend-panel"></div>
+</div>
+</div>
+
+<script>
+const EMOJIS = ['','😔','😕','😐','🙂','😊'];
+const MOOD_COLORS = ['','#C62828','#E65100','#F5A623','#4CAF50','#1A5C42'];
+const MOOD_LABELS = ['','Very low','Low','Okay','Good','Great'];
+
+let selectedMood = 0;
+let selectedSleep = '';
+let meds = JSON.parse(localStorage.getItem('aatmiya-meds') || '[]');
+let medStatus = {};
+let checkins = JSON.parse(localStorage.getItem('aatmiya-checkins') || '[]');
+
+// Init
+document.getElementById('today-date-label').textContent =
+  new Date().toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+
+renderMedList();
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'trend') renderTrend();
+}
+
+function selectMood(val, el) {
+  selectedMood = val;
+  document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectSleep(el, val) {
+  selectedSleep = val;
+  document.querySelectorAll('.sleep-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function addMed() {
+  const input = document.getElementById('new-med-name');
+  const name = input.value.trim();
+  if (!name) return;
+  if (!meds.includes(name)) {
+    meds.push(name);
+    localStorage.setItem('aatmiya-meds', JSON.stringify(meds));
+  }
+  input.value = '';
+  renderMedList();
+}
+
+function renderMedList() {
+  const list = document.getElementById('med-list');
+  if (meds.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px 0">No medications added yet. Add below.</div>';
+    return;
+  }
+  list.innerHTML = meds.map(med => {
+    const status = medStatus[med] || 'none';
+    return `<div class="med-row ${status === 'yes' ? 'taken' : status === 'no' ? 'missed' : ''}" id="medrow-${med.replace(/\s/g,'_')}">
+      <div><div class="med-name">${med}</div></div>
+      <div class="med-btns">
+        <button class="med-btn ${status==='yes'?'yes':''}" onclick="setMed('${med}','yes')">✓ Taken</button>
+        <button class="med-btn ${status==='partial'?'partial':''}" onclick="setMed('${med}','partial')">Partial</button>
+        <button class="med-btn ${status==='no'?'no':''}" onclick="setMed('${med}','no')">✗ Missed</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setMed(name, status) {
+  medStatus[name] = status;
+  renderMedList();
+}
+
+function submitCheckin() {
+  const today = new Date().toISOString().split('T')[0];
+  const entry = {
+    date: today,
+    mood: selectedMood,
+    energy: parseInt(document.getElementById('energy-slider').value),
+    sleep: selectedSleep,
+    meds: { ...medStatus },
+    note: document.getElementById('today-note').value.trim()
+  };
+  checkins = checkins.filter(c => c.date !== today);
+  checkins.push(entry);
+  checkins = checkins.slice(-30);
+  localStorage.setItem('aatmiya-checkins', JSON.stringify(checkins));
+  document.getElementById('success-msg').classList.add('visible');
+  document.getElementById('success-msg').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderTrend() {
+  const panel = document.getElementById('trend-panel');
+  const last14 = checkins.slice(-14);
+
+  if (last14.length === 0) {
+    panel.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-size:14px">No check-ins yet. Complete your first check-in in the Today tab.</div>';
+    return;
+  }
+
+  const avgMood = (last14.reduce((a,c)=>a+(c.mood||0),0)/last14.length).toFixed(1);
+  const medsOk = last14.filter(c => Object.values(c.meds||{}).every(v=>v==='yes')).length;
+  const avgSleep = last14.filter(c=>c.sleep==='6–8 hrs').length;
+
+  panel.innerHTML = `
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-val">${avgMood}/5</div><div class="stat-lbl">Avg mood</div></div>
+      <div class="stat-box"><div class="stat-val">${medsOk}/${last14.length}</div><div class="stat-lbl">Full meds days</div></div>
+      <div class="stat-box"><div class="stat-val">${avgSleep}</div><div class="stat-lbl">Good sleep nights</div></div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Mood trend (last ${last14.length} days)</div>
+      <div id="mood-chart">
+        ${last14.map(c => {
+          const h = c.mood ? (c.mood / 5) * 70 : 4;
+          const dayLabel = new Date(c.date).toLocaleDateString('en-IN',{weekday:'short'}).slice(0,2);
+          return `<div class="chart-bar-wrap">
+            <div class="chart-emoji">${EMOJIS[c.mood]||'○'}</div>
+            <div class="chart-bar" style="height:${h}px;background:${MOOD_COLORS[c.mood]||'var(--border)'}"></div>
+            <div class="chart-day">${dayLabel}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="log-list">
+      ${[...last14].reverse().map(c => {
+        const allTaken = Object.values(c.meds||{}).length > 0 && Object.values(c.meds||{}).every(v=>v==='yes');
+        const anyMissed = Object.values(c.meds||{}).some(v=>v==='no');
+        return `<div class="log-item">
+          <div class="log-date">${new Date(c.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div>
+          <div class="log-emoji">${EMOJIS[c.mood]||'○'}</div>
+          <div class="log-detail">
+            <strong>${MOOD_LABELS[c.mood]||'—'}</strong> · Energy: ${c.energy||'—'}/5 · Sleep: ${c.sleep||'—'}
+            ${c.note ? `<br>${c.note}` : ''}
+          </div>
+          ${Object.keys(c.meds||{}).length ? `<span class="log-meds-ok" style="background:${allTaken?'#E8F5EE':anyMissed?'#FFEBEE':'#FFF3E0'};color:${allTaken?'#2E7D52':anyMissed?'#B71C1C':'#B85C00'}">${allTaken?'Meds ✓':anyMissed?'Missed':'Partial'}</span>` : ''}
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function clearData() {
+  if (confirm('Clear all check-in history? This cannot be undone.')) {
+    localStorage.removeItem('aatmiya-checkins');
+    checkins = [];
+    selectedMood = 0;
+    medStatus = {};
+    document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.sleep-chip').forEach(c => c.classList.remove('selected'));
+    document.getElementById('today-note').value = '';
+    document.getElementById('success-msg').classList.remove('visible');
+    renderMedList();
+  }
+}
+</script>
+</body>
+</html>
