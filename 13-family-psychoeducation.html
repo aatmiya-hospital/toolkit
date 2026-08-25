@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Psychoeducation — Aatmiya Hospital</title>
+<style>
+  :root{
+    --bg:#F5F3EE;--surface:#FFF;--surface2:#EEEAE2;--border:#DDD9D0;
+    --text:#1A1610;--text2:#5A5448;--text3:#9A9488;
+    --accent:#1A5C42;--accent-light:#E3F0EB;
+    --gold:#8B6200;--gold-light:#FFF8E1;
+    --red:#7B1818;--red-light:#FBEBEB;
+    --blue:#1A3D70;--blue-light:#E8EEF8;
+    --orange:#8B3A00;--orange-light:#FFF0E5;
+    --radius:12px;--shadow:0 2px 14px rgba(26,92,66,.09);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;transition:background .15s}
+  .bg:hover{background:rgba(255,255,255,.25)}
+  /* Lang toggle */
+  .lang-bar{background:#134a34;padding:8px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .lang-label{font-size:11px;color:rgba(255,255,255,.7)}
+  .lang-btn{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid rgba(255,255,255,.3);background:transparent;color:rgba(255,255,255,.8);cursor:pointer;font-family:inherit;transition:all .15s}
+  .lang-btn.active{background:#fff;color:var(--accent);font-weight:700}
+  /* Nav */
+  .nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;display:flex;overflow-x:auto;gap:0}
+  .nav-btn{padding:11px 16px;font-size:12px;font-weight:500;color:var(--text3);border:none;background:transparent;cursor:pointer;font-family:inherit;white-space:nowrap;border-bottom:2.5px solid transparent;transition:all .15s}
+  .nav-btn.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+  /* Content */
+  .wrap{max-width:860px;margin:0 auto;padding:16px}
+  .topic-section{display:none}.topic-section.active{display:block}
+  /* Topic card */
+  .topic-card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .tc-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+  .tc-icon{font-size:24px}
+  .tc-title{font-size:15px;font-weight:700;color:var(--text)}
+  .tc-sub{font-size:11px;color:var(--text3);margin-top:2px}
+  .tc-body{padding:16px 18px}
+  /* Bilingual blocks */
+  .bi-block{margin-bottom:14px}
+  .bi-en{font-size:13px;color:var(--text);line-height:1.7;margin-bottom:4px}
+  .bi-gu{font-size:13px;color:var(--text2);line-height:1.8;font-style:italic;border-left:3px solid var(--accent-light);padding-left:10px;display:none}
+  body.gujarati .bi-en{display:none}
+  body.gujarati .bi-gu{display:block}
+  body.gujarati .tc-title-gu{display:block}
+  body.gujarati .tc-title-en{display:none}
+  .tc-title-gu{display:none}
+  /* Key points */
+  .key-points{background:var(--accent-light);border-radius:8px;padding:12px 14px;margin-bottom:12px}
+  .kp-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin-bottom:6px}
+  .kp-item{display:flex;gap:8px;margin-bottom:5px;align-items:flex-start}
+  .kp-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px}
+  .kp-text{font-size:12px;color:var(--accent);line-height:1.5}
+  /* Myth vs fact */
+  .myth-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:540px){.myth-grid{grid-template-columns:1fr}}
+  .myth-card{border-radius:8px;padding:10px 12px}
+  .myth-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+  .myth-text{font-size:12px;line-height:1.55}
+  /* DO/DON'T */
+  .do-dont{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  @media(max-width:480px){.do-dont{grid-template-columns:1fr}}
+  .do-col{background:var(--accent-light);border-radius:8px;padding:10px 12px}
+  .dont-col{background:var(--red-light);border-radius:8px;padding:10px 12px}
+  .dd-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+  .dd-item{font-size:12px;line-height:1.6;display:flex;gap:6px;margin-bottom:3px}
+  /* Warning signs */
+  .warn-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+  .warn-chip{padding:5px 10px;border-radius:20px;font-size:11px;font-weight:500}
+  /* Tabs inside section */
+  .inner-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .itab{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .12s;font-family:inherit}
+  .itab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .itab-content{display:none}.itab-content.active{display:block}
+  /* Print handout */
+  .handout-preview{border:2px dashed var(--border);border-radius:var(--radius);padding:20px;margin-top:14px;display:none}
+  .handout-preview.visible{display:block}
+  .handout-title{font-size:16px;font-weight:700;color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:8px;margin-bottom:12px}
+  .action-row{display:flex;gap:8px;padding:14px 18px;flex-wrap:wrap;border-top:1px solid var(--border)}
+  .bp{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  @media print{.header,.lang-bar,.nav,.action-row,.ha{display:none!important}.handout-preview{display:block!important;border:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Family Psychoeducation Suite</div><div class="hs">Aatmiya Hospital · Clinical Tool 13 · Indian context</div></div>
+  </div>
+  <div class="ha">
+    <button class="bg" onclick="generateHandout()">Print handout</button>
+    <button class="bg" onclick="window.print()">Print page</button>
+  </div>
+</div>
+
+<div class="lang-bar">
+  <span class="lang-label">Language / ભાષા:</span>
+  <button class="lang-btn active" id="lb-en" onclick="setLang('en')">English</button>
+  <button class="lang-btn" id="lb-gu" onclick="setLang('gu')">ગુજરાતી</button>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="showTopic('overview',this)">Overview</button>
+  <button class="nav-btn" onclick="showTopic('illness',this)">Understanding illness</button>
+  <button class="nav-btn" onclick="showTopic('stigma',this)">Stigma</button>
+  <button class="nav-btn" onclick="showTopic('jointfamily',this)">Joint family</button>
+  <button class="nav-btn" onclick="showTopic('caregiver',this)">Caregiver fatigue</button>
+  <button class="nav-btn" onclick="showTopic('communication',this)">Communication</button>
+  <button class="nav-btn" onclick="showTopic('relapse',this)">Relapse warning</button>
+  <button class="nav-btn" onclick="showTopic('myths',this)">Myths &amp; facts</button>
+</div>
+
+<div class="wrap">
+
+<!-- OVERVIEW -->
+<div class="topic-section active" id="topic-overview">
+  <div class="topic-card">
+    <div class="tc-head">
+      <div class="tc-icon">🏠</div>
+      <div>
+        <div class="tc-title tc-title-en">Welcome to family education</div>
+        <div class="tc-title tc-title-gu">પરિવારની શિક્ષા — સ્વાગત છે</div>
+        <div class="tc-sub">Aatmiya Hospital · Dr. Dhaivat Mehta</div>
+      </div>
+    </div>
+    <div class="tc-body">
+      <div class="key-points">
+        <div class="kp-title">Why family involvement matters</div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Family support is one of the strongest predictors of recovery in psychiatric illness.</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">In India, the joint family is both a resource and a source of stress — understanding both is essential.</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Informed families reduce relapse rates, improve medication adherence, and lower expressed emotion (EE).</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Caregivers also need support — burnout in caregivers directly worsens patient outcomes.</div></div>
+      </div>
+      <div class="bi-block">
+        <div class="bi-en">This programme covers six key areas that every family member of someone with a mental illness should understand. You do not need any medical background — just patience and willingness to learn. Each section can be read in 5–10 minutes and is available in both English and Gujarati.</div>
+        <div class="bi-gu">આ કાર્યક્રમ છ મુખ્ય વિષયો આવરે છે જે માનસિક બીમારીથી પીડાતા વ્યક્તિના દરેક પરિવારના સભ્યે સમજવા જોઈએ. તમારે કોઈ તબીબી જ્ઞાનની જરૂર નથી — ફક્ત ધૈર્ય અને શીખવાની ઇચ્છા. દરેક ભાગ ૫–૧૦ મિનિટમાં વાંચી શકાય છે.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:10px">
+        <div style="background:var(--accent-light);border-radius:8px;padding:10px;text-align:center;cursor:pointer" onclick="showTopic('illness',document.querySelector('.nav-btn:nth-child(2)'))">
+          <div style="font-size:20px;margin-bottom:4px">🧠</div>
+          <div style="font-size:11px;font-weight:600;color:var(--accent)">Understanding the illness</div>
+        </div>
+        <div style="background:var(--red-light);border-radius:8px;padding:10px;text-align:center;cursor:pointer" onclick="showTopic('stigma',document.querySelector('.nav-btn:nth-child(3)'))">
+          <div style="font-size:20px;margin-bottom:4px">🚫</div>
+          <div style="font-size:11px;font-weight:600;color:var(--red)">Breaking stigma</div>
+        </div>
+        <div style="background:var(--gold-light);border-radius:8px;padding:10px;text-align:center;cursor:pointer" onclick="showTopic('jointfamily',document.querySelector('.nav-btn:nth-child(4)'))">
+          <div style="font-size:20px;margin-bottom:4px">👨‍👩‍👧‍👦</div>
+          <div style="font-size:11px;font-weight:600;color:var(--gold)">Joint family dynamics</div>
+        </div>
+        <div style="background:var(--orange-light);border-radius:8px;padding:10px;text-align:center;cursor:pointer" onclick="showTopic('caregiver',document.querySelector('.nav-btn:nth-child(5)'))">
+          <div style="font-size:20px;margin-bottom:4px">💙</div>
+          <div style="font-size:11px;font-weight:600;color:var(--orange)">Caregiver self-care</div>
+        </div>
+        <div style="background:var(--blue-light);border-radius:8px;padding:10px;text-align:center;cursor:pointer" onclick="showTopic('communication',document.querySelector('.nav-btn:nth-child(6)'))">
+          <div style="font-size:20px;margin-bottom:4px">💬</div>
+          <div style="font-size:11px;font-weight:600;color:var(--blue)">Communication</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:8px;padding:10px;text-align:center;cursor:pointer" onclick="showTopic('relapse',document.querySelector('.nav-btn:nth-child(7)'))">
+          <div style="font-size:20px;margin-bottom:4px">⚠️</div>
+          <div style="font-size:11px;font-weight:600;color:var(--text2)">Relapse warning signs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ILLNESS -->
+<div class="topic-section" id="topic-illness">
+  <div class="topic-card">
+    <div class="tc-head"><div class="tc-icon">🧠</div><div>
+      <div class="tc-title tc-title-en">Understanding mental illness</div>
+      <div class="tc-title tc-title-gu">માનસિક બીમારી સમજો</div>
+    </div></div>
+    <div class="tc-body">
+      <div class="inner-tabs">
+        <button class="itab active" onclick="showITab('it-general',this)">General</button>
+        <button class="itab" onclick="showITab('it-depression',this)">Depression</button>
+        <button class="itab" onclick="showITab('it-anxiety',this)">Anxiety</button>
+        <button class="itab" onclick="showITab('it-psychosis',this)">Psychosis</button>
+        <button class="itab" onclick="showITab('it-sud',this)">Addiction</button>
+      </div>
+      <div class="itab-content active" id="it-general">
+        <div class="bi-block">
+          <div class="bi-en">Mental illness is a medical condition — not a personal failure, spiritual failing, or weakness of character. The brain is an organ, just like the heart or kidney. When the brain's chemistry or function is disrupted, the result is a psychiatric illness. It is no different from diabetes or hypertension in this regard.</div>
+          <div class="bi-gu">માનસિક બીમારી એ એક તબીબી સ્થિતિ છે — કોઈ વ્યક્તિગત નિષ્ફળતા, આધ્યાત્મિક ખામી અથવા ચારિત્ર્યની નબળાઈ નથી. મગજ એ હૃદય અથવા કિડની જેવું જ એક અંગ છે. જ્યારે મગજની રાસાયણિક ક્રિયા ખોરવાય છે, ત્યારે માનસિક બીમારી ઉત્પન્ન થાય છે. આ ડાયાબિટીસ કે હાઈ બ્લડ પ્રેશર જેવી જ છે.</div>
+        </div>
+        <div class="key-points">
+          <div class="kp-title">What the family should know</div>
+          <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Recovery is possible. Most people improve significantly with treatment.</div></div>
+          <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Medication often needs weeks to work — stopping early is a common cause of relapse.</div></div>
+          <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">The person is not "mad" — they are unwell. Use respectful language.</div></div>
+          <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Treatment is a combination of medicine, therapy, family support, and lifestyle.</div></div>
+        </div>
+      </div>
+      <div class="itab-content" id="it-depression">
+        <div class="bi-block">
+          <div class="bi-en"><strong>Depression</strong> is not laziness, sadness, or "just tension." It is a real illness where the brain's mood-regulating systems are disrupted. The person experiences persistent low mood, loss of interest, fatigue, poor sleep, changes in appetite, and sometimes thoughts of death. In the Indian context, depression often presents as physical complaints — headache, bodyache, tiredness — rather than "feeling sad."</div>
+          <div class="bi-gu"><strong>ડિપ્રેશન</strong> આળસ, ઉદાસી, અથવા "ફક્ત ટેન્શન" નથી. તે એક વાસ્તવિક બીમારી છે. ભારતીય સંદર્ભમાં, ડિપ્રેશન ઘણી વખત શારીરિક ફરિયાદ — માથાનો દુખાવો, શરીરનો દુખાવો, થાક — તરીકે આવે છે.</div>
+        </div>
+        <div class="do-dont">
+          <div class="do-col"><div class="dd-label" style="color:var(--accent)">✓ Helpful</div>
+            <div class="dd-item"><span>✓</span> Sit with them without pressure to talk</div>
+            <div class="dd-item"><span>✓</span> Accompany them to appointments</div>
+            <div class="dd-item"><span>✓</span> Ensure medication is taken regularly</div>
+            <div class="dd-item"><span>✓</span> Gently encourage small activities</div>
+          </div>
+          <div class="dont-col"><div class="dd-label" style="color:var(--red)">✗ Harmful</div>
+            <div class="dd-item"><span>✗</span> "Cheer up / think positive"</div>
+            <div class="dd-item"><span>✗</span> "You have everything, why sad?"</div>
+            <div class="dd-item"><span>✗</span> Pressuring to perform duties</div>
+            <div class="dd-item"><span>✗</span> Dismissing as laziness</div>
+          </div>
+        </div>
+      </div>
+      <div class="itab-content" id="it-anxiety">
+        <div class="bi-block">
+          <div class="bi-en"><strong>Anxiety disorders</strong> involve excessive, uncontrollable worry, physical symptoms (racing heart, breathlessness, sweating, chest tightness), and avoidance. In India, anxiety is often expressed through somatic complaints and may be culturally framed as "weakness" or "overthinking." Panic attacks are frequently misdiagnosed as heart attacks and can be frightening for both patient and family.</div>
+          <div class="bi-gu"><strong>ચિંતા વિકાર</strong>માં અતિશય, અનિયંત્રણ ચિંતા અને શારીરિક લક્ષણો (ઝડપી ધબકારા, શ્વાસ ચઢવો, પરસેવો) સામેલ છે. ભારતમાં, ચિંતા ઘણી વખત "નબળાઈ" અથવા "વધુ પડતી ચિંતા" તરીકે ઓળખાવાય છે.</div>
+        </div>
+        <div class="key-points">
+          <div class="kp-title">During a panic attack — family response</div>
+          <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Stay calm. Your calm directly helps them co-regulate.</div></div>
+          <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Speak slowly and softly: "You are safe. This will pass."</div></div>
+          <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Guide them to breathe with you — slow, deliberate breaths.</div></div>
+          <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Do NOT rush to the hospital unless there are actual chest symptoms warranting it — this reinforces the panic pattern.</div></div>
+        </div>
+      </div>
+      <div class="itab-content" id="it-psychosis">
+        <div class="bi-block">
+          <div class="bi-en"><strong>Psychosis</strong> (including schizophrenia, bipolar with psychosis) involves loss of contact with reality — hallucinations (hearing or seeing things), delusions (false fixed beliefs), disorganised thinking and behaviour. This is one of the most frightening presentations for families. Critically: the person is not "possessed," not dangerous by default, and is suffering deeply. Early treatment significantly improves outcomes.</div>
+          <div class="bi-gu"><strong>સાઇકોસિસ</strong>માં વ્યક્તિ વાસ્તવિકતા સાથેનો સંપર્ક ગુમાવે છે — ભ્રમ, ભ્રામક વિચારો. આ ભૂત-પ્રેત નથી. આ એક ગંભીર તબીબી સ્થિતિ છે. વ્યક્તિ ખૂબ જ તકલીફ અનુભવે છે. વહેલું ઉપચાર ઘણો ફરક પાડે છે.</div>
+        </div>
+        <div class="do-dont">
+          <div class="do-col"><div class="dd-label" style="color:var(--accent)">✓ Helpful</div>
+            <div class="dd-item"><span>✓</span> Stay calm and consistent</div>
+            <div class="dd-item"><span>✓</span> Do not argue with delusions</div>
+            <div class="dd-item"><span>✓</span> Ensure medication is given</div>
+            <div class="dd-item"><span>✓</span> Reduce stimulation at home</div>
+          </div>
+          <div class="dont-col"><div class="dd-label" style="color:var(--red)">✗ Harmful</div>
+            <div class="dd-item"><span>✗</span> Arguing with the beliefs</div>
+            <div class="dd-item"><span>✗</span> Religious "treatments" instead of medicine</div>
+            <div class="dd-item"><span>✗</span> Expressing frustration openly</div>
+            <div class="dd-item"><span>✗</span> Leaving them unsupervised if unsafe</div>
+          </div>
+        </div>
+      </div>
+      <div class="itab-content" id="it-sud">
+        <div class="bi-block">
+          <div class="bi-en"><strong>Addiction</strong> is a brain disease — not a moral failure or lack of willpower. Repeated substance use changes the brain's reward circuitry, making stopping genuinely difficult. In Gujarat (a dry state), alcohol use is common but hidden — this adds shame and delays help-seeking. Families often swing between enabling (giving money, covering up) and punishing (anger, threats). Both extremes worsen the illness.</div>
+          <div class="bi-gu"><strong>વ્યસન</strong> એ મગજની બીમારી છે — નૈતિક નિષ્ફળતા નહીં. ગુજરાત દારૂ-નિષેધ રાજ્ય હોવા છતાં, ઉપયોગ સામાન્ય છે — આ શરમ ઉમેરે છે. પરિવાર ઘણી વખત "સુવિધા આપવા" (પૈસા, ઢાંકવું) અને "સજા" (ક્રોધ, ધમકી) વચ્ચે ઝૂલે છે. બંને ઉગ્રતા બીમારીને વધારે છે.</div>
+        </div>
+        <div class="key-points">
+          <div class="kp-title">The family's role in recovery</div>
+          <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Do not enable: do not give money for substances, cover up consequences, or lie to others about the problem.</div></div>
+          <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Do not punish: threats, ultimatums, and anger rarely work and often delay recovery.</div></div>
+          <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Do support: accompany to treatment, express concern calmly ("I am worried about you"), celebrate small wins.</div></div>
+          <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Attend a support group — Al-Anon meetings exist in most districts for family members.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STIGMA -->
+<div class="topic-section" id="topic-stigma">
+  <div class="topic-card">
+    <div class="tc-head"><div class="tc-icon">🚫</div><div>
+      <div class="tc-title tc-title-en">Understanding and breaking stigma</div>
+      <div class="tc-title tc-title-gu">કલંક સમજો અને તોડો</div>
+    </div></div>
+    <div class="tc-body">
+      <div class="bi-block">
+        <div class="bi-en">Stigma — social shame and discrimination against people with mental illness — is one of the biggest barriers to care in India. It causes people to hide symptoms for years, avoid treatment, discontinue medication to "appear normal," and suffer in silence. Stigma lives in families too — fear of "what people will say," concern about children's marriage prospects, and shame about the diagnosis.</div>
+        <div class="bi-gu">કલંક — માનસિક બીમારી ધરાવતા લોકો સામે સામાજિક શરમ — ભારતમાં ઉપચારનો સૌથી મોટો અવરોધ છે. "લોકો શું કહેશે" — આ ડરથી વ્યક્તિ વર્ષો સુધી લક્ષણ છુપાવે છે, ઉપચાર ટાળે છે.</div>
+      </div>
+      <div class="key-points">
+        <div class="kp-title">How families can fight stigma</div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Use person-first language: "a person with depression" not "a depressed person" or "pagal."</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Treat psychiatric appointments like any other medical appointment — no secrecy needed.</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Educate extended family members calmly, with facts, not defensiveness.</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Avoid discussing the person's illness publicly in ways that could humiliate them.</div></div>
+      </div>
+      <div class="bi-block">
+        <div class="bi-en"><strong>About marriage concerns:</strong> Many families delay or avoid treatment for fear it will affect the person's marriage prospects. In reality, untreated mental illness is a far greater obstacle to a stable marriage than a well-managed condition. A person who is stable on treatment, working, and functional is in a better position to marry than one who is unwell and untreated.</div>
+        <div class="bi-gu"><strong>લગ્ન અંગે:</strong> ઘણા પરિવારો ઉપચાર મોડો પાડે છે કારણ કે તેઓ ડરે છે કે તે લગ્નની તકો ઘટાડશે. વાસ્તવમાં, સારી રીતે નિયંત્રિત સ્થિતિ ધરાવતી વ્યક્તિ અણઉપચારિત વ્યક્તિ કરતાં ઘણી સારી સ્થિતિમાં છે.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JOINT FAMILY -->
+<div class="topic-section" id="topic-jointfamily">
+  <div class="topic-card">
+    <div class="tc-head"><div class="tc-icon">👨‍👩‍👧‍👦</div><div>
+      <div class="tc-title tc-title-en">Joint family dynamics and mental illness</div>
+      <div class="tc-title tc-title-gu">સંયુક્ત પરિવાર અને માનસિક બીમારી</div>
+    </div></div>
+    <div class="tc-body">
+      <div class="bi-block">
+        <div class="bi-en">The Indian joint family is both a remarkable resource — shared caregiving, financial support, constant companionship — and a potential source of stress — conflicting advice, criticism, invasion of privacy, and high expressed emotion (EE). <strong>Expressed emotion (EE)</strong> is a research term for the level of criticism, hostility, and emotional over-involvement in the home. High EE is one of the strongest predictors of relapse in schizophrenia and depression.</div>
+        <div class="bi-gu">ભારતીય સંયુક્ત પરિવાર સંભાળ અને ટેકો માટે અદ્ભુત સ્ત્રોત છે — પણ ટીકા, વ્યક્તિગતતાનો અભાવ, અને ઉચ્ચ "expressed emotion" (EE) — ઘરમાં ટીકા, વૈરભાવ, ભાવનાત્મક અતિ-સંડોવણ — ફરી બીમારીનું મજબૂત આગાહી-સૂચક છે.</div>
+      </div>
+      <div class="do-dont">
+        <div class="do-col"><div class="dd-label" style="color:var(--accent)">✓ Supportive family environment</div>
+          <div class="dd-item"><span>✓</span> Consistent, calm daily routine</div>
+          <div class="dd-item"><span>✓</span> One designated family contact for the doctor</div>
+          <div class="dd-item"><span>✓</span> Allow privacy and space when needed</div>
+          <div class="dd-item"><span>✓</span> Reduce arguments and household conflict</div>
+          <div class="dd-item"><span>✓</span> Include the person in normal family activities</div>
+          <div class="dd-item"><span>✓</span> Speak about them with respect in their absence</div>
+        </div>
+        <div class="dont-col"><div class="dd-label" style="color:var(--red)">✗ High EE behaviours to avoid</div>
+          <div class="dd-item"><span>✗</span> Frequent criticism of behaviour or appearance</div>
+          <div class="dd-item"><span>✗</span> Discussing illness in front of extended family</div>
+          <div class="dd-item"><span>✗</span> Overprotecting / doing everything for them</div>
+          <div class="dd-item"><span>✗</span> Arguing about medication or treatment</div>
+          <div class="dd-item"><span>✗</span> Comparing to siblings or others</div>
+          <div class="dd-item"><span>✗</span> Pressuring recovery timeline</div>
+        </div>
+      </div>
+      <div class="bi-block" style="margin-top:10px">
+        <div class="bi-en"><strong>Who speaks to the doctor?</strong> In joint families, multiple members often want to attend appointments and give their version of events. This can overwhelm the patient and fragment care. We recommend designating one or two primary caregivers who attend appointments and communicate with the team. Others can be updated by them.</div>
+        <div class="bi-gu"><strong>ડૉક્ટર સાથે કોણ વાત કરે?</strong> અમે ભલામણ કરીએ છીએ કે એક કે બે પ્રાથમિક સંભાળ આપનારા નિષ્ઠ ટૂટ નિમાય, જે ઓ.પી.ડી.માં આવે અને ટીમ સાથે વાતચીત કરે.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CAREGIVER FATIGUE -->
+<div class="topic-section" id="topic-caregiver">
+  <div class="topic-card">
+    <div class="tc-head"><div class="tc-icon">💙</div><div>
+      <div class="tc-title tc-title-en">Caregiver fatigue and self-care</div>
+      <div class="tc-title tc-title-gu">સંભાળ આપનારનો થાક અને આત્મ-સંભાળ</div>
+    </div></div>
+    <div class="tc-body">
+      <div class="bi-block">
+        <div class="bi-en">Caregiving for a family member with mental illness is one of the most demanding roles a person can take on. Caregiver burnout — physical, emotional, and mental exhaustion from sustained caregiving — is extremely common and often invisible. In India, the caregiver is frequently a woman — wife, mother, or daughter-in-law — who receives little recognition or support for her own wellbeing.</div>
+        <div class="bi-gu">માનસિક બીમારી ધરાવતા સ્વજન માટે સંભાળ આપવી એ સૌથી કઠોર ભૂમિકાઓ પૈકીની એક છે. ભારતમાં, સંભાળ આપનાર ઘણી વખત સ્ત્રી — પત્ની, માતા, વહુ — હોય છે, જેને પોતાની સ્વસ્થતા માટે ઓછો ટેકો મળે છે.</div>
+      </div>
+      <div class="warn-chips">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);width:100%;margin-bottom:4px">Warning signs of caregiver burnout</div>
+        <div class="warn-chip" style="background:var(--red-light);color:var(--red)">Constant exhaustion</div>
+        <div class="warn-chip" style="background:var(--red-light);color:var(--red)">Resentment toward patient</div>
+        <div class="warn-chip" style="background:var(--red-light);color:var(--red)">Social withdrawal</div>
+        <div class="warn-chip" style="background:var(--red-light);color:var(--red)">Neglecting own health</div>
+        <div class="warn-chip" style="background:var(--red-light);color:var(--red)">Feeling trapped</div>
+        <div class="warn-chip" style="background:var(--red-light);color:var(--red)">Crying frequently</div>
+        <div class="warn-chip" style="background:var(--red-light);color:var(--red)">Anger / irritability</div>
+        <div class="warn-chip" style="background:var(--red-light);color:var(--red)">Feeling hopeless</div>
+      </div>
+      <div class="key-points" style="margin-top:12px">
+        <div class="kp-title">Self-care is not selfish — it is essential</div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">You cannot pour from an empty vessel. Your own health directly affects your ability to care.</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Schedule at least 30 minutes daily for yourself — a walk, rest, prayer, or time with a friend.</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Share the caregiving role with other family members — no one person should carry it alone.</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Speak to Dr. Mehta or the counsellor at Aatmiya — caregiver wellbeing is part of treatment.</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">It is okay to feel angry, sad, or frustrated. These are normal responses to a very difficult situation.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMMUNICATION -->
+<div class="topic-section" id="topic-communication">
+  <div class="topic-card">
+    <div class="tc-head"><div class="tc-icon">💬</div><div>
+      <div class="tc-title tc-title-en">Communicating with your family member</div>
+      <div class="tc-title tc-title-gu">પરિવારના સભ્ય સાથે સંવાદ</div>
+    </div></div>
+    <div class="tc-body">
+      <div class="bi-block">
+        <div class="bi-en">How you talk <em>to</em> and <em>about</em> your family member with mental illness has a direct biological effect on their stress response and recovery. Research consistently shows that tone, word choice, and frequency of criticism or warmth predict relapse and recovery more reliably than many clinical measures.</div>
+        <div class="bi-gu">તમે સ્વજન સાથે <em>કેવી રીતે</em> વાત કરો છો તેની તેમના તણાવ-પ્રતિભાવ અને સ્વસ્થ થવા પર સીધી જૈવિક અસર છે.</div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">Try these phrases instead</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div style="background:var(--red-light);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--red)"><strong>Instead of:</strong><br>"Why are you like this? Pull yourself together."</div>
+            <div style="background:var(--accent-light);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--accent)"><strong>Try:</strong><br>"I can see you're struggling. I'm here with you."</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div style="background:var(--red-light);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--red)"><strong>Instead of:</strong><br>"You don't need tablets. Just pray more / think positive."</div>
+            <div style="background:var(--accent-light);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--accent)"><strong>Try:</strong><br>"The doctor has prescribed these for a reason. Let's make sure you take them."</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div style="background:var(--red-light);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--red)"><strong>Instead of:</strong><br>"You're ruining this family. Look what you're doing to us."</div>
+            <div style="background:var(--accent-light);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--accent)"><strong>Try:</strong><br>"I know this is hard for all of us. We will get through it together."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RELAPSE WARNING -->
+<div class="topic-section" id="topic-relapse">
+  <div class="topic-card">
+    <div class="tc-head"><div class="tc-icon">⚠️</div><div>
+      <div class="tc-title tc-title-en">Recognising early warning signs of relapse</div>
+      <div class="tc-title tc-title-gu">ફરી બીમારીના પ્રારંભિક ચેતવણી ચિહ્નો</div>
+    </div></div>
+    <div class="tc-body">
+      <div class="bi-block">
+        <div class="bi-en">Most relapses do not happen suddenly. There are usually 2–4 weeks of early warning signs that the family notices before the person themselves — or before the treating doctor sees them. Learning to recognise these signs and acting early can prevent a full relapse and hospitalisation.</div>
+        <div class="bi-gu">મોટા ભાગની ફરી-બીમારી અચાનક આવતી નથી. સામાન્ય રીતે ૨–૪ અઠવાડિયા પહેલા ચેતવણી ચિહ્નો આવે છે. આ ઓળખવાથી સંપૂર્ણ ફરી-બીમારી ટાળી શકાય છે.</div>
+      </div>
+      <div class="warn-chips" style="margin-bottom:10px">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);width:100%;margin-bottom:4px">Common early warning signs across conditions</div>
+        <div class="warn-chip" style="background:var(--gold-light);color:var(--gold)">Sleep changes</div>
+        <div class="warn-chip" style="background:var(--gold-light);color:var(--gold)">Social withdrawal</div>
+        <div class="warn-chip" style="background:var(--gold-light);color:var(--gold)">Stopping medication</div>
+        <div class="warn-chip" style="background:var(--gold-light);color:var(--gold)">Appetite changes</div>
+        <div class="warn-chip" style="background:var(--gold-light);color:var(--gold)">Increased irritability</div>
+        <div class="warn-chip" style="background:var(--gold-light);color:var(--gold)">Renewed substance use</div>
+        <div class="warn-chip" style="background:var(--gold-light);color:var(--gold)">Talking to self</div>
+        <div class="warn-chip" style="background:var(--gold-light);color:var(--gold)">Neglecting hygiene</div>
+        <div class="warn-chip" style="background:var(--gold-light);color:var(--gold)">Missing work / duties</div>
+        <div class="warn-chip" style="background:var(--gold-light);color:var(--gold)">Unusual energy / elation</div>
+        <div class="warn-chip" style="background:var(--gold-light);color:var(--gold)">Religious preoccupation</div>
+        <div class="warn-chip" style="background:var(--gold-light);color:var(--gold)">Spending unusually</div>
+      </div>
+      <div class="key-points">
+        <div class="kp-title">What to do when you notice warning signs</div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Do not wait for the next appointment. Call Aatmiya Hospital and describe what you're seeing.</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Ensure medication is being taken — many relapses are triggered by stopping tablets.</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Reduce stress in the home environment — postpone conflicts, avoid arguments.</div></div>
+        <div class="kp-item"><div class="kp-dot"></div><div class="kp-text">Accompany to an urgent appointment even if the person resists — early intervention saves months of recovery.</div></div>
+      </div>
+      <div style="background:var(--red-light);border-radius:8px;padding:12px;margin-top:10px;border-left:4px solid var(--red)">
+        <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:4px">🆘 Emergency signs — act immediately</div>
+        <div style="font-size:12px;color:var(--red);line-height:1.6">Talking about suicide or self-harm · Threatening to harm others · Completely unable to care for self · Not recognising family members · Aggressive behaviour that poses risk · Refusing all food and water for more than 24 hours.</div>
+        <div style="margin-top:8px;font-size:12px;font-weight:600;color:var(--red)">Call Aatmiya Hospital immediately. Emergency: 108. Police: 100.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MYTHS -->
+<div class="topic-section" id="topic-myths">
+  <div class="topic-card">
+    <div class="tc-head"><div class="tc-icon">💡</div><div>
+      <div class="tc-title tc-title-en">Common myths and the facts</div>
+      <div class="tc-title tc-title-gu">સામાન્ય ગેરસમજ અને સત્ય</div>
+    </div></div>
+    <div class="tc-body">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="myth-grid">
+          <div class="myth-card" style="background:var(--red-light)">
+            <div class="myth-label" style="color:var(--red)">❌ Myth</div>
+            <div class="myth-text" style="color:var(--red)">"Mental illness is caused by black magic or evil spirits."</div>
+          </div>
+          <div class="myth-card" style="background:var(--accent-light)">
+            <div class="myth-label" style="color:var(--accent)">✓ Fact</div>
+            <div class="myth-text" style="color:var(--accent)">Mental illness is caused by brain chemistry, genetics, stress, and life experiences. It has biological, psychological, and social causes — no supernatural ones.</div>
+          </div>
+        </div>
+        <div class="myth-grid">
+          <div class="myth-card" style="background:var(--red-light)">
+            <div class="myth-label" style="color:var(--red)">❌ Myth</div>
+            <div class="myth-text" style="color:var(--red)">"Psychiatric medicines are addictive and dangerous. Better to avoid."</div>
+          </div>
+          <div class="myth-card" style="background:var(--accent-light)">
+            <div class="myth-label" style="color:var(--accent)">✓ Fact</div>
+            <div class="myth-text" style="color:var(--accent)">Most psychiatric medications (antidepressants, antipsychotics, mood stabilisers) are not addictive. They are essential treatment. Stopping abruptly is dangerous — always consult the doctor first.</div>
+          </div>
+        </div>
+        <div class="myth-grid">
+          <div class="myth-card" style="background:var(--red-light)">
+            <div class="myth-label" style="color:var(--red)">❌ Myth</div>
+            <div class="myth-text" style="color:var(--red)">"People with mental illness are dangerous and violent."</div>
+          </div>
+          <div class="myth-card" style="background:var(--accent-light)">
+            <div class="myth-label" style="color:var(--accent)">✓ Fact</div>
+            <div class="myth-text" style="color:var(--accent)">People with mental illness are far more likely to be victims of violence than perpetrators. Most are not dangerous. Untreated illness and substance use together increase risk — both can be treated.</div>
+          </div>
+        </div>
+        <div class="myth-grid">
+          <div class="myth-card" style="background:var(--red-light)">
+            <div class="myth-label" style="color:var(--red)">❌ Myth</div>
+            <div class="myth-text" style="color:var(--red)">"Once mentally ill, always mentally ill. No cure."</div>
+          </div>
+          <div class="myth-card" style="background:var(--accent-light)">
+            <div class="myth-label" style="color:var(--accent)">✓ Fact</div>
+            <div class="myth-text" style="color:var(--accent)">Many people achieve full recovery. Even those with chronic conditions can live productive, fulfilling lives with proper treatment and support. Recovery is a journey, not a destination.</div>
+          </div>
+        </div>
+        <div class="myth-grid">
+          <div class="myth-card" style="background:var(--red-light)">
+            <div class="myth-label" style="color:var(--red)">❌ Myth</div>
+            <div class="myth-text" style="color:var(--red)">"Visiting a psychiatrist means you are 'pagal' (mad)."</div>
+          </div>
+          <div class="myth-card" style="background:var(--accent-light)">
+            <div class="myth-label" style="color:var(--accent)">✓ Fact</div>
+            <div class="myth-text" style="color:var(--accent)">A psychiatrist treats all mental and emotional disorders — from stress and sleep problems to anxiety, depression, and addiction. Seeing one means you are taking your health seriously — like seeing a cardiologist for the heart.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Handout preview -->
+<div class="handout-preview" id="handout-preview">
+  <div class="handout-title">Aatmiya Hospital — Family Education Handout</div>
+  <div id="handout-content"></div>
+</div>
+
+</div>
+
+<script>
+function showTopic(name, btn) {
+  document.querySelectorAll('.topic-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('topic-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+function showITab(id, btn) {
+  const parent = btn.closest('.tc-body');
+  parent.querySelectorAll('.itab').forEach(t=>t.classList.remove('active'));
+  parent.querySelectorAll('.itab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+function setLang(lang) {
+  document.body.classList.toggle('gujarati', lang==='gu');
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('lb-'+lang).classList.add('active');
+}
+function generateHandout() {
+  const preview = document.getElementById('handout-preview');
+  const isGu = document.body.classList.contains('gujarati');
+  preview.innerHTML = `<div class="handout-title">Aatmiya Hospital — ${isGu?'પરિવાર શિક્ષા':'Family Education'} Handout</div>
+    <div style="font-size:12px;color:#666;margin-bottom:12px">Dr. Dhaivat Mehta · Aatmiya Hospital, Gandhidham · ${new Date().toLocaleDateString('en-IN',{dateStyle:'medium'})}</div>
+    <div style="font-size:12px;line-height:1.8;color:#333">
+    <p><strong>${isGu?'મુખ્ય સ્મરણ:':'Key reminders:'}</strong></p>
+    <ul style="margin-left:16px;margin-top:6px">
+      <li>${isGu?'માનસિક બીમારી એ તબીબી સ્થિતિ છે, નૈતિક નિષ્ફળતા નહીં.':'Mental illness is a medical condition, not a personal failure.'}</li>
+      <li>${isGu?'ઘરમાં ટીકા અને ઉચ્ચ EE ફરી-બીમારી વધારે છે.':'Criticism and high expressed emotion at home increase relapse.'}</li>
+      <li>${isGu?'ઉપચાર સહમતી — નિયમિત દવા, OPD મુલાકાત, ઓછો તણાવ.':'Treatment adherence — regular medication, OPD visits, reduced stress.'}</li>
+      <li>${isGu?'સ્વ-સંભાળ સ્વ-કેન્દ્રિત નથી. સ્વ-સ્વસ્થ સંભાળ-કર્તા = સ્વ-સ્વસ્થ દર્દી.':'Caregiver self-care is not selfish. Healthy caregiver = better patient outcomes.'}</li>
+      <li>${isGu?'ફરી-બીમારીના પ્રારંભિક ચેતવણી ચિહ્નો ઓળખો — ઝડપ વહેલો દખલ.':'Recognise early warning signs — early intervention prevents full relapse.'}</li>
+    </ul>
+    <p style="margin-top:12px"><strong>${isGu?'ઇમર્જન્સી:':'Emergency:'}</strong> Aatmiya Hospital · Ambulance: 108 · iCall: 9152987821</p>
+    </div>`;
+  preview.classList.add('visible');
+  preview.scrollIntoView({behavior:'smooth'});
+  setTimeout(()=>window.print(),500);
+}
+</script>
+</body>
+</html>

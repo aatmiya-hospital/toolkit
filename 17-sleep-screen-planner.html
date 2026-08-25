@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sleep & Screen Hygiene Planner — Aatmiya</title>
+<style>
+  :root{
+    --bg:#0F1A2E;--surface:#1A2640;--surface2:#243050;--border:#2A3860;
+    --text:#E8EEF8;--text2:#9AAAC0;--text3:#5A6A80;
+    --accent:#4A8ECC;--accent-light:#1A3050;
+    --gold:#C8A030;--gold-light:#2A2010;
+    --green:#2E9E62;--green-light:#0A2018;
+    --red:#CC4444;--red-light:#2A1010;
+    --purple:#8A60CC;--purple-light:#1A1030;
+    --radius:12px;--shadow:0 4px 20px rgba(0,0,0,.3);
+  }
+  /* Light mode */
+  @media(prefers-color-scheme:light){
+    :root{
+      --bg:#F0F4FA;--surface:#FFF;--surface2:#E8EEF8;--border:#D0DAF0;
+      --text:#101830;--text2:#485880;--text3:#90A0C0;
+      --accent:#1A5EA0;--accent-light:#E0EEF8;
+      --gold:#8B6200;--gold-light:#FFF8E1;
+      --green:#1E6E42;--green-light:#E3F2E9;
+      --red:#882020;--red-light:#FBEBEE;
+      --purple:#4C2D8E;--purple-light:#EDE8FA;
+      --shadow:0 2px 14px rgba(26,61,112,.1);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:linear-gradient(135deg,#0A1428 0%,#1A3060 50%,#0A2040 100%);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  @media(prefers-color-scheme:light){.header{background:linear-gradient(135deg,#1A3D70 0%,#2D5EA0 100%)}}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:40px;height:40px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+  .ht{font-size:18px;font-weight:700}.hs{font-size:11px;opacity:.7;margin-top:2px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 16px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  /* Tabs */
+  .tabs{background:#080E1C;display:flex;overflow-x:auto}
+  @media(prefers-color-scheme:light){.tabs{background:#1A3D70}}
+  .tab{flex:1;min-width:90px;padding:11px 8px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.6);cursor:pointer;border:none;background:transparent;font-family:inherit;border-bottom:2.5px solid transparent;white-space:nowrap}
+  .tab.active{color:#fff;border-bottom-color:#4A8ECC}
+  .wrap{max-width:800px;margin:0 auto;padding:16px}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px;border:1px solid var(--border)}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:13px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:1px}
+  .pb{padding:14px 18px}
+  .fl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
+  .fi{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .fi:focus{outline:none;border-color:var(--accent);background:var(--surface)}
+  select.fi{cursor:pointer}
+  .fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:540px){.fg{grid-template-columns:1fr}}
+  .frow{margin-bottom:10px}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+  .chip{padding:5px 10px;border-radius:20px;font-size:11px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .12s;user-select:none}
+  .chip.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600}
+  /* Score dial */
+  .score-section{display:flex;align-items:center;gap:20px;padding:16px 18px;background:var(--surface2);border-radius:10px;margin-bottom:14px}
+  .score-dial{width:80px;height:80px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid var(--border);flex-shrink:0;transition:all .3s}
+  .score-num{font-size:28px;font-weight:900;line-height:1}
+  .score-lbl{font-size:9px;color:var(--text3);text-align:center}
+  .score-detail{flex:1}
+  .score-grade{font-size:16px;font-weight:700;margin-bottom:4px}
+  .score-sub{font-size:12px;color:var(--text2);line-height:1.5}
+  /* Week plan */
+  .week-plan{display:flex;flex-direction:column;gap:6px}
+  .day-row{display:flex;gap:8px;align-items:stretch}
+  .day-label{font-size:11px;font-weight:700;color:var(--text3);min-width:36px;display:flex;align-items:center}
+  .day-slots{flex:1;display:flex;gap:4px}
+  .slot{flex:1;border-radius:6px;padding:4px 6px;font-size:10px;text-align:center;font-weight:500}
+  /* Plan output */
+  .plan-card{border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:4px solid}
+  .plan-card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+  .plan-card-text{font-size:12px;line-height:1.65}
+  .out-area{background:var(--surface2);border-radius:8px;padding:12px;font-size:11px;line-height:1.8;white-space:pre-wrap;color:var(--text);border:1px solid var(--border);display:none;margin:0 0 14px}
+  .out-area.visible{display:block}
+  .bp{background:var(--accent);color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+  .tab-content{display:none}.tab-content.active{display:block}
+  /* Slider */
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .slider-row{display:flex;align-items:center;gap:10px}
+  .slider-val{font-size:16px;font-weight:800;color:var(--accent);min-width:48px;text-align:right}
+  .slider-ends{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:2px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">🌙</div>
+    <div><div class="ht">Sleep &amp; Screen Hygiene Planner</div><div class="hs">Aatmiya Hospital · CBT-I informed · Clinical + Corporate Tool 17</div></div>
+  </div>
+  <div class="ha"><button class="bg" onclick="buildPlan()">Build plan</button><button class="bg" onclick="window.print()">Print</button></div>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('assess',this)">Assessment</button>
+  <button class="tab" onclick="switchTab('screen',this)">Screen habits</button>
+  <button class="tab" onclick="switchTab('plan',this)">Your plan</button>
+  <button class="tab" onclick="switchTab('cbtiedu',this)">CBT-I education</button>
+</div>
+
+<div class="wrap">
+
+<!-- ASSESS TAB -->
+<div class="tab-content active" id="tab-assess">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Current sleep pattern</div></div></div>
+    <div class="pb">
+      <div class="fg">
+        <div class="frow"><div class="fl">Usual bedtime</div><input class="fi" type="time" id="bedtime" value="23:00"></div>
+        <div class="frow"><div class="fl">Usual wake time</div><input class="fi" type="time" id="waketime" value="07:00"></div>
+        <div class="frow"><div class="fl">Time to fall asleep</div>
+          <select class="fi" id="sleep-onset">
+            <option>< 15 minutes (normal)</option>
+            <option>15–30 minutes</option>
+            <option>30–60 minutes</option>
+            <option>> 1 hour</option>
+            <option>Varies greatly</option>
+          </select>
+        </div>
+        <div class="frow"><div class="fl">Night wakings</div>
+          <select class="fi" id="wakings">
+            <option>None / rarely</option>
+            <option>Once</option>
+            <option>2–3 times</option>
+            <option>> 3 times</option>
+            <option>Wake and can't return to sleep</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fl">Sleep quality (1 = very poor, 10 = excellent)</div>
+        <div class="slider-row">
+          <input type="range" id="sq-slider" min="1" max="10" value="5" oninput="document.getElementById('sq-val').textContent=this.value+'/10';updateScore()">
+          <div class="slider-val" id="sq-val">5/10</div>
+        </div>
+        <div class="slider-ends"><span>1 — Very poor</span><span>10 — Excellent</span></div>
+      </div>
+      <div class="frow">
+        <div class="fl">Daytime sleepiness</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">None</div>
+          <div class="chip" onclick="toggleChip(this)">Mild — occasional</div>
+          <div class="chip" onclick="toggleChip(this)">Moderate — affects work</div>
+          <div class="chip" onclick="toggleChip(this)">Severe — napping daily</div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fl">Sleep complaints (select all)</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Difficulty falling asleep</div>
+          <div class="chip" onclick="toggleChip(this)">Frequent night wakings</div>
+          <div class="chip" onclick="toggleChip(this)">Early morning waking</div>
+          <div class="chip" onclick="toggleChip(this)">Unrefreshing sleep</div>
+          <div class="chip" onclick="toggleChip(this)">Nightmares / vivid dreams</div>
+          <div class="chip" onclick="toggleChip(this)">Difficulty getting up</div>
+          <div class="chip" onclick="toggleChip(this)">Too much sleep</div>
+          <div class="chip" onclick="toggleChip(this)">No complaints</div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fl">Possible contributing factors</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Anxiety / worry at bedtime</div>
+          <div class="chip" onclick="toggleChip(this)">Depression</div>
+          <div class="chip" onclick="toggleChip(this)">Chronic pain</div>
+          <div class="chip" onclick="toggleChip(this)">Caffeine use</div>
+          <div class="chip" onclick="toggleChip(this)">Alcohol use</div>
+          <div class="chip" onclick="toggleChip(this)">Irregular schedule</div>
+          <div class="chip" onclick="toggleChip(this)">Shift work</div>
+          <div class="chip" onclick="toggleChip(this)">Medication side effect</div>
+          <div class="chip" onclick="toggleChip(this)">Partner / child disturbing sleep</div>
+          <div class="chip" onclick="toggleChip(this)">Noise / light environment</div>
+          <div class="chip" onclick="toggleChip(this)">Hot / humid room</div>
+        </div>
+      </div>
+      <div class="frow"><div class="fl">Duration of sleep problem</div>
+        <select class="fi" id="duration">
+          <option>< 1 month (acute insomnia)</option>
+          <option>1–3 months</option>
+          <option>3–6 months (chronic insomnia)</option>
+          <option>> 6 months (chronic)</option>
+          <option>Lifelong pattern</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN TAB -->
+<div class="tab-content" id="tab-screen">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--gold)"></div><div><div class="pht">Screen &amp; digital habits</div></div></div>
+    <div class="pb">
+      <div class="frow">
+        <div class="fl">Daily total screen time (all devices)</div>
+        <div class="slider-row">
+          <input type="range" id="screen-hrs" min="1" max="14" value="6" oninput="document.getElementById('screen-val').textContent=this.value+'h';updateScore()">
+          <div class="slider-val" id="screen-val">6h</div>
+        </div>
+        <div class="slider-ends"><span>1h</span><span>14h+</span></div>
+      </div>
+      <div class="frow">
+        <div class="fl">Last screen use before bed</div>
+        <select class="fi" id="screen-before-bed" onchange="updateScore()">
+          <option value="0">No screens before bed (great)</option>
+          <option value="1">30 min before</option>
+          <option value="2">1 hour before</option>
+          <option value="3" selected>Right up to bedtime</option>
+          <option value="4">After getting into bed</option>
+          <option value="5">Until falling asleep</option>
+        </select>
+      </div>
+      <div class="frow">
+        <div class="fl">Devices used in bed</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Smartphone (social media)</div>
+          <div class="chip" onclick="toggleChip(this)">Streaming video</div>
+          <div class="chip" onclick="toggleChip(this)">Work emails / messages</div>
+          <div class="chip" onclick="toggleChip(this)">News</div>
+          <div class="chip" onclick="toggleChip(this)">Gaming</div>
+          <div class="chip" onclick="toggleChip(this)">Nothing — no devices in bed</div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fl">Work-related screen habits</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Work WhatsApp after 9pm</div>
+          <div class="chip" onclick="toggleChip(this)">Checking email before sleep</div>
+          <div class="chip" onclick="toggleChip(this)">Replying to messages in bed</div>
+          <div class="chip" onclick="toggleChip(this)">Work calls after dinner</div>
+          <div class="chip" onclick="toggleChip(this)">No work after a fixed time</div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fl">Morning screen habits</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Check phone within 5 min of waking</div>
+          <div class="chip" onclick="toggleChip(this)">Social media first thing</div>
+          <div class="chip" onclick="toggleChip(this)">News before breakfast</div>
+          <div class="chip" onclick="toggleChip(this)">Work messages before 8am</div>
+          <div class="chip" onclick="toggleChip(this)">Screen-free morning routine</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live score -->
+  <div id="score-section-wrap"></div>
+</div>
+
+<!-- PLAN TAB -->
+<div class="tab-content" id="tab-plan">
+  <div id="plan-cards"></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <button class="bp" onclick="buildPlan()">Generate personalised plan</button>
+    <button class="bpo" onclick="window.print()">Print</button>
+  </div>
+  <div class="out-area" id="plan-out"></div>
+</div>
+
+<!-- CBT-I EDUCATION TAB -->
+<div class="tab-content" id="tab-cbtiedu">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--purple)"></div><div><div class="pht">CBT-I — the evidence base</div><div class="phs">Cognitive Behavioural Therapy for Insomnia · First-line treatment</div></div></div>
+    <div class="pb" style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:var(--surface2);border-radius:10px;padding:12px 14px">
+        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">What is CBT-I?</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.65">CBT-I is recommended as the first-line treatment for chronic insomnia by the American College of Physicians, NICE (UK), and the European Sleep Research Society — preferred over sleep medication. It typically consists of 4–8 sessions and produces durable improvements that outlast pharmacological treatment.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--accent-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--accent)">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px">Sleep restriction therapy</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Temporarily limit time in bed to actual sleep time, building homeostatic sleep pressure. Counterintuitive but highly effective — produces deep, consolidated sleep.</div>
+        </div>
+        <div style="background:var(--green-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--green)">
+          <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:4px">Stimulus control</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Use the bed only for sleep and intimacy. If not asleep within 20 min, get up. Retrains the brain to associate bed with sleepiness, not wakefulness.</div>
+        </div>
+        <div style="background:var(--gold-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--gold)">
+          <div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px">Sleep hygiene education</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Consistent wake time, limiting caffeine and alcohol, managing light exposure, temperature, exercise timing. Necessary but insufficient alone.</div>
+        </div>
+        <div style="background:var(--purple-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--purple)">
+          <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:4px">Cognitive restructuring</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Addressing catastrophic thoughts about sleep loss ("I must sleep 8 hours", "Tomorrow will be ruined"). Hyperarousal driven by dysfunctional sleep beliefs is a primary maintaining factor.</div>
+        </div>
+        <div style="background:var(--red-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--red)">
+          <div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:4px">Relaxation training</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Progressive muscle relaxation, diaphragmatic breathing, guided imagery. Targets physiological hyperarousal that prevents sleep onset and maintenance.</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;border-left:3px solid var(--border)">
+          <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:4px">Blue light &amp; circadian biology</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Short-wavelength (blue) light from screens suppresses melatonin secretion by up to 3 hours and delays circadian phase. Dim, warm-tone lighting 2h before bed is biologically significant.</div>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.65">
+        <strong style="color:var(--text)">Pharmacotherapy note:</strong> Benzodiazepines and Z-drugs (zolpidem, zopiclone) are effective short-term but do not address perpetuating factors and carry dependence risk. Melatonin is appropriate for circadian phase disorders and jet lag. CBT-I addresses the underlying mechanisms. The two are not mutually exclusive — short-course medication can bridge acute distress while CBT-I builds durable skills.
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function switchTab(name, btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='plan') buildPlan();
+}
+function toggleChip(el){el.classList.toggle('on')}
+
+function getChipsOn(container){
+  return [...container.querySelectorAll('.chip.on')].map(c=>c.textContent.trim());
+}
+
+function updateScore(){
+  const sq=parseInt(document.getElementById('sq-slider').value)||5;
+  const screenHrs=parseInt(document.getElementById('screen-hrs').value)||6;
+  const screenBed=parseInt(document.getElementById('screen-before-bed').value)||3;
+  // Score 0-100 lower = worse
+  let score = 100;
+  score -= (10-sq)*6;
+  if(screenHrs>8) score-=10;
+  if(screenHrs>10) score-=10;
+  score -= screenBed*8;
+  score = Math.max(0,Math.min(100,score));
+  let grade,color,bg;
+  if(score>=75){grade='Good';color='var(--green)';bg='var(--green-light)'}
+  else if(score>=50){grade='Fair — room to improve';color='var(--gold)';bg='var(--gold-light)'}
+  else if(score>=25){grade='Poor — action needed';color='var(--red)';bg='var(--red-light)'}
+  else{grade='Very poor — clinical review';color:'var(--red)';bg='var(--red-light)'}
+  const wrap=document.getElementById('score-section-wrap');
+  if(wrap) wrap.innerHTML=`
+    <div class="score-section" style="background:var(--surface);border:1px solid var(--border)">
+      <div class="score-dial" style="border-color:${color}">
+        <div class="score-num" style="color:${color}">${score}</div>
+        <div class="score-lbl">Sleep score</div>
+      </div>
+      <div class="score-detail">
+        <div class="score-grade" style="color:${color}">${grade}</div>
+        <div class="score-sub">Based on sleep quality and screen habits. Complete both tabs for an accurate score.</div>
+      </div>
+    </div>`;
+}
+
+function buildPlan(){
+  const bedtime=document.getElementById('bedtime').value||'23:00';
+  const waketime=document.getElementById('waketime').value||'07:00';
+  const onset=document.getElementById('sleep-onset').value;
+  const screenBed=parseInt(document.getElementById('screen-before-bed').value)||3;
+  const screenHrs=parseInt(document.getElementById('screen-hrs').value)||6;
+  const complaints=getChipsOn(document.querySelectorAll('#tab-assess .panel')[0]);
+  const factors=getChipsOn(document.querySelectorAll('#tab-assess .panel')[0]);
+  const screenHabits=getChipsOn(document.querySelectorAll('#tab-screen .panel')[0]);
+
+  const rules=[];
+  // Wake time — most important
+  rules.push({
+    color:'var(--accent)',bg:'var(--accent-light)',
+    title:'🕐 Anchor your wake time — the single most important rule',
+    text:`Set your alarm for ${waketime} every day — including weekends — for the next 4 weeks. A consistent wake time is the most powerful regulator of your circadian rhythm and sleep pressure. Do not sleep in, even after a bad night. This is non-negotiable in CBT-I.`
+  });
+  // Screen buffer
+  if(screenBed>=3){
+    rules.push({
+      color:'var(--gold)',bg:'var(--gold-light)',
+      title:'📱 Screen-free window before bed',
+      text:`Aim for a ${screenBed>=4?'60':'45'}-minute screen-free window before ${bedtime}. Blue light from screens suppresses melatonin by 2–3 hours. Switch to: reading a physical book, light conversation, stretching, warm shower, or breathing practice. Use night mode / warm filter on devices if screens are unavoidable.`
+    });
+  }
+  // Work screen boundary
+  if(screenHabits.some(s=>s.includes('WhatsApp')||s.includes('email')||s.includes('calls'))){
+    rules.push({
+      color:'var(--red)',bg:'var(--red-light)',
+      title:'💼 Work screen boundary',
+      text:`Set a firm work screen-off time — suggested: 8:30pm. Disable work WhatsApp/email notifications after this time. Tell colleagues your availability hours. The cortisol spike from a work message activates the stress response and takes 45–90 minutes to fully resolve — long after you\'ve put the phone down.`
+    });
+  }
+  // Stimulus control
+  if(complaints.some(c=>c.includes('falling asleep')||c.includes('wakings'))){
+    rules.push({
+      color:'var(--purple)',bg:'var(--purple-light)',
+      title:'🛏️ Bed is for sleep only (stimulus control)',
+      text:`Use your bed only for sleep and intimacy — no phones, screens, work, eating, or prolonged wakefulness. If you are not asleep within 20 minutes, get up and do a quiet activity (light reading, breathing) in dim light until genuinely sleepy, then return. This retrains your brain to associate bed with sleep.`
+    });
+  }
+  // Caffeine
+  if(factors.some(f=>f.includes('Caffeine'))){
+    rules.push({
+      color:'var(--green)',bg:'var(--green-light)',
+      title:'☕ Caffeine cutoff',
+      text:`Stop all caffeine (chai, coffee, cola, energy drinks) by 2:00pm. Caffeine has a half-life of 5–7 hours — an afternoon chai is still 50% active at bedtime. Tolerance to caffeine\'s wakefulness effects can mask the sleep disruption it causes.`
+    });
+  }
+  // Anxiety at bedtime
+  if(factors.some(f=>f.includes('Anxiety'))){
+    rules.push({
+      color:'var(--purple)',bg:'var(--purple-light)',
+      title:'🧠 Scheduled worry time + wind-down ritual',
+      text:`Do a 10-minute "brain dump" at 8pm — write all worries and tomorrow\'s tasks on paper. This externalises anxiety from bedtime to earlier. Follow with a 20-minute wind-down ritual (same order each night: e.g. shower → chamomile tea → book → breathing). The ritual signals to the brain that sleep is approaching.`
+    });
+  }
+  // Morning habits
+  if(screenHabits.some(s=>s.includes('phone within 5 min')||s.includes('Social media first'))){
+    rules.push({
+      color:'var(--gold)',bg:'var(--gold-light)',
+      title:'🌅 Morning screen delay',
+      text:`Do not check your phone for the first 30 minutes after waking. Morning is when cortisol peaks naturally — this is your brain\'s best state for focus, creativity, and intentionality. Starting with social media hijacks this window. Use the first 30 minutes for: water, sunlight, breathing, movement, or quiet reflection.`
+    });
+  }
+  // Exercise
+  rules.push({
+    color:'var(--green)',bg:'var(--green-light)',
+    title:'🚶 Physical activity timing',
+    text:`Moderate exercise earlier in the day (morning or afternoon) significantly improves sleep quality and reduces sleep onset time. Vigorous exercise within 2–3 hours of bedtime can delay sleep onset in some people. A 20-minute walk after dinner is generally fine and beneficial.`
+  });
+  // Environment
+  rules.push({
+    color:'var(--accent)',bg:'var(--accent-light)',
+    title:'🌡️ Sleep environment',
+    text:`Bedroom temperature: 18–21°C is optimal for sleep. Darkness: use blackout curtains or eye mask — even dim light from a charger affects sleep quality. Sound: earplugs or a white noise app if noise is an issue. Reserve the bedroom\'s sensory environment for sleep.`
+  });
+
+  const cardsHTML=rules.map(r=>`<div class="plan-card" style="background:${r.bg};border-color:${r.color}">
+    <div class="plan-card-title" style="color:${r.color}">${r.title}</div>
+    <div class="plan-card-text" style="color:${r.color}">${r.text}</div>
+  </div>`).join('');
+
+  document.getElementById('plan-cards').innerHTML=cardsHTML;
+
+  const now=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const planText=`AATMIYA HOSPITAL — SLEEP & SCREEN HYGIENE PLAN
+Generated: ${now}
+Bedtime: ${bedtime} · Wake time: ${waketime}
+
+${rules.map(r=>`${r.title}\n${r.text}`).join('\n\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Aatmiya Hospital · Dr. Dhaivat Mehta, Gandhidham`;
+
+  const out=document.getElementById('plan-out');
+  out.textContent=planText;
+  out.classList.add('visible');
+  navigator.clipboard?.writeText(planText);
+}
+
+updateScore();
+</script>
+</body>
+</html>

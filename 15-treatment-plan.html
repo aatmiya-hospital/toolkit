@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Treatment Plan Builder — Aatmiya Hospital</title>
+<style>
+  :root{
+    --bg:#F3F1F8;--surface:#FFF;--surface2:#ECEAF4;--border:#D8D4EC;
+    --text:#16122A;--text2:#4A4660;--text3:#9A97B0;
+    --accent:#3D2080;--accent-light:#EAE4FA;
+    --green:#1E5E32;--green-light:#E5F2E9;
+    --amber:#8B5E00;--amber-light:#FFF8E1;
+    --red:#7B1818;--red-light:#FBEBEE;
+    --blue:#1A3D70;--blue-light:#E8EEF8;
+    --radius:12px;--shadow:0 2px 14px rgba(61,32,128,.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .wrap{max-width:1060px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 340px;gap:16px}
+  @media(max-width:860px){.wrap{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:13px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:1px}
+  .pb{padding:14px 18px}
+  .fl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
+  .fi{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .fi:focus{outline:none;border-color:var(--accent);background:#fff}
+  textarea.fi{resize:vertical;line-height:1.55}
+  select.fi{cursor:pointer}
+  .fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:540px){.fg{grid-template-columns:1fr}}
+  .fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  @media(max-width:540px){.fg3{grid-template-columns:1fr}}
+  .frow{margin-bottom:10px}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+  .chip{padding:5px 10px;border-radius:20px;font-size:11px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .12s;user-select:none}
+  .chip.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600}
+  /* SMART goal builder */
+  .goal-card{border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px}
+  .goal-head{background:var(--surface2);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .goal-num{font-size:11px;font-weight:700;color:var(--text3)}
+  .goal-domain{font-size:12px;font-weight:600;color:var(--accent)}
+  .goal-rm{width:24px;height:24px;border-radius:6px;background:var(--red-light);border:1px solid var(--red);color:var(--red);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .goal-body{padding:10px 14px;display:flex;flex-direction:column;gap:7px}
+  .smart-row{display:grid;grid-template-columns:60px 1fr;gap:6px;align-items:center}
+  .smart-letter{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}
+  .smart-input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);width:100%}
+  .smart-input:focus{outline:none;border-color:var(--accent);background:#fff}
+  .add-goal-btn{font-size:12px;color:var(--accent);cursor:pointer;border:none;background:none;font-family:inherit;font-weight:500;padding:4px 0;text-decoration:underline;text-underline-offset:2px}
+  /* Milestones */
+  .milestone-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+  .milestone-input{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .milestone-input:focus{outline:none;border-color:var(--accent);background:#fff}
+  .milestone-week{width:80px;padding:7px 8px;border:1px solid var(--border);border-radius:8px;font-size:11px;font-family:inherit;background:var(--surface2);color:var(--text);text-align:center}
+  .milestone-rm{width:26px;height:26px;border-radius:6px;background:var(--red-light);border:1px solid var(--red);color:var(--red);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  /* Right panel */
+  .plan-preview{padding:14px 18px;font-size:12px;line-height:1.8;color:var(--text);white-space:pre-wrap;background:var(--surface2);border-radius:8px;min-height:200px;display:none;border:1px solid var(--border)}
+  .plan-preview.visible{display:block}
+  .act-row{display:flex;gap:8px;padding:14px 18px;flex-wrap:wrap;border-top:1px solid var(--border)}
+  .bp{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .bp:hover{background:#2e1860}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  /* Domain colour badges */
+  .d-pharm{color:#1A3D70}.d-psych{color:#1E5E32}.d-social{color:#8B5E00}
+  .d-deadd{color:#7B3500}.d-medical{color:#4C2D8E}.d-family{color:#1A5C42}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Treatment Plan Builder</div><div class="hs">Aatmiya Hospital · Clinician Tool 15 · IPS / NIMHANS framework</div></div>
+  </div>
+  <div class="ha">
+    <button class="bg" onclick="buildPlan()">Build plan</button>
+    <button class="bg" onclick="window.print()">Print</button>
+    <button class="bg" onclick="resetAll()">Reset</button>
+  </div>
+</div>
+
+<div class="wrap">
+<div>
+
+<!-- Patient & diagnosis -->
+<div class="panel">
+  <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Patient & diagnosis</div></div></div>
+  <div class="pb">
+    <div class="fg">
+      <div class="frow"><div class="fl">Patient code</div><input class="fi" id="pat-id" placeholder="PT-2024-001"></div>
+      <div class="frow"><div class="fl">Date</div><input class="fi" type="date" id="plan-date"></div>
+      <div class="frow"><div class="fl">Primary diagnosis (ICD-11)</div><input class="fi" id="diagnosis" placeholder="e.g. 6A40 — Single episode depressive disorder, moderate"></div>
+      <div class="frow"><div class="fl">Comorbidities</div><input class="fi" id="comorbid" placeholder="e.g. 6C40 — Alcohol dependence; Type 2 DM"></div>
+    </div>
+    <div class="fg">
+      <div class="frow"><div class="fl">Clinical phase</div>
+        <select class="fi" id="phase">
+          <option>Acute — stabilisation</option>
+          <option>Continuation — relapse prevention</option>
+          <option>Maintenance — long-term</option>
+          <option>Recovery — rehabilitation</option>
+          <option>Crisis management</option>
+        </select>
+      </div>
+      <div class="frow"><div class="fl">Plan duration</div>
+        <select class="fi" id="plan-duration">
+          <option>4 weeks</option><option>6 weeks</option><option>3 months</option>
+          <option>6 months</option><option>1 year</option><option>Ongoing</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow"><div class="fl">Presenting problems / functional impairments</div>
+      <textarea class="fi" id="problems" rows="2" placeholder="Sleep, occupational function, relationships, substance use, self-care…"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- SMART Goals -->
+<div class="panel">
+  <div class="ph"><div class="phd" style="background:var(--blue)"></div><div><div class="pht">SMART treatment goals</div><div class="phs">Specific · Measurable · Achievable · Relevant · Time-bound</div></div></div>
+  <div class="pb">
+    <div id="goal-list"></div>
+    <button class="add-goal-btn" onclick="addGoal()">+ Add goal</button>
+  </div>
+</div>
+
+<!-- Pharmacotherapy -->
+<div class="panel">
+  <div class="ph"><div class="phd" style="background:#1A3D70"></div><div><div class="pht">Pharmacotherapy</div></div></div>
+  <div class="pb">
+    <div id="rx-rows"></div>
+    <button class="add-goal-btn" onclick="addRxRow()">+ Add medication</button>
+    <div style="margin-top:10px">
+      <div class="fl">Pharmacotherapy rationale / notes</div>
+      <textarea class="fi" id="pharma-notes" rows="2" placeholder="Choice rationale, previous trials, tolerability, TDM plan, duration…"></textarea>
+    </div>
+    <div style="margin-top:8px">
+      <div class="fl">Monitoring plan</div>
+      <div class="chips">
+        <div class="chip" onclick="toggleChip(this)">LFT @ 3 months</div>
+        <div class="chip" onclick="toggleChip(this)">Lithium level monthly</div>
+        <div class="chip" onclick="toggleChip(this)">Valproate level</div>
+        <div class="chip" onclick="toggleChip(this)">FBS / HbA1c</div>
+        <div class="chip" onclick="toggleChip(this)">Weight monthly</div>
+        <div class="chip" onclick="toggleChip(this)">ECG at baseline</div>
+        <div class="chip" onclick="toggleChip(this)">UDS monthly</div>
+        <div class="chip" onclick="toggleChip(this)">CBC 3-monthly</div>
+        <div class="chip" onclick="toggleChip(this)">EEG 6-monthly</div>
+        <div class="chip" onclick="toggleChip(this)">TFT 6-monthly</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Psychotherapy & interventions -->
+<div class="panel">
+  <div class="ph"><div class="phd" style="background:var(--green)"></div><div><div class="pht">Psychotherapy &amp; interventions</div></div></div>
+  <div class="pb">
+    <div class="frow">
+      <div class="fl">Primary psychotherapy modality</div>
+      <select class="fi" id="therapy-modality">
+        <option>Supportive psychotherapy</option>
+        <option>Cognitive Behavioural Therapy (CBT)</option>
+        <option>Motivational Interviewing (MI)</option>
+        <option>Mindfulness-Based Cognitive Therapy (MBCT)</option>
+        <option>Problem-Solving Therapy (PST)</option>
+        <option>Interpersonal Therapy (IPT)</option>
+        <option>Relapse Prevention Therapy</option>
+        <option>Family-Focused Therapy</option>
+        <option>Psychoeducation only</option>
+        <option>Crisis-focused / stabilisation</option>
+      </select>
+    </div>
+    <div class="fg">
+      <div class="frow"><div class="fl">Frequency</div>
+        <select class="fi" id="therapy-freq">
+          <option>Weekly</option><option>Fortnightly</option><option>Monthly</option>
+          <option>As needed / SOS</option><option>Intensive (2×/week)</option>
+        </select>
+      </div>
+      <div class="frow"><div class="fl">Format</div>
+        <select class="fi" id="therapy-format">
+          <option>Individual</option><option>Family sessions included</option>
+          <option>Group therapy</option><option>Combined individual + family</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fl">Session focus areas</div>
+      <div class="chips">
+        <div class="chip" onclick="toggleChip(this)">Psychoeducation — diagnosis</div>
+        <div class="chip" onclick="toggleChip(this)">Medication adherence</div>
+        <div class="chip" onclick="toggleChip(this)">Sleep hygiene</div>
+        <div class="chip" onclick="toggleChip(this)">Behavioural activation</div>
+        <div class="chip" onclick="toggleChip(this)">Thought challenging</div>
+        <div class="chip" onclick="toggleChip(this)">Emotion regulation</div>
+        <div class="chip" onclick="toggleChip(this)">Craving management</div>
+        <div class="chip" onclick="toggleChip(this)">Relapse prevention</div>
+        <div class="chip" onclick="toggleChip(this)">Caregiver education</div>
+        <div class="chip" onclick="toggleChip(this)">Safety planning</div>
+        <div class="chip" onclick="toggleChip(this)">Grief work</div>
+        <div class="chip" onclick="toggleChip(this)">HSM / mindfulness</div>
+        <div class="chip" onclick="toggleChip(this)">Communication skills</div>
+        <div class="chip" onclick="toggleChip(this)">Problem solving</div>
+        <div class="chip" onclick="toggleChip(this)">Occupational rehabilitation</div>
+      </div>
+    </div>
+    <div class="frow"><div class="fl">Psychotherapy notes</div>
+      <textarea class="fi" id="therapy-notes" rows="2" placeholder="Specific techniques, contraindications, patient preferences…"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- Milestones -->
+<div class="panel">
+  <div class="ph"><div class="phd" style="background:var(--amber)"></div><div><div class="pht">Recovery milestones</div><div class="phs">Measurable checkpoints across the plan duration</div></div></div>
+  <div class="pb">
+    <div id="milestone-list"></div>
+    <button class="add-goal-btn" onclick="addMilestone()">+ Add milestone</button>
+  </div>
+</div>
+
+<!-- Social / vocational / family -->
+<div class="panel">
+  <div class="ph"><div class="phd" style="background:var(--amber)"></div><div><div class="pht">Social, vocational &amp; family goals</div></div></div>
+  <div class="pb">
+    <div class="frow">
+      <div class="fl">Occupational / vocational goals</div>
+      <div class="chips">
+        <div class="chip" onclick="toggleChip(this)">Return to work / employment</div>
+        <div class="chip" onclick="toggleChip(this)">Maintain current employment</div>
+        <div class="chip" onclick="toggleChip(this)">Vocational training / skill building</div>
+        <div class="chip" onclick="toggleChip(this)">Education resumption</div>
+        <div class="chip" onclick="toggleChip(this)">Supported employment</div>
+        <div class="chip" onclick="toggleChip(this)">Daily routine / structure</div>
+        <div class="chip" onclick="toggleChip(this)">Disability assessment</div>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fl">Social / relationship goals</div>
+      <div class="chips">
+        <div class="chip" onclick="toggleChip(this)">Rebuild family relationships</div>
+        <div class="chip" onclick="toggleChip(this)">Expand social support network</div>
+        <div class="chip" onclick="toggleChip(this)">Reduce social isolation</div>
+        <div class="chip" onclick="toggleChip(this)">Marital / couples work</div>
+        <div class="chip" onclick="toggleChip(this)">Parenting support</div>
+        <div class="chip" onclick="toggleChip(this)">AA / NA / peer support group</div>
+        <div class="chip" onclick="toggleChip(this)">Community / spiritual reintegration</div>
+      </div>
+    </div>
+    <div class="frow"><div class="fl">Additional social / family goals</div>
+      <textarea class="fi" id="social-notes" rows="2" placeholder="Housing, financial, legal, family system issues…"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- Follow-up -->
+<div class="panel">
+  <div class="ph"><div class="phd" style="background:var(--red)"></div><div><div class="pht">Follow-up &amp; review plan</div></div></div>
+  <div class="pb">
+    <div class="fg3">
+      <div class="frow"><div class="fl">OPD review</div>
+        <select class="fi" id="fu-opd">
+          <option>1 week</option><option>2 weeks</option><option>3 weeks</option>
+          <option>1 month</option><option>6 weeks</option><option>3 months</option>
+        </select>
+      </div>
+      <div class="frow"><div class="fl">Crisis / SOS plan</div>
+        <select class="fi" id="fu-sos">
+          <option>Safety plan in place</option><option>Safety plan to be completed</option>
+          <option>Low risk — no formal plan needed</option>
+        </select>
+      </div>
+      <div class="frow"><div class="fl">Outcome measure</div>
+        <select class="fi" id="fu-measure">
+          <option>PHQ-9 (depression)</option><option>GAD-7 (anxiety)</option>
+          <option>PANSS (psychosis)</option><option>YMRS (mania)</option>
+          <option>AUDIT (alcohol)</option><option>DAST (drugs)</option>
+          <option>Clinical impression only</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow"><div class="fl">Plan review date</div><input class="fi" type="date" id="review-date"></div>
+    <div class="frow"><div class="fl">Additional notes</div>
+      <textarea class="fi" id="fu-notes" rows="2" placeholder="Referrals, inter-specialty coordination, legal/ethical issues…"></textarea>
+    </div>
+  </div>
+</div>
+
+</div><!-- end left -->
+
+<!-- Right: live plan output -->
+<div>
+  <div class="panel" style="position:sticky;top:16px">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Treatment plan</div><div class="phs">Click "Build plan" to generate</div></div></div>
+    <div style="padding:14px 18px">
+      <div class="plan-preview" id="plan-out"></div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text3)">Auto-copies to clipboard on generation.</div>
+    </div>
+    <div class="act-row">
+      <button class="bp" onclick="buildPlan()">Build plan</button>
+      <button class="bpo" onclick="copyPlan()">Copy</button>
+      <button class="bpo" onclick="window.print()">Print</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+let goalCount = 0;
+let rxCount = 0;
+let milestoneCount = 0;
+
+document.getElementById('plan-date').value = new Date().toISOString().split('T')[0];
+const reviewDate = new Date(); reviewDate.setMonth(reviewDate.getMonth()+1);
+document.getElementById('review-date').value = reviewDate.toISOString().split('T')[0];
+
+const GOAL_DOMAINS = ['Symptom reduction','Medication adherence','Sleep','Occupational function','Substance use','Social functioning','Safety','Insight','Self-care','Mood stabilisation'];
+const RX_FREQ = ['OD morning','OD night','BD','TDS','HS','SOS','Weekly','Alternate days'];
+const COMMON_DRUGS = [
+  'Tab. Escitalopram (Stalopam)','Tab. Sertraline (Daxid)','Tab. Fluoxetine (Fludac)',
+  'Tab. Mirtazapine (Mirtaz)','Tab. Venlafaxine (Veniz)','Tab. Duloxetine (Duzela)',
+  'Tab. Amitriptyline (Tryptomer)','Tab. Bupropion (Bupron)',
+  'Tab. Clonazepam (Clonapax)','Tab. Lorazepam (Ativan)','Tab. Alprazolam (Alprax)',
+  'Tab. Olanzapine (Oleanz)','Tab. Risperidone (Sizodon)','Tab. Quetiapine (Seroquel)',
+  'Tab. Aripiprazole (Arip)','Tab. Clozapine (Sizopin)','Tab. Haloperidol (Serenace)',
+  'Tab. Lithium carbonate (Licab)','Tab. Sodium valproate (Valparin)','Tab. Lamotrigine (Lametec)',
+  'Tab. Buprenorphine+Naloxone (Addnok)','Tab. Naltrexone (Nodict)','Tab. Disulfiram (Esperal)',
+  'Tab. Modafinil (Modalert)','Tab. Methylphenidate (Ritalin)',
+];
+
+function toggleChip(el){el.classList.toggle('on')}
+
+function addGoal(){
+  goalCount++;
+  const id='goal_'+goalCount;
+  const div=document.createElement('div');
+  div.className='goal-card'; div.id=id;
+  div.innerHTML=`
+    <div class="goal-head">
+      <span class="goal-num">Goal ${goalCount}</span>
+      <select style="font-size:11px;font-weight:600;border:none;background:transparent;color:var(--accent);font-family:inherit;cursor:pointer" id="${id}_domain">
+        ${GOAL_DOMAINS.map(d=>`<option>${d}</option>`).join('')}
+      </select>
+      <div class="goal-rm" onclick="document.getElementById('${id}').remove()">×</div>
+    </div>
+    <div class="goal-body">
+      <div class="smart-row"><span class="smart-letter">S — Specific</span><input class="smart-input" id="${id}_s" placeholder="What exactly will be achieved?"></div>
+      <div class="smart-row"><span class="smart-letter">M — Measurable</span><input class="smart-input" id="${id}_m" placeholder="How will we measure progress?"></div>
+      <div class="smart-row"><span class="smart-letter">A — Achievable</span><input class="smart-input" id="${id}_a" placeholder="Is this realistic for this patient?"></div>
+      <div class="smart-row"><span class="smart-letter">R — Relevant</span><input class="smart-input" id="${id}_r" placeholder="Why does this goal matter to the patient?"></div>
+      <div class="smart-row"><span class="smart-letter">T — Time-bound</span><input class="smart-input" id="${id}_t" placeholder="By when? e.g. By week 4"></div>
+    </div>`;
+  document.getElementById('goal-list').appendChild(div);
+}
+
+function addRxRow(){
+  rxCount++;
+  const id='rx_'+rxCount;
+  const div=document.createElement('div');
+  div.style.cssText='display:flex;gap:6px;margin-bottom:8px;align-items:center';
+  div.id=id;
+  div.innerHTML=`
+    <input list="drugs-list" placeholder="Drug / brand…" id="${id}_drug" style="flex:2;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)">
+    <datalist id="drugs-list">${COMMON_DRUGS.map(d=>`<option value="${d}">`).join('')}</datalist>
+    <input placeholder="Dose" id="${id}_dose" style="width:80px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)">
+    <select id="${id}_freq" style="padding:7px 8px;border:1px solid var(--border);border-radius:8px;font-size:11px;font-family:inherit;background:var(--surface2);color:var(--text);cursor:pointer">
+      ${RX_FREQ.map(f=>`<option>${f}</option>`).join('')}
+    </select>
+    <input placeholder="Duration" id="${id}_dur" style="width:90px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)">
+    <div onclick="document.getElementById('${id}').remove()" style="width:26px;height:26px;border-radius:6px;background:var(--red-light);border:1px solid var(--red);color:var(--red);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</div>`;
+  document.getElementById('rx-rows').appendChild(div);
+}
+
+function addMilestone(){
+  milestoneCount++;
+  const id='ms_'+milestoneCount;
+  const div=document.createElement('div');
+  div.className='milestone-row'; div.id=id;
+  div.innerHTML=`
+    <input class="milestone-week" placeholder="Week" id="${id}_week" type="number" min="1" max="52">
+    <input class="milestone-input" placeholder="Milestone — e.g. PHQ-9 score < 10, sleeping 6+ hrs, back at work" id="${id}_text">
+    <div class="milestone-rm" onclick="document.getElementById('${id}').remove()">×</div>`;
+  document.getElementById('milestone-list').appendChild(div);
+}
+
+function getGoals(){
+  return [...document.querySelectorAll('.goal-card')].map(card=>{
+    const id=card.id;
+    return {
+      domain: document.getElementById(id+'_domain')?.value||'',
+      s: document.getElementById(id+'_s')?.value||'',
+      m: document.getElementById(id+'_m')?.value||'',
+      a: document.getElementById(id+'_a')?.value||'',
+      r: document.getElementById(id+'_r')?.value||'',
+      t: document.getElementById(id+'_t')?.value||'',
+    };
+  }).filter(g=>g.s);
+}
+
+function getRx(){
+  return [...document.querySelectorAll('[id^="rx_"]')].filter(el=>el.id.match(/^rx_\d+$/)).map(row=>{
+    const id=row.id;
+    const drug=document.getElementById(id+'_drug')?.value||'';
+    if(!drug) return null;
+    return `${drug} · ${document.getElementById(id+'_dose')?.value||'—'} · ${document.getElementById(id+'_freq')?.value||''} · ${document.getElementById(id+'_dur')?.value||''}`;
+  }).filter(Boolean);
+}
+
+function getMilestones(){
+  return [...document.querySelectorAll('[id^="ms_"]')].filter(el=>el.id.match(/^ms_\d+$/)).map(row=>{
+    const id=row.id;
+    const week=document.getElementById(id+'_week')?.value;
+    const text=document.getElementById(id+'_text')?.value;
+    return text?`Week ${week||'?'}: ${text}`:null;
+  }).filter(Boolean);
+}
+
+function getChipsOn(){
+  return (container)=>[...container.querySelectorAll('.chip.on')].map(c=>c.textContent.trim());
+}
+
+function buildPlan(){
+  const now=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const goals=getGoals();
+  const rx=getRx();
+  const milestones=getMilestones();
+  const allChipsOn=(selector)=>[...document.querySelectorAll(selector+' .chip.on')].map(c=>c.textContent.trim());
+
+  const plan=`AATMIYA HOSPITAL — INDIVIDUALISED TREATMENT PLAN
+Generated: ${now}
+Clinician: Dr. Dhaivat Mehta
+Patient: ${document.getElementById('pat-id').value||'—'}
+Diagnosis: ${document.getElementById('diagnosis').value||'—'}
+Comorbidities: ${document.getElementById('comorbid').value||'—'}
+Phase: ${document.getElementById('phase').value} · Duration: ${document.getElementById('plan-duration').value}
+
+PRESENTING PROBLEMS:
+${document.getElementById('problems').value||'—'}
+
+━━━━ SMART TREATMENT GOALS ━━━━
+${goals.length?goals.map((g,i)=>`
+Goal ${i+1} — ${g.domain}
+  Specific: ${g.s}
+  Measurable: ${g.m}
+  Achievable: ${g.a}
+  Relevant: ${g.r}
+  Time-bound: ${g.t}`).join('\n'):'No goals specified'}
+
+━━━━ PHARMACOTHERAPY ━━━━
+${rx.length?rx.map(r=>`  • ${r}`).join('\n'):'No medications specified'}
+${document.getElementById('pharma-notes').value?'\nNotes: '+document.getElementById('pharma-notes').value:''}
+Monitoring: ${allChipsOn('.panel:nth-child(3)').join(', ')||'As clinically indicated'}
+
+━━━━ PSYCHOTHERAPY & INTERVENTIONS ━━━━
+Modality: ${document.getElementById('therapy-modality').value}
+Frequency: ${document.getElementById('therapy-freq').value} (${document.getElementById('therapy-format').value})
+Focus areas: ${allChipsOn('.panel:nth-child(4)').join(', ')||'As clinically guided'}
+${document.getElementById('therapy-notes').value?'Notes: '+document.getElementById('therapy-notes').value:''}
+
+━━━━ RECOVERY MILESTONES ━━━━
+${milestones.length?milestones.map(m=>`  • ${m}`).join('\n'):'No milestones specified'}
+
+━━━━ SOCIAL / VOCATIONAL / FAMILY ━━━━
+Occupational: ${allChipsOn('.panel:nth-child(6)').slice(0,5).join(', ')||'—'}
+Social: ${allChipsOn('.panel:nth-child(6)').slice(5).join(', ')||'—'}
+${document.getElementById('social-notes').value?'Notes: '+document.getElementById('social-notes').value:''}
+
+━━━━ FOLLOW-UP PLAN ━━━━
+OPD review: ${document.getElementById('fu-opd').value}
+Crisis / safety: ${document.getElementById('fu-sos').value}
+Outcome measure: ${document.getElementById('fu-measure').value}
+Plan review date: ${document.getElementById('review-date').value}
+${document.getElementById('fu-notes').value?'Additional: '+document.getElementById('fu-notes').value:''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Aatmiya Hospital, Gandhidham · Param Diagnostic Lab · Aatmiya Pharmacy`;
+
+  const out=document.getElementById('plan-out');
+  out.textContent=plan;
+  out.classList.add('visible');
+  navigator.clipboard?.writeText(plan);
+  out.scrollIntoView({behavior:'smooth'});
+}
+
+function copyPlan(){navigator.clipboard?.writeText(document.getElementById('plan-out').textContent)}
+
+function resetAll(){
+  document.querySelectorAll('input:not([type=date]),textarea,select').forEach(el=>{
+    if(el.tagName==='SELECT')el.selectedIndex=0; else el.value='';
+  });
+  document.querySelectorAll('.chip.on').forEach(c=>c.classList.remove('on'));
+  document.getElementById('goal-list').innerHTML='';
+  document.getElementById('rx-rows').innerHTML='';
+  document.getElementById('milestone-list').innerHTML='';
+  document.getElementById('plan-out').classList.remove('visible');
+  document.getElementById('plan-date').value=new Date().toISOString().split('T')[0];
+  goalCount=0;rxCount=0;milestoneCount=0;
+}
+
+// Initialise with one of each
+addGoal(); addRxRow(); addMilestone();
+</script>
+</body>
+</html>

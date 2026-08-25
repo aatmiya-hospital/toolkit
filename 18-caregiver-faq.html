@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caregiver FAQ Reference — Aatmiya Hospital</title>
+<style>
+  :root{
+    --bg:#F5F3EE;--surface:#FFF;--surface2:#EEEAE2;--border:#DDD9D0;
+    --text:#1A1610;--text2:#5A5448;--text3:#9A9488;
+    --accent:#1A5C42;--accent-light:#E3F0EB;
+    --blue:#1A3D70;--blue-light:#E8EEF8;
+    --amber:#8B5E00;--amber-light:#FFF8E1;
+    --red:#7B1818;--red-light:#FBEBEE;
+    --purple:#4C2D8E;--purple-light:#EDE8FA;
+    --orange:#7B3500;--orange-light:#FFF0E5;
+    --radius:12px;--shadow:0 2px 12px rgba(26,92,66,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  /* Search + filter bar */
+  .search-bar{background:#134a34;padding:12px 24px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .search-input{flex:1;min-width:200px;padding:9px 14px;border-radius:8px;border:none;font-size:13px;font-family:inherit;background:rgba(255,255,255,.15);color:#fff;outline:none}
+  .search-input::placeholder{color:rgba(255,255,255,.5)}
+  .search-input:focus{background:rgba(255,255,255,.2)}
+  .cat-btns{display:flex;gap:5px;flex-wrap:wrap}
+  .cat-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;border:1px solid rgba(255,255,255,.25);background:transparent;color:rgba(255,255,255,.7);cursor:pointer;font-family:inherit;transition:all .12s}
+  .cat-btn.active{background:#fff;color:var(--accent);font-weight:700}
+  /* Layout */
+  .wrap{max-width:960px;margin:0 auto;padding:16px;display:grid;grid-template-columns:220px 1fr;gap:16px}
+  @media(max-width:720px){.wrap{grid-template-columns:1fr}}
+  /* Sidebar */
+  .sidebar{display:flex;flex-direction:column;gap:6px}
+  .sidebar-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);padding:8px 4px 4px;margin-top:4px}
+  .sidebar-item{padding:8px 12px;border-radius:8px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .12s;border:1px solid transparent}
+  .sidebar-item:hover{background:var(--surface);border-color:var(--border)}
+  .sidebar-item.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600}
+  .sidebar-count{float:right;font-size:10px;background:var(--surface2);color:var(--text3);padding:1px 6px;border-radius:20px;margin-top:1px}
+  /* FAQ area */
+  .faq-area{display:flex;flex-direction:column;gap:0}
+  .faq-cat-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);padding:10px 0 6px;border-bottom:1px solid var(--border);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .cat-dot{width:8px;height:8px;border-radius:50%}
+  /* FAQ cards */
+  .faq-card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:8px;border:1.5px solid transparent;transition:border-color .15s}
+  .faq-card:hover{border-color:var(--border)}
+  .faq-card.open{border-color:var(--accent)}
+  .faq-q{padding:13px 16px;display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+  .faq-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+  .faq-q-text{flex:1;font-size:13px;font-weight:500;color:var(--text);line-height:1.4}
+  .faq-arrow{font-size:14px;color:var(--text3);transition:transform .2s;flex-shrink:0;margin-top:2px}
+  .faq-card.open .faq-arrow{transform:rotate(90deg);color:var(--accent)}
+  .faq-a{display:none;padding:0 16px 14px 42px}
+  .faq-card.open .faq-a{display:block}
+  .faq-a-text{font-size:12px;color:var(--text2);line-height:1.75}
+  .faq-a-text strong{color:var(--text);font-weight:600}
+  .faq-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+  .faq-tag{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--surface2);color:var(--text3)}
+  .faq-urgent{background:var(--red-light);border:1px solid #EF9A9A;border-radius:6px;padding:8px 10px;margin-top:8px;font-size:11px;color:var(--red);line-height:1.5}
+  .faq-tip{background:var(--accent-light);border-radius:6px;padding:8px 10px;margin-top:8px;font-size:11px;color:var(--accent);line-height:1.5}
+  /* Empty state */
+  .empty{text-align:center;padding:40px;color:var(--text3);font-size:13px;display:none}
+  .empty.visible{display:block}
+  /* Print */
+  @media print{.search-bar,.sidebar,.ha{display:none!important}.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Caregiver FAQ Reference</div><div class="hs">Aatmiya Hospital · Front-desk &amp; Staff Reference · Tool 18</div></div>
+  </div>
+  <div class="ha"><button class="bg" onclick="window.print()">Print</button></div>
+</div>
+
+<div class="search-bar">
+  <input class="search-input" id="search" placeholder="Search questions — medication, side effects, safety, relapse…" oninput="filterFAQs()">
+  <div class="cat-btns">
+    <button class="cat-btn active" onclick="filterCat('all',this)">All</button>
+    <button class="cat-btn" onclick="filterCat('medication',this)">Medication</button>
+    <button class="cat-btn" onclick="filterCat('crisis',this)">Crisis</button>
+    <button class="cat-btn" onclick="filterCat('behaviour',this)">Behaviour</button>
+    <button class="cat-btn" onclick="filterCat('system',this)">System</button>
+    <button class="cat-btn" onclick="filterCat('recovery',this)">Recovery</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="sidebar" id="sidebar"></div>
+  <div>
+    <div class="faq-area" id="faq-area"></div>
+    <div class="empty" id="empty-state">No questions match your search.</div>
+  </div>
+</div>
+
+<script>
+const FAQS = [
+  // MEDICATION
+  {cat:'medication',catLabel:'Medication & treatment',catColor:'#1A3D70',icon:'💊',
+   q:'When will the medication start working? My family member says they feel no different.',
+   a:`Most psychiatric medications take <strong>2–4 weeks</strong> for meaningful symptom improvement, and <strong>4–8 weeks</strong> for full therapeutic effect. This is one of the most common misunderstandings that leads to early discontinuation.\n\nAntidepressants (SSRIs, SNRIs) generally take 2–4 weeks before mood lifts. Sleep and energy often improve first. Antipsychotics may reduce agitation within days but positive symptoms (hallucinations, delusions) take longer. Mood stabilisers require dose optimisation and blood level monitoring before judging efficacy.\n\n<strong>What to tell the caregiver:</strong> The medication is working on the brain's chemistry even when the person doesn't feel it yet. Stopping early is the most common cause of relapse. Continue as prescribed and report any side effects.`,
+   tags:['antidepressants','waiting period','adherence']},
+
+  {cat:'medication',catLabel:'Medication & treatment',catColor:'#1A3D70',icon:'💊',
+   q:'My family member refuses to take their medication. What should I do?',
+   a:`Non-adherence is common and has multiple causes: side effects, lack of insight, stigma ("I'm not mad"), feeling better ("I don't need it anymore"), family discouragement, or financial barriers.\n\n<strong>Strategies that help:</strong>\n• Explore the reason non-judgmentally — "What makes it hard to take the tablet?"\n• Involve them in their own treatment — come to the appointment together\n• Address side effects with Dr. Mehta — often medication can be adjusted\n• Simplify regimen — once-daily dosing is better than multiple times\n• Use a pill organiser for visibility\n• Pair with a daily habit (morning tea, meal)\n• Aatmiya Pharmacy can pre-pack weekly doses\n\n<strong>If they have no insight</strong> (severe psychosis, mania): an urgent appointment is needed to discuss options including depot injections.`,
+   urgent:'If the person is acutely unwell and refusing all treatment, contact Aatmiya Hospital immediately for guidance. In rare cases of risk, the Mental Healthcare Act 2017 allows for treatment in the best interest of the patient.',
+   tags:['non-adherence','refusal','depot']},
+
+  {cat:'medication',catLabel:'Medication & treatment',catColor:'#1A3D70',icon:'💊',
+   q:'Can the medication be stopped once the person feels better?',
+   a:`<strong>No — this is one of the most critical points to convey to families.</strong> Feeling better is a sign the medication is working, not a sign that it is no longer needed.\n\nFor depression: typically continue for <strong>6–12 months</strong> after full remission (longer for recurrent episodes). Stopping early is the single biggest risk factor for relapse.\n\nFor schizophrenia / bipolar disorder: often requires <strong>long-term or lifelong</strong> maintenance. Each relapse causes progressive neurobiological damage and makes the next episode more severe and treatment-resistant.\n\nFor de-addiction medications (naltrexone, buprenorphine): stopping prematurely dramatically increases relapse risk, particularly in the first year.\n\n<strong>Always discuss stopping with Dr. Mehta before reducing or stopping any psychiatric medication.</strong> Abrupt discontinuation of many medications causes withdrawal symptoms.`,
+   tags:['stopping medication','relapse prevention','duration']},
+
+  {cat:'medication',catLabel:'Medication & treatment',catColor:'#1A3D70',icon:'💊',
+   q:'What are the common side effects we should watch for?',
+   a:`Side effects vary by medication class. The most common ones families notice:\n\n<strong>Sedation / drowsiness:</strong> Common with mirtazapine, quetiapine, antipsychotics, clonazepam. Usually improves in 1–2 weeks. Give these at night.\n\n<strong>Weight gain:</strong> Olanzapine, quetiapine, mirtazapine, valproate. Monitor weight monthly. Lifestyle measures and sometimes medication changes help.\n\n<strong>Tremor:</strong> Lithium (dose-related), antipsychotics (EPS). Report to Dr. Mehta — dosing or medication changes may help.\n\n<strong>Sexual side effects:</strong> SSRIs commonly. Important to ask — patients often don't volunteer this. May require switch.\n\n<strong>Dry mouth, constipation:</strong> TCAs, antipsychotics. Increase water and fibre.\n\n<strong>Nausea:</strong> SSRIs, lithium, valproate. Usually settles in 1–2 weeks. Take with food.\n\n<strong>When to call urgently:</strong> High fever + muscle stiffness (NMS), skin rash (especially with lamotrigine — can be serious), confusion with lithium, severe restlessness that appeared after starting antipsychotics (akathisia).`,
+   urgent:'Fever + muscle rigidity + confusion after starting/increasing antipsychotics = possible NMS — emergency. Call immediately.',
+   tags:['side effects','EPS','NMS','lithium','weight']},
+
+  {cat:'medication',catLabel:'Medication & treatment',catColor:'#1A3D70',icon:'💊',
+   q:'Is it safe to take psychiatric medication with other medicines or herbal remedies?',
+   a:`Drug interactions are clinically important. Key ones:\n\n<strong>Lithium:</strong> NSAIDs (combiflam, ibuprofen), ACE inhibitors, thiazide diuretics can raise lithium levels to toxic range. Always inform any doctor treating the patient that they are on lithium.\n\n<strong>MAOIs (rare but used):</strong> Dangerous interactions with many drugs and certain foods.\n\n<strong>Antipsychotics + other CNS depressants:</strong> Additive sedation.\n\n<strong>Warfarin:</strong> Many psychiatric medications affect INR — always check.\n\n<strong>Herbal remedies:</strong> Ashwagandha, Brahmi — generally low risk but inform Dr. Mehta. St. John's Wort significantly reduces levels of many medications and can trigger mania — avoid.\n\n<strong>Alcohol:</strong> Interacts with virtually all psychiatric medication — sedation, loss of efficacy, worsens underlying condition.\n\n<strong>Rule: Always tell every doctor — including dentists and surgeons — about all psychiatric medications before any procedure or new prescription.</strong>`,
+   tags:['interactions','herbal','alcohol','lithium toxicity']},
+
+  // CRISIS
+  {cat:'crisis',catLabel:'Crisis & safety',catColor:'#7B1818',icon:'🆘',
+   q:'My family member has said they want to die / end their life. What do I do right now?',
+   a:`Take every mention of suicide seriously — do not dismiss it as "attention-seeking" or "just talk."\n\n<strong>Immediate steps:</strong>\n1. <strong>Stay with them.</strong> Do not leave them alone.\n2. <strong>Listen without judgment.</strong> Ask directly: "Are you thinking of ending your life?" — this does not plant the idea, it opens the conversation.\n3. <strong>Remove access to means</strong> — medications (give to another family member), sharp objects, access to heights or vehicles if there is risk.\n4. <strong>Call Aatmiya Hospital immediately</strong> for guidance.\n5. <strong>If there is immediate risk</strong> — take to the nearest government hospital emergency or call 108.\n\n<strong>Crisis lines available 24/7:</strong>\niCall: 9152987821 | Vandrevala: 1860-2662-345 | iMind: 080-46110007\n\nDo not argue with the person, minimise their pain, or promise to keep suicidal talk a secret.`,
+   urgent:'If the person has taken an overdose, is self-harming, or is about to harm themselves — call 108 (ambulance) or take to emergency immediately. Call police (100) if needed for safety.',
+   tags:['suicide','crisis','immediate','safety']},
+
+  {cat:'crisis',catLabel:'Crisis & safety',catColor:'#7B1818',icon:'🆘',
+   q:'My family member is aggressive and threatening. How do I keep the family safe?',
+   a:`Aggression in mental illness is most often driven by fear, confusion (psychosis), withdrawal, or intoxication — not intentional malice.\n\n<strong>De-escalation in the moment:</strong>\n• Speak slowly, calmly, and quietly — your nervous system regulates theirs\n• Give space — do not crowd or corner them\n• Remove other people from the room if possible\n• Reduce stimulation — turn off loud TV, dim lights\n• Do not argue, threaten, or challenge\n• Avoid sudden movements\n• Validate their distress: "I can see you're really upset"\n\n<strong>Call for help if:</strong>\n• There is a weapon involved\n• Physical harm has occurred\n• De-escalation is not working\n\n<strong>Contact:</strong> Aatmiya Hospital for urgent guidance. Police (100) if immediate physical danger. 108 for medical emergency.\n\nAfter the episode: this needs urgent clinical review — medication adjustment, depot injection, or brief hospitalisation may be needed.`,
+   urgent:'Your safety and the family\'s safety comes first. If physical harm is occurring or imminent — leave the situation and call 100 (police) and 108 (ambulance).',
+   tags:['aggression','violence','de-escalation','safety']},
+
+  {cat:'crisis',catLabel:'Crisis & safety',catColor:'#7B1818',icon:'🆘',
+   q:'What are the warning signs that a relapse is coming? What do we do?',
+   a:`Most relapses do not arrive suddenly. There is usually a <strong>2–4 week prodromal window</strong> — a period of early warning signs that the family notices before the treating team sees the patient.\n\n<strong>Common warning signs across conditions:</strong>\n• Sleep changes (reduced need for sleep in mania, early wakening in depression)\n• Social withdrawal or increased isolation\n• Stopping or reducing medication\n• Increased irritability, suspiciousness, or emotional reactivity\n• Return of specific symptoms (e.g. hearing voices, talking to self, excessive praying, grandiose ideas)\n• Neglecting hygiene, food, or daily duties\n• Renewed or increased substance use\n• Spending unusually or making impulsive decisions\n\n<strong>What to do when you notice signs:</strong>\n1. Do not wait for the next appointment — call Aatmiya Hospital the same day\n2. Ensure medication is being taken\n3. Reduce stress in the home — postpone arguments and non-urgent demands\n4. Accompany to an urgent appointment even if the person resists`,
+   tip:'Keep a simple daily note of any changes you observe. Even a voice memo helps. This information is invaluable at the clinical review.',
+   tags:['relapse','warning signs','prodrome','early intervention']},
+
+  // BEHAVIOUR
+  {cat:'behaviour',catLabel:'Difficult behaviours',catColor:'#7B3500',icon:'🧩',
+   q:'My family member sleeps all day and won\'t do anything. Are they just being lazy?',
+   a:`<strong>No.</strong> What looks like laziness is a symptom called <em>psychomotor retardation</em> (in depression) or <em>negative symptoms</em> (in schizophrenia). The brain's motivation and reward circuitry is genuinely disrupted.\n\nIn depression, the brain literally cannot generate the motivation signal to initiate activity. This is not a character flaw — it is like asking someone with a broken leg to run.\n\n<strong>What helps:</strong>\n• Gentle, low-pressure invitations — not demands or comparisons\n• Behavioural activation: start with 5-minute activities (sitting outside, walking to the gate)\n• Celebrate tiny steps — a shower, eating a meal, making a phone call\n• A structured routine — even basic: same wake time, meal times, one activity\n\n<strong>What makes it worse:</strong>\n• "Just get up," "Think positive," "Look at what others are doing"\n• Removing all responsibility (learned helplessness) or piling it on\n• Criticism and expressed frustration`,
+   tags:['anergia','negative symptoms','depression','behavioural activation']},
+
+  {cat:'behaviour',catLabel:'Difficult behaviours',catColor:'#7B3500',icon:'🧩',
+   q:'My family member hears voices or sees things that aren\'t there. How do I respond?',
+   a:`Hallucinations are real experiences to the person having them — arguing or dismissing makes things worse.\n\n<strong>Helpful responses:</strong>\n• "I understand you're hearing something, even though I can't hear it. That sounds really distressing."\n• Redirect to a calm activity without drawing attention to the hallucination\n• Reduce sensory overload — quiet environment, fewer people, dim lighting\n• Ensure medication is being taken — hallucinations are very medication-responsive\n\n<strong>What not to do:</strong>\n• "There's nothing there — you're imagining it"\n• Playing along or agreeing that the voices/visions are real\n• Arguing about the reality of what they're experiencing\n• Involving religious or supernatural interventions as a first response\n\n<strong>When to call urgently:</strong> If the voices are commanding the person to harm themselves or others, or if the person is acting on hallucinations in a dangerous way.`,
+   urgent:'Command hallucinations telling the person to harm themselves or others require urgent clinical review today.',
+   tags:['hallucinations','voices','psychosis','responding']},
+
+  {cat:'behaviour',catLabel:'Difficult behaviours',catColor:'#7B3500',icon:'🧩',
+   q:'My family member with depression keeps crying and saying nothing will get better. How do I respond without making it worse?',
+   a:`Hopelessness is a core symptom of depression — the brain genuinely cannot access hopeful thoughts in the way a healthy brain can. This is not negativity or pessimism — it is a symptom.\n\n<strong>Responses that help:</strong>\n• "I hear you. This sounds really painful."\n• "I'm here with you, even when it feels like this."\n• "You don't have to feel better right now. I'm not going anywhere."\n• Sit with them in silence — presence is more powerful than words\n\n<strong>Responses that backfire (even with good intentions):</strong>\n• "Count your blessings / think of those worse off"\n• "Pull yourself together"\n• "God has a plan" (can feel dismissive of real pain)\n• "But you have so much to live for" (often increases guilt)\n• "I don't know how to help you" (abandonment message)\n\n<strong>What actually helps recovery:</strong> Medication working, therapy, and the consistent presence of someone who doesn't need them to be better faster than they can be.`,
+   tip:'You don\'t need to fix it. Being present without pressure is the most therapeutic thing a family member can do.',
+   tags:['hopelessness','depression','responding','communication']},
+
+  {cat:'behaviour',catLabel:'Difficult behaviours',catColor:'#7B3500',icon:'🧩',
+   q:'My family member in recovery keeps relapsing on alcohol. I\'m losing hope. Is there anything left to try?',
+   a:`Relapse is part of the recovery process for most people with alcohol use disorder — it is not failure, and it does not mean nothing will ever work.\n\n<strong>The evidence is clear:</strong> Most people who achieve long-term sobriety have had multiple relapses. Each attempt builds insight, skill, and motivation — even when it doesn't feel that way.\n\n<strong>After a relapse — what helps:</strong>\n• Return to treatment as quickly as possible — shame and delay make it worse\n• Review what triggered this relapse with Dr. Mehta — it contains important information\n• Consider medication options: naltrexone reduces craving and the reward of drinking; acamprosate reduces withdrawal discomfort; disulfiram creates a deterrent\n• Look at high-risk situations that weren't planned for\n• Family involvement in the recovery plan — but not as police or enablers\n\n<strong>For the caregiver:</strong> Your hope, resilience, and self-care matter too. Attending a support group (Al-Anon) for family members of people with alcohol use disorder can be transformative.`,
+   tags:['relapse','alcohol','recovery','naltrexone','hope']},
+
+  // SYSTEM
+  {cat:'system',catLabel:'System & appointments',catColor:'#4C2D8E',icon:'🏥',
+   q:'How do I get an urgent appointment? What counts as urgent?',
+   a:`<strong>Contact Aatmiya Hospital directly by phone for same-day or next-day urgent appointments.</strong>\n\n<strong>What counts as urgent (call today):</strong>\n• Any mention of suicide, self-harm, or harming others\n• Sudden return of psychotic symptoms (voices, delusions, disorganised behaviour)\n• Refusing all food and fluids\n• Aggressive behaviour that cannot be de-escalated\n• Significant medication side effects (severe tremor, rigidity, fever)\n• Sudden deterioration in function after a period of stability\n• Recent severe relapse to substance use\n\n<strong>What can wait for the next available appointment:</strong>\n• Gradual decline over several weeks\n• Side effect questions\n• Wanting to adjust medication\n• Routine review\n\nWhen in doubt, call and describe what you're seeing — the team can advise on urgency.`,
+   tags:['urgent appointment','emergency','access']},
+
+  {cat:'system',catLabel:'System & appointments',catColor:'#4C2D8E',icon:'🏥',
+   q:'What information should I bring to each OPD appointment?',
+   a:`A well-prepared appointment leads to much better care.\n\n<strong>Always bring:</strong>\n• All current medications (or a photo of all the strips and doses)\n• Old prescriptions and lab reports if relevant\n• Patient code / OPD file number\n• Patient's Aadhar / ID (for Param Lab)\n\n<strong>Useful to note before the appointment:</strong>\n• Sleep pattern over the last 2 weeks\n• Mood — any changes, highs or lows\n• Appetite and weight changes\n• Any new or changed symptoms\n• Medication side effects noticed\n• Alcohol or substance use (be honest — this is confidential and important)\n• Any major life events or stressors since last visit\n• Questions or concerns you want to raise\n\n<strong>Tip:</strong> Use the Daily Mood + Meds Check-in tool (Tool 05) on your phone — it creates a 14-day summary you can show Dr. Mehta directly.`,
+   tip:'Write down your questions before the appointment. It is easy to forget in the moment. Three specific questions are more useful than a long general concern.',
+   tags:['appointment preparation','documentation','records']},
+
+  {cat:'system',catLabel:'System & appointments',catColor:'#4C2D8E',icon:'🏥',
+   q:'Can I speak to the doctor separately from my family member? Is that appropriate?',
+   a:`Yes — and this is often very helpful. Caregivers frequently have information and concerns that they cannot share freely in front of the patient, and the patient may say things to the doctor they wouldn't say with family present.\n\n<strong>How it works at Aatmiya:</strong>\n• Ask for a few minutes alone with Dr. Mehta at the start or end of the session\n• Share information — the clinician will incorporate it into their assessment\n• Be aware: Dr. Mehta maintains confidentiality with the patient and may not share everything the patient has disclosed with you\n\n<strong>What caregivers often share separately:</strong>\n• Actual substance use (patient may minimise)\n• Suicidal statements the patient denies to the doctor\n• Family conflict that may be relevant\n• Medication concerns they don't want to raise in front of the patient\n\nThis is a normal part of psychiatric care — not a betrayal of the patient.`,
+   tags:['confidentiality','caregiver consultation','communication']},
+
+  {cat:'system',catLabel:'System & appointments',catColor:'#4C2D8E',icon:'🏥',
+   q:'My family member has been unwell for years and nothing has worked. Are there other options?',
+   a:`Treatment-resistant illness is real and can be exhausting for families. But there are almost always more options to explore.\n\n<strong>Options to discuss with Dr. Mehta:</strong>\n• <strong>Medication review:</strong> Has the full therapeutic dose been tried for an adequate duration? Have drug-drug interactions been assessed? TDM (therapeutic drug monitoring) via Param Lab can guide this.\n• <strong>EEG:</strong> In some presentations (atypical psychosis, treatment resistance, behavioural change), EEG findings can guide management — Aatmiya has the 64-channel suite on-site.\n• <strong>Augmentation strategies:</strong> Adding a second agent to boost response\n• <strong>Clozapine:</strong> For treatment-resistant schizophrenia — the most evidence-based option, requires monitoring\n• <strong>rTMS:</strong> For treatment-resistant depression — non-invasive brain stimulation\n• <strong>ECT:</strong> For severe, treatment-resistant depression, catatonia, severe mania — highly effective and more widely available than most families realise\n• <strong>Formulation review:</strong> Are perpetuating psychosocial factors being addressed? Family therapy, vocational rehabilitation, substance use comorbidity?`,
+   tags:['treatment resistant','ECT','rTMS','clozapine','second opinion']},
+
+  // RECOVERY
+  {cat:'recovery',catLabel:'Recovery & long-term',catColor:'#1E5E32',icon:'🌱',
+   q:'When will my family member be "normal" again? How long does recovery take?',
+   a:`Recovery is a process, not an event — and it looks different for every person and every condition.\n\n<strong>Depression:</strong> Most people achieve remission within 8–12 weeks with treatment. Full functional recovery (back to work, relationships, energy) may take several more months.\n\n<strong>Schizophrenia:</strong> Recovery is real but often involves managing a chronic condition rather than a one-time cure. Many people achieve good quality of life, employment, and relationships with ongoing treatment. The first few years of treatment are most critical for long-term outcome.\n\n<strong>Bipolar disorder:</strong> Episodes can be prevented or minimised with mood stabilisers. Many people have long periods of full function between episodes.\n\n<strong>Alcohol dependence:</strong> The first year of sobriety is highest risk for relapse. Many people achieve long-term sobriety — especially with medical, psychological, and social support together.\n\n<strong>What "recovery" means:</strong> Not necessarily the absence of all symptoms — but a return to meaningful activity, relationships, and quality of life. Managing a condition well is itself recovery.`,
+   tags:['recovery timeline','expectations','schizophrenia','depression']},
+
+  {cat:'recovery',catLabel:'Recovery & long-term',catColor:'#1E5E32',icon:'🌱',
+   q:'How much should we protect my family member vs. encourage them to do normal things?',
+   a:`This is one of the hardest questions in family caregiving — the balance between protection and normalisation.\n\n<strong>Overprotection causes:</strong>\n• Learned helplessness — the person stops believing they can manage anything\n• Loss of role and identity\n• Reduced self-esteem and increased dependence\n• Caregiver burnout\n\n<strong>Pushing too hard causes:</strong>\n• Stress-induced relapse\n• Shame and withdrawal\n• Damage to the therapeutic relationship\n\n<strong>The graduated approach (with Dr. Mehta's guidance):</strong>\n• Start with very small responsibilities — making their own bed, one household task\n• Increase gradually as stability is maintained\n• Treat setbacks as information, not failures\n• Maintain structure and routine — predictability is therapeutic\n• Ask the patient what they feel ready for — their agency matters\n\n<strong>General principle:</strong> Do WITH, not FOR. Support the person to do things, rather than doing everything for them.`,
+   tip:'Discuss the specific question of function and role with Dr. Mehta — the right level of expectation is highly individual and changes over the course of recovery.',
+   tags:['independence','recovery','overprotection','function']},
+
+  {cat:'recovery',catLabel:'Recovery & long-term',catColor:'#1E5E32',icon:'🌱',
+   q:'Can my family member with mental illness get married and have children? Is the illness hereditary?',
+   a:`<strong>Marriage:</strong> Most people with well-managed mental illness can have stable, fulfilling marriages. Stability, insight, and adherence to treatment are the key factors — not the diagnosis per se. Untreated illness is a greater obstacle to a successful marriage than treated illness.\n\n<strong>Pregnancy and medication:</strong> This requires careful planning and discussion with Dr. Mehta before conceiving. Some psychiatric medications carry risks in pregnancy; others are considered safer. Stopping medication during pregnancy significantly increases the risk of relapse, which itself carries risks. This decision is individual and nuanced.\n\n<strong>Hereditary risk:</strong>\n• Most psychiatric conditions have a genetic component — but genetics is not destiny.\n• <strong>Schizophrenia:</strong> General population risk ~1%. Having one parent with schizophrenia raises risk to ~10–13%. Having two affected parents raises it to ~40–45%.\n• <strong>Bipolar disorder:</strong> General population ~1–3%. One affected parent ~10–25%.\n• <strong>Depression:</strong> General population ~15%. Family history raises risk 2–3 fold.\n• <strong>Alcohol dependence:</strong> Strong genetic component — children of people with alcohol dependence have higher risk.\n\nGenetic risk does not mean certainty, and early recognition allows early intervention.`,
+   tags:['marriage','pregnancy','hereditary','genetics','children']},
+
+  {cat:'recovery',catLabel:'Recovery & long-term',catColor:'#1E5E32',icon:'🌱',
+   q:'What can the family do at home to support recovery?',
+   a:`The family environment is one of the most powerful determinants of outcome in psychiatric illness.\n\n<strong>Most important:</strong>\n• <strong>Reduce expressed emotion (EE):</strong> Less criticism, less hostility, less emotional over-involvement. Calm, consistent, warm presence.\n• <strong>Maintain routine:</strong> Regular wake times, meal times, and daily structure reduce relapse risk significantly.\n• <strong>Ensure medication:</strong> This is the single most controllable variable.\n• <strong>Accompany to appointments</strong> — even when the person says they don't need it.\n\n<strong>Also helpful:</strong>\n• Healthy meals — not special diets, just regular nutritious food\n• Sleep prioritisation for the whole household\n• Physical activity — walking together is one of the most evidence-based interventions for depression\n• Social inclusion — include them in family activities, don't treat them as separate\n• Respect their privacy and dignity\n• HSM or breathing practices together can build a shared wellness routine\n\n<strong>What the family should avoid:</strong>\n• Constantly asking "are you okay?" (can increase anxiety and monitoring)\n• Discussing the illness in front of extended family without consent\n• Making promises that can't be kept`,
+   tags:['home environment','expressed emotion','routine','family support']},
+];
+
+let activeFilter = 'all';
+let activeCategory = null;
+
+function renderSidebar(){
+  const cats = {};
+  FAQS.forEach(f=>{
+    if(!cats[f.cat]) cats[f.cat]={label:f.catLabel,color:f.catColor,count:0};
+    cats[f.cat].count++;
+  });
+  const sidebar = document.getElementById('sidebar');
+  let html = `<div class="sidebar-item active" onclick="setCategory(null,this)" style="--c:var(--accent)">All questions <span class="sidebar-count">${FAQS.length}</span></div>`;
+  Object.entries(cats).forEach(([cat,meta])=>{
+    html+=`<div class="sidebar-item" onclick="setCategory('${cat}',this)">${meta.label}<span class="sidebar-count">${meta.count}</span></div>`;
+  });
+  sidebar.innerHTML=html;
+}
+
+function setCategory(cat, el){
+  activeCategory=cat;
+  document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  filterFAQs();
+}
+
+function filterCat(cat, btn){
+  activeFilter=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filterFAQs();
+}
+
+function filterFAQs(){
+  const q = document.getElementById('search').value.toLowerCase();
+  let list = FAQS;
+  if(activeFilter!=='all') list=list.filter(f=>f.cat===activeFilter);
+  if(activeCategory) list=list.filter(f=>f.cat===activeCategory);
+  if(q) list=list.filter(f=>f.q.toLowerCase().includes(q)||f.a.toLowerCase().includes(q)||(f.tags&&f.tags.some(t=>t.includes(q))));
+  renderFAQs(list);
+}
+
+function renderFAQs(list){
+  const area=document.getElementById('faq-area');
+  const empty=document.getElementById('empty-state');
+  if(!list.length){area.innerHTML='';empty.classList.add('visible');return;}
+  empty.classList.remove('visible');
+  // Group by category
+  const grouped={};
+  list.forEach(f=>{
+    if(!grouped[f.cat]) grouped[f.cat]={label:f.catLabel,color:f.catColor,items:[]};
+    grouped[f.cat].items.push(f);
+  });
+  let html='';
+  Object.entries(grouped).forEach(([cat,grp])=>{
+    html+=`<div class="faq-cat-head"><div class="cat-dot" style="background:${grp.color}"></div>${grp.label}</div>`;
+    grp.items.forEach((f,i)=>{
+      const id=`faq_${cat}_${i}`;
+      const aFormatted=f.a.replace(/\n/g,'<br>');
+      html+=`<div class="faq-card" id="${id}">
+        <div class="faq-q" onclick="toggleFAQ('${id}')">
+          <div class="faq-icon">${f.icon}</div>
+          <div class="faq-q-text">${f.q}</div>
+          <div class="faq-arrow">›</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-text">${aFormatted}</div>
+          ${f.urgent?`<div class="faq-urgent">🚨 <strong>Action required:</strong> ${f.urgent}</div>`:''}
+          ${f.tip?`<div class="faq-tip">💡 <strong>Tip:</strong> ${f.tip}</div>`:''}
+          ${f.tags?`<div class="faq-tags">${f.tags.map(t=>`<span class="faq-tag">${t}</span>`).join('')}</div>`:''}
+        </div>
+      </div>`;
+    });
+  });
+  area.innerHTML=html;
+}
+
+function toggleFAQ(id){
+  const card=document.getElementById(id);
+  const wasOpen=card.classList.contains('open');
+  document.querySelectorAll('.faq-card.open').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen) card.classList.add('open');
+}
+
+renderSidebar();
+renderFAQs(FAQS);
+</script>
+</body>
+</html>

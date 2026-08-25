@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EEG Episode Log — Aatmiya Hospital</title>
+<style>
+  :root{
+    --bg:#F0F4F8;--surface:#FFF;--surface2:#E8EEF4;--border:#D0DAE4;
+    --text:#101820;--text2:#485460;--text3:#90A0B0;
+    --accent:#1A3D70;--accent-light:#E8EEF8;
+    --green:#1E5E32;--green-light:#E5F2E9;
+    --amber:#8B5E00;--amber-light:#FFF8E1;
+    --red:#7B1818;--red-light:#FBEBEB;
+    --purple:#4C2D8E;--purple-light:#EDE8FA;
+    --radius:12px;--shadow:0 2px 14px rgba(26,61,112,.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .tabs{background:var(--accent);border-top:1px solid rgba(255,255,255,.15);display:flex}
+  .tab{flex:1;padding:10px 8px;text-align:center;font-size:12px;font-weight:500;color:rgba(255,255,255,.65);cursor:pointer;border:none;background:transparent;font-family:inherit;border-bottom:2.5px solid transparent}
+  .tab.active{color:#fff;border-bottom-color:#fff}
+  .wrap{max-width:860px;margin:0 auto;padding:16px}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:13px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:1px}
+  .pb{padding:14px 18px}
+  .fl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
+  .fi{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .fi:focus{outline:none;border-color:var(--accent);background:#fff}
+  textarea.fi{resize:vertical;line-height:1.55}
+  select.fi{cursor:pointer}
+  .fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:540px){.fg{grid-template-columns:1fr}}
+  .fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  @media(max-width:540px){.fg3{grid-template-columns:1fr}}
+  .frow{margin-bottom:10px}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+  .chip{padding:5px 10px;border-radius:20px;font-size:11px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;user-select:none;transition:all .12s}
+  .chip.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600}
+  /* Episode cards in log */
+  .ep-card{border-radius:10px;border:1.5px solid var(--border);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;background:var(--surface)}
+  .ep-card:hover{border-color:var(--accent)}
+  .ep-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .ep-date{font-size:12px;font-weight:700;color:var(--text)}
+  .ep-type{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+  .ep-duration{font-size:11px;color:var(--text3)}
+  .ep-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+  .ep-tag{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--surface2);color:var(--text3)}
+  .ep-body{margin-top:8px;font-size:12px;color:var(--text2);line-height:1.55;display:none}
+  .ep-card.open .ep-body{display:block}
+  /* Severity indicator */
+  .sev-bar{display:flex;gap:2px;margin-top:6px}
+  .sev-block{height:8px;flex:1;border-radius:2px;background:var(--border)}
+  /* Timeline chart */
+  .timeline{padding:14px 18px;overflow-x:auto}
+  .tl-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;min-width:600px}
+  .tl-date{font-size:10px;color:var(--text3);min-width:70px;text-align:right}
+  .tl-bar{height:20px;border-radius:4px;min-width:6px;display:flex;align-items:center;padding:0 6px;font-size:9px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden}
+  /* Actions */
+  .act-row{display:flex;gap:8px;padding:14px 18px;flex-wrap:wrap;border-top:1px solid var(--border)}
+  .bp{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .out-area{background:var(--surface2);border-radius:8px;padding:12px;font-size:11px;line-height:1.8;white-space:pre-wrap;color:var(--text);border:1px solid var(--border);display:none;margin:0 18px 14px}
+  .out-area.visible{display:block}
+  /* EEG flag */
+  .eeg-flag{background:var(--purple-light);border:1px solid #B8A0EC;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:12px;color:var(--purple)}
+  .eeg-flag-title{font-weight:700;margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+  .tab-content{display:none}.tab-content.active{display:block}
+  .empty-state{text-align:center;padding:32px;color:var(--text3);font-size:13px}
+  /* Stats */
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+  @media(max-width:540px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+  .stat-box{background:var(--surface);border-radius:10px;padding:10px 12px;text-align:center;box-shadow:var(--shadow)}
+  .stat-val{font-size:22px;font-weight:800;color:var(--accent)}
+  .stat-lbl{font-size:10px;color:var(--text3);margin-top:2px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">EEG Episode Log</div><div class="hs">Aatmiya Hospital · 64-ch EEG Suite · Tool 14</div></div>
+  </div>
+  <div class="ha">
+    <button class="bg" onclick="generateReport()">Generate report</button>
+    <button class="bg" onclick="window.print()">Print</button>
+  </div>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('log',this)">Log episode</button>
+  <button class="tab" onclick="switchTab('history',this)">Episode history</button>
+  <button class="tab" onclick="switchTab('eeg',this)">EEG notes</button>
+  <button class="tab" onclick="switchTab('report',this)">Clinical report</button>
+</div>
+
+<div class="wrap">
+
+<!-- LOG TAB -->
+<div class="tab-content active" id="tab-log">
+
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Patient</div></div></div>
+    <div class="pb">
+      <div class="fg">
+        <div class="frow"><div class="fl">Patient code / initials</div><input class="fi" id="pat-id" placeholder="PT-2024-001"></div>
+        <div class="frow"><div class="fl">Age / diagnosis</div><input class="fi" id="pat-diag" placeholder="28M · Epilepsy — focal temporal"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:#C62828"></div><div><div class="pht">Episode details</div><div class="phs">Complete as soon as possible after the episode</div></div></div>
+    <div class="pb">
+      <div class="fg3">
+        <div class="frow"><div class="fl">Date</div><input class="fi" type="date" id="ep-date"></div>
+        <div class="frow"><div class="fl">Time of onset</div><input class="fi" type="time" id="ep-time"></div>
+        <div class="frow"><div class="fl">Duration</div><input class="fi" id="ep-duration" placeholder="e.g. 90 seconds"></div>
+      </div>
+      <div class="frow">
+        <div class="fl">Episode type</div>
+        <select class="fi" id="ep-type">
+          <option value="">Select…</option>
+          <option>Generalised tonic-clonic (GTC)</option>
+          <option>Focal aware seizure</option>
+          <option>Focal impaired awareness seizure</option>
+          <option>Absence seizure</option>
+          <option>Myoclonic jerk</option>
+          <option>Atonic (drop attack)</option>
+          <option>Tonic seizure</option>
+          <option>Clonic seizure</option>
+          <option>Epileptic spasm</option>
+          <option>Non-epileptic attack (NEAD)</option>
+          <option>Dissociative episode</option>
+          <option>Panic attack</option>
+          <option>Psychogenic non-epileptic seizure (PNES)</option>
+          <option>Status epilepticus</option>
+          <option>Unclear / uncertain</option>
+        </select>
+      </div>
+      <div class="frow">
+        <div class="fl">Severity</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div class="chip" onclick="selectSev('mild',this)" id="sev-mild">Mild</div>
+          <div class="chip" onclick="selectSev('moderate',this)" id="sev-moderate">Moderate</div>
+          <div class="chip" onclick="selectSev('severe',this)" id="sev-severe">Severe</div>
+          <div class="chip" onclick="selectSev('emergency',this)" id="sev-emergency">Emergency / Status</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:#8B5E00"></div><div><div class="pht">Prodrome</div><div class="phs">Signs noticed before the episode began</div></div></div>
+    <div class="pb">
+      <div class="frow"><div class="fl">How long before episode?</div>
+        <select class="fi" id="prod-time">
+          <option>No warning / sudden</option><option>Seconds</option><option>1–5 minutes</option>
+          <option>5–30 minutes</option><option>Hours</option><option>1–2 days</option>
+        </select>
+      </div>
+      <div class="frow">
+        <div class="fl">Prodromal signs (select all that apply)</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Aura — smell</div>
+          <div class="chip" onclick="toggleChip(this)">Aura — taste</div>
+          <div class="chip" onclick="toggleChip(this)">Aura — visual (lights/shapes)</div>
+          <div class="chip" onclick="toggleChip(this)">Aura — rising epigastric sensation</div>
+          <div class="chip" onclick="toggleChip(this)">Aura — déjà vu</div>
+          <div class="chip" onclick="toggleChip(this)">Aura — fear</div>
+          <div class="chip" onclick="toggleChip(this)">Headache</div>
+          <div class="chip" onclick="toggleChip(this)">Mood change (irritable)</div>
+          <div class="chip" onclick="toggleChip(this)">Mood change (elated)</div>
+          <div class="chip" onclick="toggleChip(this)">Sleep disturbance night before</div>
+          <div class="chip" onclick="toggleChip(this)">Increased anxiety</div>
+          <div class="chip" onclick="toggleChip(this)">Tingling / numbness</div>
+          <div class="chip" onclick="toggleChip(this)">Jerks/myoclonus</div>
+          <div class="chip" onclick="toggleChip(this)">Blank spells</div>
+          <div class="chip" onclick="toggleChip(this)">Nausea</div>
+          <div class="chip" onclick="toggleChip(this)">None noted</div>
+        </div>
+      </div>
+      <div class="frow"><div class="fl">Describe prodrome in own words</div>
+        <textarea class="fi" id="prod-desc" rows="2" placeholder="What the patient / caregiver noticed before it began…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:#C62828"></div><div><div class="pht">During the episode (ictal)</div></div></div>
+    <div class="pb">
+      <div class="frow">
+        <div class="fl">Motor features</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Tonic stiffening</div>
+          <div class="chip" onclick="toggleChip(this)">Clonic jerking — bilateral</div>
+          <div class="chip" onclick="toggleChip(this)">Clonic jerking — unilateral</div>
+          <div class="chip" onclick="toggleChip(this)">Automatisms (lip-smacking, chewing)</div>
+          <div class="chip" onclick="toggleChip(this)">Hand automatisms (picking, fumbling)</div>
+          <div class="chip" onclick="toggleChip(this)">Head version (turning)</div>
+          <div class="chip" onclick="toggleChip(this)">Eye deviation</div>
+          <div class="chip" onclick="toggleChip(this)">Falls</div>
+          <div class="chip" onclick="toggleChip(this)">No motor features (absence/focal aware)</div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fl">Consciousness</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Fully conscious throughout</div>
+          <div class="chip" onclick="toggleChip(this)">Impaired consciousness</div>
+          <div class="chip" onclick="toggleChip(this)">Unresponsive</div>
+          <div class="chip" onclick="toggleChip(this)">Able to speak during episode</div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fl">Other ictal features</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Incontinence (urine)</div>
+          <div class="chip" onclick="toggleChip(this)">Tongue bite</div>
+          <div class="chip" onclick="toggleChip(this)">Cyanosis</div>
+          <div class="chip" onclick="toggleChip(this)">Cry / vocalisation at onset</div>
+          <div class="chip" onclick="toggleChip(this)">Injury sustained</div>
+          <div class="chip" onclick="toggleChip(this)">Foaming at mouth</div>
+          <div class="chip" onclick="toggleChip(this)">Eye rolling</div>
+        </div>
+      </div>
+      <div class="frow"><div class="fl">Ictal description (what you saw)</div>
+        <textarea class="fi" id="ictal-desc" rows="3" placeholder="Describe the episode as you witnessed it — movements, eyes, sounds, position…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:#1E5E32"></div><div><div class="pht">Post-ictal phase</div><div class="phs">After the episode ended</div></div></div>
+    <div class="pb">
+      <div class="frow"><div class="fl">Post-ictal duration</div>
+        <select class="fi" id="postictal-dur">
+          <option>Immediate recovery (seconds)</option><option>1–5 minutes</option>
+          <option>5–30 minutes</option><option>30–60 minutes</option><option>Hours</option><option>Next day</option>
+        </select>
+      </div>
+      <div class="frow">
+        <div class="fl">Post-ictal features</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Confusion</div>
+          <div class="chip" onclick="toggleChip(this)">Drowsiness / sleep</div>
+          <div class="chip" onclick="toggleChip(this)">Headache</div>
+          <div class="chip" onclick="toggleChip(this)">Todd's paralysis (weakness)</div>
+          <div class="chip" onclick="toggleChip(this)">Nausea / vomiting</div>
+          <div class="chip" onclick="toggleChip(this)">Mood change (tearful, depressed)</div>
+          <div class="chip" onclick="toggleChip(this)">Amnesia for episode</div>
+          <div class="chip" onclick="toggleChip(this)">Full immediate recovery</div>
+          <div class="chip" onclick="toggleChip(this)">Muscle ache</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:#4C2D8E"></div><div><div class="pht">Possible triggers &amp; context</div></div></div>
+    <div class="pb">
+      <div class="frow">
+        <div class="fl">Possible triggers</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Sleep deprivation</div>
+          <div class="chip" onclick="toggleChip(this)">Missed medication dose</div>
+          <div class="chip" onclick="toggleChip(this)">Alcohol use</div>
+          <div class="chip" onclick="toggleChip(this)">Stress / emotional upset</div>
+          <div class="chip" onclick="toggleChip(this)">Fever / illness</div>
+          <div class="chip" onclick="toggleChip(this)">Flashing lights / screen</div>
+          <div class="chip" onclick="toggleChip(this)">Menstrual cycle (catamenial)</div>
+          <div class="chip" onclick="toggleChip(this)">Physical exhaustion</div>
+          <div class="chip" onclick="toggleChip(this)">Medication change</div>
+          <div class="chip" onclick="toggleChip(this)">No identifiable trigger</div>
+          <div class="chip" onclick="toggleChip(this)">Unknown</div>
+        </div>
+      </div>
+      <div class="fg">
+        <div class="frow"><div class="fl">Last medication dose</div><input class="fi" id="last-med" placeholder="Drug, time, dose…"></div>
+        <div class="frow"><div class="fl">Sleep last night</div>
+          <select class="fi" id="sleep-last">
+            <option>Normal (6–8h)</option><option>Reduced (< 4h)</option><option>4–6h</option>
+            <option>Broken / disturbed</option><option>Unknown</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow"><div class="fl">Additional context</div>
+        <textarea class="fi" id="ctx-notes" rows="2" placeholder="What was happening before, where they were, who was present…"></textarea>
+      </div>
+      <div class="eeg-flag">
+        <div class="eeg-flag-title">📊 EEG correlation flags</div>
+        <div class="chips" style="margin-top:4px">
+          <div class="chip" onclick="toggleChip(this)">EEG scheduled</div>
+          <div class="chip" onclick="toggleChip(this)">EEG already done (Param Lab)</div>
+          <div class="chip" onclick="toggleChip(this)">EEG correlation pending</div>
+          <div class="chip" onclick="toggleChip(this)">Clinical pattern matches prior EEG focus</div>
+          <div class="chip" onclick="toggleChip(this)">New semiology — flag for EEG review</div>
+          <div class="chip" onclick="toggleChip(this)">Video-EEG indicated</div>
+        </div>
+        <div style="margin-top:8px">
+          <div class="fl">EEG findings / impression (if available)</div>
+          <textarea class="fi" id="eeg-notes" rows="2" placeholder="Focal slowing, epileptiform discharges, IEDs, normal background…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="act-row">
+      <button class="bp" onclick="saveEpisode()">Save episode ✓</button>
+      <button class="bpo" onclick="resetForm()">Clear form</button>
+    </div>
+    <div class="out-area" id="save-confirm"></div>
+  </div>
+
+</div>
+
+<!-- HISTORY TAB -->
+<div class="tab-content" id="tab-history">
+  <div class="stat-grid" id="stat-grid"></div>
+  <div id="history-list"></div>
+</div>
+
+<!-- EEG NOTES TAB -->
+<div class="tab-content" id="tab-eeg">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:#4C2D8E"></div><div><div class="pht">EEG study notes</div><div class="phs">Log each EEG study done at Param Lab — 64-channel suite</div></div></div>
+    <div class="pb">
+      <div class="fg">
+        <div class="frow"><div class="fl">EEG date</div><input class="fi" type="date" id="eeg-date"></div>
+        <div class="frow"><div class="fl">EEG type</div>
+          <select class="fi" id="eeg-type">
+            <option>Routine EEG (20–30 min)</option>
+            <option>Extended EEG (1–2 hours)</option>
+            <option>Sleep-deprived EEG</option>
+            <option>Ambulatory EEG</option>
+            <option>Video-EEG</option>
+            <option>Hyperventilation + photic</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow"><div class="fl">Background activity</div>
+        <select class="fi" id="eeg-bg">
+          <option>Normal alpha rhythm (8–13 Hz)</option>
+          <option>Mildly slow background</option>
+          <option>Diffuse slowing</option>
+          <option>Focal slowing — left temporal</option>
+          <option>Focal slowing — right temporal</option>
+          <option>Focal slowing — frontal</option>
+          <option>Burst suppression</option>
+          <option>Low voltage / flat</option>
+        </select>
+      </div>
+      <div class="frow">
+        <div class="fl">Epileptiform activity</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">No epileptiform discharges</div>
+          <div class="chip" onclick="toggleChip(this)">Interictal epileptiform discharges (IEDs)</div>
+          <div class="chip" onclick="toggleChip(this)">Spike-wave complexes</div>
+          <div class="chip" onclick="toggleChip(this)">3 Hz spike-wave</div>
+          <div class="chip" onclick="toggleChip(this)">Polyspike-wave</div>
+          <div class="chip" onclick="toggleChip(this)">Focal sharp waves — left temporal</div>
+          <div class="chip" onclick="toggleChip(this)">Focal sharp waves — right temporal</div>
+          <div class="chip" onclick="toggleChip(this)">Focal sharp waves — frontal</div>
+          <div class="chip" onclick="toggleChip(this)">FIRDA</div>
+          <div class="chip" onclick="toggleChip(this)">OIRDA</div>
+          <div class="chip" onclick="toggleChip(this)">Ictal pattern captured</div>
+          <div class="chip" onclick="toggleChip(this)">Photosensitive response</div>
+        </div>
+      </div>
+      <div class="frow"><div class="fl">Clinical impression / report summary</div>
+        <textarea class="fi" id="eeg-impression" rows="3" placeholder="EEG impression as reported by Param Lab / Dr. Mehta…"></textarea>
+      </div>
+      <div class="frow"><div class="fl">Clinical correlation note</div>
+        <textarea class="fi" id="eeg-correlation" rows="2" placeholder="How this EEG finding relates to the clinical episode history…"></textarea>
+      </div>
+      <button class="bp" style="margin-top:4px" onclick="saveEEGNote()">Save EEG note</button>
+      <div id="eeg-save-confirm" style="font-size:12px;color:var(--green);margin-top:8px;display:none">✓ EEG note saved</div>
+    </div>
+  </div>
+  <div id="eeg-notes-list"></div>
+</div>
+
+<!-- REPORT TAB -->
+<div class="tab-content" id="tab-report">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Clinical episode report</div><div class="phs">For review appointment</div></div></div>
+    <div class="pb">
+      <button class="bp" onclick="generateReport()">Generate full report</button>
+      <div class="out-area visible" id="report-out" style="margin:12px 0 0"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+let episodes = JSON.parse(localStorage.getItem('aatmiya-episodes')||'[]');
+let eegNotes = JSON.parse(localStorage.getItem('aatmiya-eeg-notes')||'[]');
+let selectedSeverity = '';
+
+document.getElementById('ep-date').value = new Date().toISOString().split('T')[0];
+document.getElementById('eeg-date').value = new Date().toISOString().split('T')[0];
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if (name==='history') renderHistory();
+  if (name==='eeg') renderEEGNotes();
+  if (name==='report') generateReport();
+}
+
+function toggleChip(el) { el.classList.toggle('on'); }
+function selectSev(val, el) {
+  selectedSeverity = val;
+  document.querySelectorAll('#sev-mild,#sev-moderate,#sev-severe,#sev-emergency').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function getChipsOn(container) {
+  return [...container.querySelectorAll('.chip.on')].map(c=>c.textContent.trim());
+}
+
+function saveEpisode() {
+  const entry = {
+    id: Date.now(),
+    patId: document.getElementById('pat-id').value,
+    patDiag: document.getElementById('pat-diag').value,
+    date: document.getElementById('ep-date').value,
+    time: document.getElementById('ep-time').value,
+    duration: document.getElementById('ep-duration').value,
+    type: document.getElementById('ep-type').value,
+    severity: selectedSeverity,
+    prodTime: document.getElementById('prod-time').value,
+    prodSigns: getChipsOn(document.querySelectorAll('.panel')[2]),
+    prodDesc: document.getElementById('prod-desc').value,
+    ictalFeatures: getChipsOn(document.querySelectorAll('.panel')[3]),
+    ictalDesc: document.getElementById('ictal-desc').value,
+    postDur: document.getElementById('postictal-dur').value,
+    postFeatures: getChipsOn(document.querySelectorAll('.panel')[4]),
+    triggers: getChipsOn(document.querySelectorAll('.panel')[5]),
+    lastMed: document.getElementById('last-med').value,
+    sleep: document.getElementById('sleep-last').value,
+    ctx: document.getElementById('ctx-notes').value,
+    eegFlags: [],
+    eegNotes: document.getElementById('eeg-notes').value,
+  };
+  episodes.unshift(entry);
+  localStorage.setItem('aatmiya-episodes', JSON.stringify(episodes));
+  const conf = document.getElementById('save-confirm');
+  conf.textContent = `✓ Episode saved — ${new Date(entry.date).toLocaleDateString('en-IN',{dateStyle:'medium'})} · ${entry.type||'Unknown type'} · ${entry.severity}`;
+  conf.classList.add('visible');
+  setTimeout(()=>conf.classList.remove('visible'),4000);
+}
+
+function resetForm() {
+  document.querySelectorAll('#tab-log input,#tab-log textarea,#tab-log select').forEach(el=>{
+    if (el.type==='date') el.value=new Date().toISOString().split('T')[0];
+    else if (el.type==='time') el.value='';
+    else if (el.tagName==='SELECT') el.selectedIndex=0;
+    else el.value='';
+  });
+  document.querySelectorAll('#tab-log .chip.on').forEach(c=>c.classList.remove('on'));
+  selectedSeverity='';
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (!episodes.length) { list.innerHTML='<div class="empty-state">No episodes logged yet.</div>'; return; }
+
+  // Stats
+  const counts = {mild:0,moderate:0,severe:0,emergency:0};
+  episodes.forEach(e=>{ if(counts[e.severity]!==undefined) counts[e.severity]++; });
+  const last = episodes[0];
+  const daysSince = last ? Math.floor((Date.now()-new Date(last.date))/(86400000)) : '—';
+  document.getElementById('stat-grid').innerHTML = `
+    <div class="stat-box"><div class="stat-val">${episodes.length}</div><div class="stat-lbl">Total episodes</div></div>
+    <div class="stat-box"><div class="stat-val" style="color:var(--amber)">${daysSince}</div><div class="stat-lbl">Days since last</div></div>
+    <div class="stat-box"><div class="stat-val" style="color:var(--red)">${counts.severe+counts.emergency}</div><div class="stat-lbl">Severe / emergency</div></div>
+    <div class="stat-box"><div class="stat-val" style="color:var(--green)">${episodes.filter(e=>e.triggers.includes('Missed medication dose')).length}</div><div class="stat-lbl">Medication-missed</div></div>`;
+
+  const sevColors = {mild:'#2E7D52',moderate:'#8B5E00',severe:'#C62828',emergency:'#6A1B9A'};
+  const sevBgs = {mild:'#E5F2E9',moderate:'#FFF8E1',severe:'#FBEBEB',emergency:'#F3E5F5'};
+  list.innerHTML = episodes.map(e => `
+    <div class="ep-card" onclick="this.classList.toggle('open')">
+      <div class="ep-head">
+        <div class="ep-date">${new Date(e.date).toLocaleDateString('en-IN',{dateStyle:'medium'})}${e.time?' · '+e.time:''}</div>
+        <div class="ep-type" style="background:${sevBgs[e.severity]||'var(--surface2)'};color:${sevColors[e.severity]||'var(--text3)'}">
+          ${e.severity||'unknown severity'}
+        </div>
+        <div class="ep-duration">${e.duration||'?'}</div>
+      </div>
+      <div class="ep-tags">
+        ${e.type?`<span class="ep-tag">${e.type}</span>`:''}
+        ${e.triggers.slice(0,3).map(t=>`<span class="ep-tag">${t}</span>`).join('')}
+        ${e.eegNotes?'<span class="ep-tag" style="background:var(--purple-light);color:var(--purple)">EEG noted</span>':''}
+      </div>
+      <div class="ep-body">
+        ${e.prodDesc?`<p><strong>Prodrome:</strong> ${e.prodDesc}</p>`:''}
+        ${e.ictalDesc?`<p style="margin-top:5px"><strong>Ictal:</strong> ${e.ictalDesc}</p>`:''}
+        ${e.triggers.length?`<p style="margin-top:5px"><strong>Triggers:</strong> ${e.triggers.join(', ')}</p>`:''}
+        ${e.postFeatures.length?`<p style="margin-top:5px"><strong>Post-ictal:</strong> ${e.postFeatures.join(', ')}</p>`:''}
+        ${e.eegNotes?`<p style="margin-top:5px;color:var(--purple)"><strong>EEG:</strong> ${e.eegNotes}</p>`:''}
+        ${e.ctx?`<p style="margin-top:5px"><strong>Context:</strong> ${e.ctx}</p>`:''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function saveEEGNote() {
+  const note = {
+    id: Date.now(),
+    date: document.getElementById('eeg-date').value,
+    type: document.getElementById('eeg-type').value,
+    bg: document.getElementById('eeg-bg').value,
+    epileptiform: getChipsOn(document.querySelectorAll('#tab-eeg .panel')[0]),
+    impression: document.getElementById('eeg-impression').value,
+    correlation: document.getElementById('eeg-correlation').value,
+  };
+  eegNotes.unshift(note);
+  localStorage.setItem('aatmiya-eeg-notes', JSON.stringify(eegNotes));
+  document.getElementById('eeg-save-confirm').style.display='block';
+  setTimeout(()=>document.getElementById('eeg-save-confirm').style.display='none',3000);
+  renderEEGNotes();
+}
+
+function renderEEGNotes() {
+  const list = document.getElementById('eeg-notes-list');
+  if (!eegNotes.length) { list.innerHTML='<div class="empty-state">No EEG notes logged yet.</div>'; return; }
+  list.innerHTML = eegNotes.map(n => `
+    <div class="panel" style="margin-bottom:10px">
+      <div class="ph">
+        <div class="phd" style="background:#4C2D8E"></div>
+        <div><div class="pht">${new Date(n.date).toLocaleDateString('en-IN',{dateStyle:'medium'})} — ${n.type}</div></div>
+      </div>
+      <div class="pb">
+        <p style="font-size:12px;color:var(--text2)"><strong>Background:</strong> ${n.bg}</p>
+        ${n.epileptiform.length?`<p style="font-size:12px;color:var(--text2);margin-top:5px"><strong>Epileptiform:</strong> ${n.epileptiform.join(', ')}</p>`:''}
+        ${n.impression?`<p style="font-size:12px;color:var(--text);margin-top:5px"><strong>Impression:</strong> ${n.impression}</p>`:''}
+        ${n.correlation?`<p style="font-size:12px;color:var(--purple);margin-top:5px"><strong>Correlation:</strong> ${n.correlation}</p>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function generateReport() {
+  const now = new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const patId = document.getElementById('pat-id').value||'—';
+  const patDiag = document.getElementById('pat-diag').value||'—';
+  const last30 = episodes.filter(e=>(Date.now()-new Date(e.date))<30*86400000);
+  const allTriggers = episodes.flatMap(e=>e.triggers);
+  const triggerCounts = {};
+  allTriggers.forEach(t=>{triggerCounts[t]=(triggerCounts[t]||0)+1});
+  const topTriggers = Object.entries(triggerCounts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`${k} (${v}×)`).join(', ');
+  const sevCounts = {mild:0,moderate:0,severe:0,emergency:0};
+  episodes.forEach(e=>{if(sevCounts[e.severity]!==undefined)sevCounts[e.severity]++});
+
+  const text = `AATMIYA HOSPITAL — EEG EPISODE LOG REPORT
+Generated: ${now}
+Patient: ${patId} · ${patDiag}
+
+SUMMARY:
+  Total episodes logged: ${episodes.length}
+  Last 30 days: ${last30.length}
+  Severity breakdown: Mild ${sevCounts.mild} · Moderate ${sevCounts.moderate} · Severe ${sevCounts.severe} · Emergency ${sevCounts.emergency}
+  Most common triggers: ${topTriggers||'Insufficient data'}
+
+EEG STUDIES LOGGED: ${eegNotes.length}
+${eegNotes.map(n=>`  ${new Date(n.date).toLocaleDateString('en-IN')} · ${n.type}\n  ${n.impression||'—'}`).join('\n') || '  None logged'}
+
+EPISODE LOG (last 10):
+${episodes.slice(0,10).map(e=>`  ${new Date(e.date).toLocaleDateString('en-IN')} ${e.time||''} · ${e.type||'?'} · ${e.severity||'?'} · ${e.duration||'?'}
+  Triggers: ${e.triggers.join(', ')||'None identified'}
+  ${e.ictalDesc?'Ictal: '+e.ictalDesc:''}`).join('\n\n') || '  No episodes logged'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Aatmiya Hospital · Param Diagnostic Lab · 64-ch EEG Suite
+Dr. Dhaivat Mehta, Gandhidham`;
+
+  const out = document.getElementById('report-out');
+  out.textContent = text;
+  out.classList.add('visible');
+  navigator.clipboard?.writeText(text);
+}
+
+renderHistory();
+</script>
+</body>
+</html>

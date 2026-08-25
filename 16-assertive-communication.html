@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assertive Communication Trainer — Aatmiya</title>
+<style>
+  :root{
+    --bg:#F0F5F0;--surface:#FFF;--surface2:#E8F0E8;--border:#D0DDD0;
+    --text:#101810;--text2:#405040;--text3:#90A090;
+    --accent:#1A5C32;--accent-light:#E3F0E8;
+    --red:#7B1818;--red-light:#FBEBEE;
+    --amber:#8B5E00;--amber-light:#FFF8E1;
+    --blue:#1A3D70;--blue-light:#E8EEF8;
+    --purple:#4C2D8E;--purple-light:#EDE8FA;
+    --radius:12px;--shadow:0 2px 14px rgba(26,92,50,.09);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .tabs{background:#134a28;display:flex;overflow-x:auto}
+  .tab{flex:1;min-width:100px;padding:10px 8px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.65);cursor:pointer;border:none;background:transparent;font-family:inherit;border-bottom:2.5px solid transparent;white-space:nowrap}
+  .tab.active{color:#fff;border-bottom-color:#fff}
+  .wrap{max-width:860px;margin:0 auto;padding:16px}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:13px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:1px}
+  .pb{padding:14px 18px}
+  .fl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
+  .fi{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .fi:focus{outline:none;border-color:var(--accent);background:#fff}
+  textarea.fi{resize:vertical;line-height:1.55}
+  /* 4-way comparison */
+  .four-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:540px){.four-grid{grid-template-columns:1fr}}
+  .style-card{border-radius:10px;padding:14px;border:2px solid var(--border)}
+  .style-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+  .style-icon{font-size:20px;margin-bottom:4px}
+  .style-example{font-size:12px;line-height:1.6;padding:8px 10px;border-radius:8px;font-style:italic}
+  .style-traits{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+  .style-trait{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500}
+  /* I-statement builder */
+  .istat-builder{display:flex;flex-direction:column;gap:10px}
+  .ipart{background:var(--surface2);border-radius:10px;padding:12px 14px}
+  .ipart-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin-bottom:4px}
+  .ipart-prompt{font-size:11px;color:var(--text3);margin-bottom:6px;font-style:italic}
+  .ipart-result{font-size:13px;font-weight:500;color:var(--accent);min-height:24px;line-height:1.5}
+  .istat-output{background:var(--accent-light);border:1.5px solid var(--accent);border-radius:10px;padding:14px;margin-top:10px}
+  .istat-output-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:6px}
+  .istat-output-text{font-size:14px;color:var(--accent);line-height:1.7;font-weight:500}
+  /* Scenario practice */
+  .scenario-card{border-radius:10px;border:1.5px solid var(--border);overflow:hidden;margin-bottom:10px;cursor:pointer}
+  .sc-head{padding:12px 14px;background:var(--surface2);display:flex;align-items:center;gap:10px}
+  .sc-icon{font-size:20px}
+  .sc-title{font-size:13px;font-weight:600}
+  .sc-tag{font-size:10px;padding:2px 8px;border-radius:20px;margin-left:auto;font-weight:500}
+  .sc-body{padding:12px 14px;display:none}
+  .scenario-card.open .sc-body{display:block}
+  .sc-situation{font-size:12px;color:var(--text2);line-height:1.6;background:var(--surface2);border-radius:8px;padding:10px 12px;margin-bottom:10px;border-left:3px solid var(--border)}
+  .responses-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:500px){.responses-grid{grid-template-columns:1fr}}
+  .response-card{border-radius:8px;padding:10px 12px}
+  .response-style{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+  .response-text{font-size:12px;line-height:1.5;font-style:italic}
+  .practice-input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);resize:none;line-height:1.55;margin-top:8px}
+  .practice-input:focus{outline:none;border-color:var(--accent);background:#fff}
+  /* Buttons */
+  .bp{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .tab-content{display:none}.tab-content.active{display:block}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+  .chip{padding:5px 10px;border-radius:20px;font-size:11px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;user-select:none;transition:all .12s}
+  .chip.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Assertive Communication Trainer</div><div class="hs">Aatmiya Hospital · Clinical + Corporate Tool 16</div></div>
+  </div>
+  <div class="ha"><button class="bg" onclick="window.print()">Print</button></div>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('styles',this)">4 Styles</button>
+  <button class="tab" onclick="switchTab('istatement',this)">I-Statement builder</button>
+  <button class="tab" onclick="switchTab('scenarios',this)">Scenario practice</button>
+  <button class="tab" onclick="switchTab('clinical',this)">Clinical use</button>
+</div>
+
+<div class="wrap">
+
+<!-- STYLES TAB -->
+<div class="tab-content active" id="tab-styles">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">The four communication styles</div><div class="phs">The same situation — four very different responses</div></div></div>
+    <div class="pb">
+      <div class="fl" style="margin-bottom:8px">Situation: Your colleague keeps interrupting you in meetings.</div>
+      <div class="four-grid">
+        <div class="style-card" style="border-color:#C62828">
+          <div class="style-icon">😶</div>
+          <div class="style-label" style="color:#C62828">Passive</div>
+          <div class="style-example" style="background:#FBEBEE;color:#C62828">"Oh it's fine, don't worry about it. I'll just wait."</div>
+          <div class="style-traits">
+            <div class="style-trait" style="background:#FBEBEE;color:#C62828">Avoids conflict</div>
+            <div class="style-trait" style="background:#FBEBEE;color:#C62828">Sacrifices own needs</div>
+            <div class="style-trait" style="background:#FBEBEE;color:#C62828">Resentment builds</div>
+            <div class="style-trait" style="background:#FBEBEE;color:#C62828">Others don't know your needs</div>
+          </div>
+        </div>
+        <div class="style-card" style="border-color:#8B3A00">
+          <div class="style-icon">😡</div>
+          <div class="style-label" style="color:#8B3A00">Aggressive</div>
+          <div class="style-example" style="background:#FFF0E5;color:#8B3A00">"You always interrupt me! You're so rude and inconsiderate!"</div>
+          <div class="style-traits">
+            <div class="style-trait" style="background:#FFF0E5;color:#8B3A00">Attacks the person</div>
+            <div class="style-trait" style="background:#FFF0E5;color:#8B3A00">Damages relationship</div>
+            <div class="style-trait" style="background:#FFF0E5;color:#8B3A00">May get short-term result</div>
+            <div class="style-trait" style="background:#FFF0E5;color:#8B3A00">Creates fear, not respect</div>
+          </div>
+        </div>
+        <div class="style-card" style="border-color:#8B5E00">
+          <div class="style-icon">🙂😠</div>
+          <div class="style-label" style="color:#8B5E00">Passive-aggressive</div>
+          <div class="style-example" style="background:#FFF8E1;color:#8B5E00">"No no, please go ahead… [eye roll] …as usual."</div>
+          <div class="style-traits">
+            <div class="style-trait" style="background:#FFF8E1;color:#8B5E00">Indirect hostility</div>
+            <div class="style-trait" style="background:#FFF8E1;color:#8B5E00">Sarcasm, withdrawal</div>
+            <div class="style-trait" style="background:#FFF8E1;color:#8B5E00">Destroys trust</div>
+            <div class="style-trait" style="background:#FFF8E1;color:#8B5E00">Problem never addressed</div>
+          </div>
+        </div>
+        <div class="style-card" style="border-color:var(--accent)">
+          <div class="style-icon">🤝</div>
+          <div class="style-label" style="color:var(--accent)">Assertive ✓</div>
+          <div class="style-example" style="background:var(--accent-light);color:var(--accent)">"When I'm interrupted before I finish, I feel frustrated and unheard. Could we agree to let each person complete their thought?"</div>
+          <div class="style-traits">
+            <div class="style-trait" style="background:var(--accent-light);color:var(--accent)">Honest and direct</div>
+            <div class="style-trait" style="background:var(--accent-light);color:var(--accent)">Respects both parties</div>
+            <div class="style-trait" style="background:var(--accent-light);color:var(--accent)">Focuses on behaviour</div>
+            <div class="style-trait" style="background:var(--accent-light);color:var(--accent)">Proposes solution</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--blue-light);border-radius:10px;padding:14px;margin-top:14px;border-left:4px solid var(--blue)">
+        <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">Key principle</div>
+        <div style="font-size:13px;color:var(--blue);line-height:1.65">Assertiveness is not aggression. It is the ability to express your feelings, needs, and rights clearly and directly — while respecting the other person's feelings, needs, and rights. The goal is mutual understanding, not winning.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- I-STATEMENT TAB -->
+<div class="tab-content" id="tab-istatement">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">I-Statement builder</div><div class="phs">Build an assertive response step by step</div></div></div>
+    <div class="pb">
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px;background:var(--accent-light);padding:10px 12px;border-radius:8px">
+        The I-Statement formula: <strong>"When [behaviour], I feel [emotion], because [impact]. I would like [specific request]."</strong><br>
+        It focuses on behaviour (not personality), takes ownership of feelings (not blame), and makes a clear request.
+      </div>
+      <div class="istat-builder">
+        <div class="ipart">
+          <div class="ipart-label">Step 1 — The behaviour</div>
+          <div class="ipart-prompt">"When you…" — describe the specific, observable behaviour. No interpretations, no character judgments.</div>
+          <textarea class="practice-input" id="is-behaviour" placeholder="e.g. come home late without letting me know… / raise your voice when we disagree… / don't complete the report on time…" rows="2" oninput="updateIStatement()"></textarea>
+        </div>
+        <div class="ipart">
+          <div class="ipart-label">Step 2 — Your feeling</div>
+          <div class="ipart-prompt">"I feel…" — one emotion word. Not "I feel that you…" (which is a thought, not a feeling).</div>
+          <div class="chips" style="margin-bottom:8px">
+            <div class="chip" onclick="setFeeling('worried',this)">Worried</div>
+            <div class="chip" onclick="setFeeling('hurt',this)">Hurt</div>
+            <div class="chip" onclick="setFeeling('frustrated',this)">Frustrated</div>
+            <div class="chip" onclick="setFeeling('disrespected',this)">Disrespected</div>
+            <div class="chip" onclick="setFeeling('anxious',this)">Anxious</div>
+            <div class="chip" onclick="setFeeling('overwhelmed',this)">Overwhelmed</div>
+            <div class="chip" onclick="setFeeling('unheard',this)">Unheard</div>
+            <div class="chip" onclick="setFeeling('sad',this)">Sad</div>
+            <div class="chip" onclick="setFeeling('angry',this)">Angry</div>
+            <div class="chip" onclick="setFeeling('unsupported',this)">Unsupported</div>
+          </div>
+          <input class="fi" id="is-feeling" placeholder="Or type your own feeling word…" oninput="updateIStatement()">
+        </div>
+        <div class="ipart">
+          <div class="ipart-label">Step 3 — The impact / because</div>
+          <div class="ipart-prompt">"Because…" — why does this behaviour affect you? What does it mean or lead to?</div>
+          <textarea class="practice-input" id="is-because" placeholder="e.g. I don't know if you're safe… / it makes me feel like my opinion doesn't matter… / the whole team is affected…" rows="2" oninput="updateIStatement()"></textarea>
+        </div>
+        <div class="ipart">
+          <div class="ipart-label">Step 4 — The request</div>
+          <div class="ipart-prompt">"I would like…" — specific, realistic, positive request. What do you want them to DO (not stop doing)?</div>
+          <textarea class="practice-input" id="is-request" placeholder="e.g. a text message if you'll be late… / to take turns speaking without interrupting… / the report by Thursday noon…" rows="2" oninput="updateIStatement()"></textarea>
+        </div>
+      </div>
+      <div class="istat-output" id="istat-output" style="display:none">
+        <div class="istat-output-label">Your assertive I-statement</div>
+        <div class="istat-output-text" id="istat-text"></div>
+        <button class="bp" style="margin-top:10px;font-size:11px" onclick="navigator.clipboard?.writeText(document.getElementById('istat-text').textContent)">Copy statement</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENARIOS TAB -->
+<div class="tab-content" id="tab-scenarios">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Scenario practice</div><div class="phs">Read the situation — write your assertive response — then see examples</div></div></div>
+    <div class="pb">
+      <div id="scenario-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CLINICAL USE TAB -->
+<div class="tab-content" id="tab-clinical">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--purple)"></div><div><div class="pht">Clinical applications</div><div class="phs">How assertiveness training fits psychiatric and corporate settings</div></div></div>
+    <div class="pb">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:var(--purple-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--purple)">
+          <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Depression</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Passive communication style is strongly associated with depression — not expressing needs leads to unmet needs, resentment, and deepening low mood. Behavioural activation + assertiveness training is a core CBT skill cluster for depression.</div>
+        </div>
+        <div style="background:var(--red-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--red)">
+          <div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Anxiety &amp; social phobia</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Fear of conflict and negative evaluation drives passive / passive-aggressive patterns. Graded assertiveness practice — starting with low-stakes situations — is a key exposure component in CBT for social anxiety and generalised anxiety disorder.</div>
+        </div>
+        <div style="background:var(--amber-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--amber)">
+          <div style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">De-addiction / SUD</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Inability to assertively refuse substance offers from peers / family is a major relapse trigger. Drink / drug refusal skills training is a form of assertiveness training — practising specific refusal scripts with role-play. Included in MBRP, CBT-SUD, and social skills training protocols.</div>
+        </div>
+        <div style="background:var(--blue-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--blue)">
+          <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Indian family context</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">In joint families, assertiveness must be balanced with collectivist cultural values. Frame it as "honest, respectful communication that strengthens relationships" rather than "standing up for yourself" — the latter can sound selfish in Indian cultural context. Adapt scenarios to reflect Indian family and workplace dynamics.</div>
+        </div>
+        <div style="background:var(--accent-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--accent)">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Corporate wellness sessions</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">High-value skill for group workshops — especially for teacher populations (boundary-setting with school management), IT workers (workload negotiation), and healthcare workers (expressing concerns to seniors). The 4-styles comparison and I-statement builder work well as group exercises.</div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="fl" style="margin-bottom:6px">Session structure for a 60-minute assertiveness workshop</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;gap:10px;padding:8px 10px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text2)"><span style="font-weight:700;color:var(--accent);min-width:50px">0–10 min</span> Psychoeducation: What is assertiveness? Why does it matter?</div>
+          <div style="display:flex;gap:10px;padding:8px 10px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text2)"><span style="font-weight:700;color:var(--accent);min-width:50px">10–20 min</span> 4-styles exercise: identify your default style</div>
+          <div style="display:flex;gap:10px;padding:8px 10px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text2)"><span style="font-weight:700;color:var(--accent);min-width:50px">20–35 min</span> I-statement building — individual practice with shared scenarios</div>
+          <div style="display:flex;gap:10px;padding:8px 10px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text2)"><span style="font-weight:700;color:var(--accent);min-width:50px">35–50 min</span> Role-play in pairs: one person plays the difficult situation, one practices assertive response</div>
+          <div style="display:flex;gap:10px;padding:8px 10px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text2)"><span style="font-weight:700;color:var(--accent);min-width:50px">50–60 min</span> Debrief: what felt hard? What surprised you? One thing to practice this week.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const SCENARIOS = [
+  {
+    icon:'🏠', title:'Family pressure to stop medication',
+    tag:'Clinic — Family', tagColor:'#1A5C32', tagBg:'#E3F0E8',
+    situation:'Your mother-in-law keeps telling you that the psychiatric tablets will make you "dependent" and "ruin your mind." She wants you to stop taking them and instead visit a religious healer. This is your fourth week on escitalopram and you are just starting to feel better.',
+    responses:{
+      passive:'"Okay, maybe you\'re right. I\'ll think about it…" [stops medication secretly]',
+      aggressive:'"You don\'t know anything about medicine! Stop interfering in my treatment!"',
+      passive_aggressive:'[Takes tablets secretly and stops mentioning treatment to her at all, grows increasingly resentful]',
+      assertive:'"I understand you\'re worried about me and want what\'s best. These tablets have been prescribed by my doctor and I\'ve started feeling better on them. I\'m going to continue as my doctor has advised. I\'d be happy for you to come with me to meet Dr. Mehta and ask him your questions directly."'
+    }
+  },
+  {
+    icon:'💼', title:'Refusing overtime at work when burnout is developing',
+    tag:'Corporate', tagColor:'#4C2D8E', tagBg:'#EDE8FA',
+    situation:'Your manager asks you — for the third weekend in a row — to come in on Saturday for a project. You are exhausted, missing family time, and noticing signs of burnout. You fear saying no will be seen as disloyal.',
+    responses:{
+      passive:'"Of course, no problem." [cancels family plans again, says nothing about exhaustion]',
+      aggressive:'"I\'ve done three weekends already! Isn\'t that enough? Other people never get asked!"',
+      passive_aggressive:'"Sure, I\'ll be there." [does the bare minimum, arrives late, is visibly disengaged]',
+      assertive:'"I appreciate you thinking of me, and I\'m committed to the project\'s success. I need to be honest — I\'ve worked the last three weekends and I\'m genuinely running low. I won\'t be able to come in this Saturday. I\'d like to discuss how we can distribute this workload more sustainably so I can keep delivering quality work."'
+    }
+  },
+  {
+    icon:'🍺', title:'Refusing alcohol offer from friends (de-addiction)',
+    tag:'Clinic — SUD', tagColor:'#7B3500', tagBg:'#FAEEE5',
+    situation:'You have been sober for 6 weeks. At a family wedding, your cousin offers you a drink: "Just one, yaar — it\'s a celebration! You\'re not an alcoholic, you just drink too much sometimes."',
+    responses:{
+      passive:'"Okay, just one…" [takes the drink]',
+      aggressive:'"Don\'t you know I\'m in recovery?! How can you offer me that?"',
+      passive_aggressive:'"No… but I\'m not an alcoholic or anything…" [takes it to avoid awkwardness]',
+      assertive:'"No thanks — I\'m not drinking tonight. I\'m feeling great and want to keep it that way. Get me a nimbu pani and let\'s celebrate together."'
+    }
+  },
+  {
+    icon:'👩‍⚕️', title:'Caregiver requesting respite from other family members',
+    tag:'Clinic — Caregiver', tagColor:'#1A3D70', tagBg:'#E8EEF8',
+    situation:'You have been the sole caregiver for your parent with schizophrenia for two years. You are burning out. Your siblings visit occasionally but don\'t take on caregiving. You want to ask your brother to take over for one weekend per month.',
+    responses:{
+      passive:'"No no, I\'m managing fine. Don\'t worry." [continues until collapse]',
+      aggressive:'"You never help! You just leave everything to me and go live your life!"',
+      passive_aggressive:'"Fine, I\'ll manage somehow…" [drops several pointed comments over the next week]',
+      assertive:'"I love Baba and want to give him the best care. I also need to be honest — I\'m exhausted and need a break to stay healthy. I\'d like to ask if you could take over one weekend per month. Even that small change would make a big difference for me. Can we find a date that works for you?"'
+    }
+  },
+  {
+    icon:'👩‍🏫', title:'Teacher setting boundary with school management',
+    tag:'Corporate — Schools', tagColor:'#1A5C32', tagBg:'#E3F0E8',
+    situation:'The school principal keeps calling staff during dinner time for non-urgent administrative matters. You feel this boundary needs addressing but are worried about being seen as difficult.',
+    responses:{
+      passive:'"Of course, I\'ll look into it now." [responds to every evening call]',
+      aggressive:'"Stop calling after school hours! We have lives outside school!"',
+      passive_aggressive:'"Sure…" [takes increasingly long to respond, mentions it sarcastically in staff meetings]',
+      assertive:'"I want to be responsive and supportive of school needs. I\'ve noticed some administrative matters are coming in during evening hours. For non-urgent items, would it be possible to use the morning briefing or email instead? I can make sure everything is followed up first thing. For genuine emergencies, I\'m always reachable."'
+    }
+  },
+];
+
+function switchTab(name, btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function setFeeling(val, el){
+  document.querySelectorAll('.istat-builder .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('is-feeling').value = val;
+  updateIStatement();
+}
+
+function updateIStatement(){
+  const beh = document.getElementById('is-behaviour').value.trim();
+  const feel = document.getElementById('is-feeling').value.trim();
+  const bec = document.getElementById('is-because').value.trim();
+  const req = document.getElementById('is-request').value.trim();
+  if (!beh && !feel) { document.getElementById('istat-output').style.display='none'; return; }
+  const parts = [];
+  if (beh) parts.push(`When you ${beh}`);
+  if (feel) parts.push(`I feel ${feel}`);
+  if (bec) parts.push(`because ${bec}`);
+  if (req) parts.push(`I would like ${req}`);
+  const text = parts.join(', ') + (parts.length ? '.' : '');
+  document.getElementById('istat-text').textContent = text;
+  document.getElementById('istat-output').style.display = 'block';
+}
+
+function renderScenarios(){
+  document.getElementById('scenario-list').innerHTML = SCENARIOS.map((s,i) => `
+    <div class="scenario-card" id="sc${i}" onclick="this.classList.toggle('open')">
+      <div class="sc-head">
+        <div class="sc-icon">${s.icon}</div>
+        <div class="sc-title">${s.title}</div>
+        <div class="sc-tag" style="background:${s.tagBg};color:${s.tagColor}">${s.tag}</div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-situation">${s.situation}</div>
+        <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Your assertive response (write before looking at examples):</div>
+        <textarea class="practice-input" placeholder="How would you respond assertively to this situation?" rows="3"></textarea>
+        <div style="margin-top:12px;font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">All four responses — tap to compare</div>
+        <div class="responses-grid">
+          <div class="response-card" style="background:#FBEBEE"><div class="response-style" style="color:#C62828">😶 Passive</div><div class="response-text" style="color:#C62828">${s.responses.passive}</div></div>
+          <div class="response-card" style="background:#FFF0E5"><div class="response-style" style="color:#8B3A00">😡 Aggressive</div><div class="response-text" style="color:#8B3A00">${s.responses.aggressive}</div></div>
+          <div class="response-card" style="background:#FFF8E1"><div class="response-style" style="color:#8B5E00">🙂😠 Passive-aggressive</div><div class="response-text" style="color:#8B5E00">${s.responses.passive_aggressive}</div></div>
+          <div class="response-card" style="background:var(--accent-light)"><div class="response-style" style="color:var(--accent)">🤝 Assertive ✓</div><div class="response-text" style="color:var(--accent)">${s.responses.assertive}</div></div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+renderScenarios();
+</script>
+</body>
+</html>
