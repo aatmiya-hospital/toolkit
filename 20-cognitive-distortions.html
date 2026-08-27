@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cognitive Distortions Trainer — Aatmiya Hospital</title>
+<style>
+  :root{
+    --bg:#F4F1F8;--surface:#FFF;--surface2:#ECEAF4;--border:#D8D4EC;
+    --text:#16122A;--text2:#4A4660;--text3:#9A97B0;
+    --accent:#5C3D9E;--accent-light:#EDE8FA;
+    --green:#1E5E32;--green-light:#E5F2E9;
+    --amber:#8B5E00;--amber-light:#FFF8E1;
+    --red:#7B1818;--red-light:#FBEBEE;
+    --radius:12px;--shadow:0 2px 14px rgba(92,61,158,.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .tabs{background:#472e80;display:flex;overflow-x:auto}
+  .tab{flex:1;min-width:80px;padding:10px 8px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.65);cursor:pointer;border:none;background:transparent;font-family:inherit;border-bottom:2.5px solid transparent;white-space:nowrap}
+  .tab.active{color:#fff;border-bottom-color:#A08AEE}
+  .wrap{max-width:960px;margin:0 auto;padding:16px}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:13px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:1px}
+  .pb{padding:14px 18px}
+  .tab-content{display:none}.tab-content.active{display:block}
+  /* Distortion cards grid */
+  .dist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;padding:14px 18px}
+  .dist-card{border-radius:10px;border:1.5px solid var(--border);padding:14px;cursor:pointer;transition:all .15s;background:var(--surface2)}
+  .dist-card:hover{border-color:var(--accent);background:#fff}
+  .dist-card.selected{border-color:var(--accent);background:var(--accent-light)}
+  .dist-icon{font-size:24px;margin-bottom:6px}
+  .dist-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .dist-def{font-size:11px;color:var(--text2);line-height:1.55;margin-bottom:8px}
+  .dist-example{font-size:11px;font-style:italic;color:var(--text3);background:var(--surface);border-radius:6px;padding:6px 8px;border-left:2px solid var(--accent-light)}
+  .dist-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--accent-light);color:var(--accent);margin-top:6px;text-transform:uppercase;letter-spacing:.05em}
+  /* Thought record */
+  .tr-section{display:flex;flex-direction:column;gap:12px;padding:14px 18px}
+  .tr-field{display:flex;flex-direction:column;gap:4px}
+  .tr-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3)}
+  .tr-sublabel{font-size:11px;color:var(--text2);margin-bottom:2px}
+  .tr-input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);resize:none;line-height:1.55}
+  .tr-input:focus{outline:none;border-color:var(--accent);background:#fff}
+  /* Emotion sliders */
+  .emo-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .emo-label{font-size:12px;color:var(--text2);min-width:100px}
+  .emo-slider{flex:1;accent-color:var(--accent)}
+  .emo-val{font-size:13px;font-weight:700;color:var(--accent);min-width:36px;text-align:right}
+  /* Distortion chips (thought record) */
+  .dist-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+  .dist-chip{padding:5px 10px;border-radius:20px;font-size:11px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;user-select:none;transition:all .12s}
+  .dist-chip.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600}
+  /* Challenge steps */
+  .challenge-steps{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .cs-item{background:var(--surface2);border-radius:8px;padding:10px 12px;border-left:3px solid var(--border)}
+  .cs-q{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
+  .cs-hint{font-size:11px;color:var(--text3);font-style:italic}
+  /* Output */
+  .out-area{background:var(--surface2);border-radius:8px;padding:12px;font-size:11px;line-height:1.8;white-space:pre-wrap;color:var(--text);border:1px solid var(--border);display:none;margin:0 18px 14px}
+  .out-area.visible{display:block}
+  .act-row{display:flex;gap:8px;padding:14px 18px;flex-wrap:wrap;border-top:1px solid var(--border)}
+  .bp{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  /* Emotion before/after comparison */
+  .emotion-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  @media(max-width:480px){.emotion-compare{grid-template-columns:1fr}}
+  .emo-box{border-radius:8px;padding:10px 12px}
+  .emo-box-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Cognitive Distortions Trainer</div><div class="hs">Aatmiya Hospital · CBT Tool 20 · Clinical + Patient use</div></div>
+  </div>
+  <div class="ha"><button class="bg" onclick="exportRecord()">Export record</button><button class="bg" onclick="window.print()">Print</button></div>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('library',this)">Distortion library</button>
+  <button class="tab" onclick="switchTab('record',this)">Thought record</button>
+  <button class="tab" onclick="switchTab('challenge',this)">Challenge steps</button>
+  <button class="tab" onclick="switchTab('clinical',this)">Clinical guide</button>
+</div>
+
+<div class="wrap">
+
+<!-- LIBRARY -->
+<div class="tab-content active" id="tab-library">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">15 cognitive distortions</div><div class="phs">Tap any card to explore. Adapted from Beck, Burns, and CBT literature.</div></div></div>
+    <div class="dist-grid" id="dist-grid"></div>
+  </div>
+</div>
+
+<!-- THOUGHT RECORD -->
+<div class="tab-content" id="tab-record">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">7-column thought record</div><div class="phs">Work through a specific situation step by step</div></div></div>
+    <div class="tr-section">
+
+      <div class="tr-field">
+        <div class="tr-label">1 — Situation</div>
+        <div class="tr-sublabel">Where were you? What happened? Who was involved?</div>
+        <textarea class="tr-input" id="tr-situation" rows="2" placeholder="e.g. I made a mistake at work and my manager noticed…"></textarea>
+      </div>
+
+      <div class="tr-field">
+        <div class="tr-label">2 — Automatic thought</div>
+        <div class="tr-sublabel">What thought went through your mind? What images?</div>
+        <textarea class="tr-input" id="tr-autothought" rows="2" placeholder="e.g. 'I am completely incompetent. I will be fired. I always ruin everything.'"></textarea>
+        <div>
+          <div class="tr-sublabel" style="margin-top:6px">How much did you believe this thought? (0–100%)</div>
+          <div class="emo-row">
+            <input type="range" class="emo-slider" id="belief-before" min="0" max="100" value="80" oninput="document.getElementById('bv-before').textContent=this.value+'%'">
+            <span class="emo-val" id="bv-before">80%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tr-field">
+        <div class="tr-label">3 — Emotions before</div>
+        <div class="tr-sublabel">What emotions did you feel? Rate intensity (0–100%)</div>
+        <div id="emotion-sliders-before"></div>
+        <div style="margin-top:6px">
+          <input class="tr-input" id="other-emotions-before" placeholder="Other emotions…" style="height:36px;padding:7px 10px;font-size:12px">
+        </div>
+      </div>
+
+      <div class="tr-field">
+        <div class="tr-label">4 — Cognitive distortions identified</div>
+        <div class="tr-sublabel">Which patterns do you recognise in this thought?</div>
+        <div class="dist-chips" id="tr-dist-chips"></div>
+      </div>
+
+      <div class="tr-field">
+        <div class="tr-label">5 — Evidence for the thought</div>
+        <div class="tr-sublabel">What facts actually support this thought?</div>
+        <textarea class="tr-input" id="tr-evidence-for" rows="2" placeholder="Facts only — not interpretations, feelings, or assumptions…"></textarea>
+      </div>
+
+      <div class="tr-field">
+        <div class="tr-label">6 — Evidence against the thought</div>
+        <div class="tr-sublabel">What facts contradict or don't support this thought?</div>
+        <textarea class="tr-input" id="tr-evidence-against" rows="3" placeholder="Past successes, other explanations, what you'd say to a friend, what's being ignored…"></textarea>
+      </div>
+
+      <div class="tr-field">
+        <div class="tr-label">7 — Balanced / alternative thought</div>
+        <div class="tr-sublabel">Write a more realistic, balanced version of the original thought</div>
+        <textarea class="tr-input" id="tr-balanced" rows="2" placeholder="e.g. 'I made one mistake. Everyone does. My manager noticing does not mean I will be fired. I have succeeded many times before.'"></textarea>
+        <div>
+          <div class="tr-sublabel" style="margin-top:6px">How much do you believe the original thought now? (0–100%)</div>
+          <div class="emo-row">
+            <input type="range" class="emo-slider" id="belief-after" min="0" max="100" value="40" oninput="document.getElementById('bv-after').textContent=this.value+'%'">
+            <span class="emo-val" id="bv-after">40%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tr-field">
+        <div class="tr-label">Emotions after</div>
+        <div class="tr-sublabel">Re-rate your emotions now</div>
+        <div id="emotion-sliders-after"></div>
+      </div>
+
+    </div>
+    <div class="act-row">
+      <button class="bp" onclick="exportRecord()">Export thought record</button>
+      <button class="bpo" onclick="resetRecord()">Clear</button>
+    </div>
+    <div class="out-area" id="tr-out"></div>
+  </div>
+</div>
+
+<!-- CHALLENGE STEPS -->
+<div class="tab-content" id="tab-challenge">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--green)"></div><div><div class="pht">Socratic challenge questions</div><div class="phs">Use these to examine distorted thoughts in session or between sessions</div></div></div>
+    <div class="pb">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Testing the evidence</div>
+          <div class="cs-item"><div class="cs-q">What is the actual evidence for and against this thought?</div><div class="cs-hint">Separate facts from interpretations.</div></div>
+          <div class="cs-item"><div class="cs-q">Am I confusing a thought or feeling with a fact?</div></div>
+          <div class="cs-item"><div class="cs-q">What would I need to see to change my mind?</div></div>
+          <div class="cs-item"><div class="cs-q">How many times has this feared outcome actually happened before?</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Alternative explanations</div>
+          <div class="cs-item"><div class="cs-q">Is there another way to look at this situation?</div></div>
+          <div class="cs-item"><div class="cs-q">What would I say to a close friend who had this thought?</div></div>
+          <div class="cs-item"><div class="cs-q">What would someone who cares about me say about this?</div></div>
+          <div class="cs-item"><div class="cs-q">In 5 years, how important will this seem?</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Decatastrophising</div>
+          <div class="cs-item"><div class="cs-q">What is the worst that could realistically happen? Could I handle it?</div></div>
+          <div class="cs-item"><div class="cs-q">What is the best that could happen? What is the most likely outcome?</div></div>
+          <div class="cs-item"><div class="cs-q">If the worst did happen, what could I do?</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Double standard</div>
+          <div class="cs-item"><div class="cs-q">Am I holding myself to a standard I wouldn't hold others to?</div></div>
+          <div class="cs-item"><div class="cs-q">Am I taking full responsibility for something that isn't entirely in my control?</div></div>
+          <div class="cs-item"><div class="cs-q">What are the advantages and disadvantages of thinking this way?</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLINICAL GUIDE -->
+<div class="tab-content" id="tab-clinical">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Clinical use guide</div><div class="phs">How to use cognitive restructuring in session</div></div></div>
+    <div class="pb" style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:var(--accent-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--accent)">
+        <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">When to use</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.65">Depression (especially negative cognitive triad — self, world, future), anxiety (threat appraisal), OCD (overvalued beliefs), PTSD (guilt, shame beliefs), adjustment disorders, caregiver burnout. Less appropriate for acute psychosis — address distortions after stabilisation and with lower challenge intensity.</div>
+      </div>
+      <div style="background:var(--green-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--green)">
+        <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Session sequence</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.65">1. Identify a specific, recent triggering situation<br>2. Elicit the automatic thought — not the emotion, the thought<br>3. Rate belief in the thought (0–100%)<br>4. Name the emotion and rate intensity<br>5. Identify the distortion type<br>6. Gather evidence for and against<br>7. Construct balanced thought<br>8. Re-rate belief and emotions<br>9. Assign homework — self-monitoring form between sessions</div>
+      </div>
+      <div style="background:var(--amber-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--amber)">
+        <div style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Indian context adaptations</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.65">• Collectivist framing: "What would your family think if they knew this thought?" can elicit external perspectives<br>• Karma and fate beliefs may interact with personalisation and fortune-telling — work respectfully, not against these beliefs<br>• Self-criticism (mental filter, personalisation) is very common in presentations shaped by shame culture<br>• Should statements often reflect family/social expectations — explore whose voice the "should" belongs to<br>• For low-literacy patients: use the distortion library verbally rather than as a reading task</div>
+      </div>
+      <div style="background:var(--red-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--red)">
+        <div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Common pitfalls</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.65">• Disputing too aggressively — the goal is examination, not persuasion<br>• Skipping the evidence-gathering step — balanced thoughts without evidence are just positive thinking<br>• Challenging beliefs that are realistic (sometimes people really are being discriminated against, or the situation is genuinely dire — validate first)<br>• Using cognitive techniques for profound grief or trauma loss before emotional validation is complete</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const DISTORTIONS = [
+  {icon:'🔲',name:'All-or-nothing thinking',aka:'Black-and-white thinking',def:'Seeing things in only two categories — perfect or failure, all good or all bad. No middle ground.',example:'"I got one question wrong, so I completely failed."',tag:'Very common',conditions:['Depression','Perfectionism','Anxiety']},
+  {icon:'🔭',name:'Overgeneralisation',aka:'',def:'Drawing a broad conclusion from a single event. Using words like "always," "never," "everyone," "nobody."',example:'"I felt awkward at that party. I always embarrass myself. Nobody likes me."',tag:'Common',conditions:['Depression','Social anxiety']},
+  {icon:'🔬',name:'Mental filter',aka:'Selective abstraction',def:'Focusing exclusively on one negative detail while ignoring the whole picture.',example:'"My presentation went well but one person yawned — so it was a disaster."',tag:'Common',conditions:['Depression','Anxiety']},
+  {icon:'🚫',name:'Disqualifying the positive',aka:'',def:'Dismissing positive experiences by saying they "don\'t count" for some reason.',example:'"Yes I passed, but it was an easy paper — anyone could have done it."',tag:'Subtle',conditions:['Depression','Low self-esteem']},
+  {icon:'🔮',name:'Mind reading',aka:'',def:'Assuming you know what others are thinking, usually assuming negative thoughts about you.',example:'"She didn\'t reply immediately — she must be angry with me."',tag:'Common',conditions:['Social anxiety','Depression','Relationships']},
+  {icon:'🎲',name:'Fortune telling',aka:'Predictive thinking',def:'Predicting negative outcomes as if they are facts, then acting as though this prediction is already true.',example:'"I\'ll definitely fail the interview. There\'s no point trying."',tag:'Common',conditions:['Anxiety','Depression','Avoidance']},
+  {icon:'🔥',name:'Catastrophising',aka:'Magnification',def:'Blowing problems out of proportion — making them much bigger than they are.',example:'"If I make a mistake at work, I\'ll be fired, lose my income, and my family will suffer terribly."',tag:'Very common',conditions:['Anxiety','Panic disorder','OCD']},
+  {icon:'🔽',name:'Minimisation',aka:'',def:'Shrinking the importance of your own qualities or achievements.',example:'"My recovery is going okay but it\'s nothing — anyone could do it."',tag:'Subtle',conditions:['Depression','Self-esteem']},
+  {icon:'💭',name:'Emotional reasoning',aka:'',def:'Assuming that because you feel something strongly, it must be true.',example:'"I feel stupid, therefore I must be stupid."',tag:'Common',conditions:['Depression','Anxiety','OCD']},
+  {icon:'📏',name:'Should statements',aka:'Musturbation',def:'Rigid rules about how you or others must behave. Leads to guilt (self-directed) or anger/frustration (other-directed).',example:'"I should be able to handle this. I must never feel weak. Others should know better."',tag:'Very common',conditions:['Guilt','Anger','Depression']},
+  {icon:'🏷️',name:'Labelling',aka:'Global labelling',def:'Attaching a global negative label to yourself or others based on specific behaviours.',example:'"I forgot an appointment — I\'m a terrible person." / "He disagreed with me — he\'s a complete idiot."',tag:'Common',conditions:['Depression','Anger','Shame']},
+  {icon:'👉',name:'Personalisation',aka:'',def:'Assuming responsibility for external events or other people\'s feelings without evidence.',example:'"My child is struggling — I\'m a bad parent." / "She seems unhappy today — I must have done something wrong."',tag:'Very common',conditions:['Guilt','Depression','Anxiety']},
+  {icon:'🚧',name:'Jumping to conclusions',aka:'',def:'Making negative interpretations without supporting evidence.',example:'"They haven\'t called — clearly they\'re not interested."',tag:'Common',conditions:['Anxiety','Relationships']},
+  {icon:'🎭',name:'Comparison',aka:'Social comparison',def:'Comparing yourself unfavourably to others, often ignoring context or selecting unsuitable comparisons.',example:'"My sibling is so much more successful — I\'ve done nothing with my life."',tag:'Indian context',conditions:['Depression','Envy','Low self-esteem']},
+  {icon:'🔑',name:'Control fallacies',aka:'',def:'Either believing you have no control (external) or that you are responsible for everyone\'s wellbeing (internal).',example:'External: "Nothing I do matters." Internal: "It\'s my job to make sure everyone is happy."',tag:'Complex',conditions:['Depression','Anxiety','Codependency']},
+];
+
+const EMOTIONS = ['Sad','Anxious','Angry','Ashamed','Guilty','Hopeless','Frustrated','Lonely','Fearful','Relieved'];
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function renderDistGrid(){
+  document.getElementById('dist-grid').innerHTML = DISTORTIONS.map((d,i)=>`
+    <div class="dist-card" onclick="toggleDist(${i},this)">
+      <div class="dist-icon">${d.icon}</div>
+      <div class="dist-name">${d.name}</div>
+      ${d.aka?`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Also: ${d.aka}</div>`:''}
+      <div class="dist-def">${d.def}</div>
+      <div class="dist-example">"${d.example}"</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">
+        <span class="dist-tag">${d.tag}</span>
+        ${d.conditions.map(c=>`<span class="dist-tag" style="background:var(--surface2);color:var(--text3)">${c}</span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function toggleDist(i,el){el.classList.toggle('selected')}
+
+function renderEmotionSliders(){
+  const before=document.getElementById('emotion-sliders-before');
+  const after=document.getElementById('emotion-sliders-after');
+  if(!before||!after) return;
+  const makeSliders=(prefix)=>EMOTIONS.slice(0,6).map(e=>`
+    <div class="emo-row">
+      <span class="emo-label">${e}</span>
+      <input type="range" class="emo-slider" id="${prefix}-${e}" min="0" max="100" value="0"
+        oninput="document.getElementById('${prefix}-val-${e}').textContent=this.value+'%'">
+      <span class="emo-val" id="${prefix}-val-${e}">0%</span>
+    </div>`).join('');
+  before.innerHTML=makeSliders('emo-b');
+  after.innerHTML=makeSliders('emo-a');
+}
+
+function renderTRDistChips(){
+  const wrap=document.getElementById('tr-dist-chips');
+  if(!wrap) return;
+  wrap.innerHTML=DISTORTIONS.map(d=>`
+    <div class="dist-chip" onclick="this.classList.toggle('on')">${d.icon} ${d.name}</div>`).join('');
+}
+
+function exportRecord(){
+  const now=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const selDists=[...document.querySelectorAll('#tr-dist-chips .dist-chip.on')].map(c=>c.textContent.trim()).join(', ');
+  const emotsBefore=EMOTIONS.slice(0,6).map(e=>{
+    const v=document.getElementById(`emo-b-${e}`)?.value||'0';
+    return v!=='0'?`${e}: ${v}%`:null;
+  }).filter(Boolean).join(', ');
+  const emotsAfter=EMOTIONS.slice(0,6).map(e=>{
+    const v=document.getElementById(`emo-a-${e}`)?.value||'0';
+    return v!=='0'?`${e}: ${v}%`:null;
+  }).filter(Boolean).join(', ');
+  const text=`AATMIYA HOSPITAL — THOUGHT RECORD
+Generated: ${now}
+
+SITUATION:
+${document.getElementById('tr-situation')?.value||'—'}
+
+AUTOMATIC THOUGHT:
+${document.getElementById('tr-autothought')?.value||'—'}
+Belief in thought: ${document.getElementById('bv-before')?.textContent||'—'}
+
+EMOTIONS BEFORE:
+${emotsBefore||'Not rated'}
+${document.getElementById('other-emotions-before')?.value||''}
+
+COGNITIVE DISTORTIONS IDENTIFIED:
+${selDists||'None selected'}
+
+EVIDENCE FOR THE THOUGHT:
+${document.getElementById('tr-evidence-for')?.value||'—'}
+
+EVIDENCE AGAINST THE THOUGHT:
+${document.getElementById('tr-evidence-against')?.value||'—'}
+
+BALANCED / ALTERNATIVE THOUGHT:
+${document.getElementById('tr-balanced')?.value||'—'}
+Belief in original thought after: ${document.getElementById('bv-after')?.textContent||'—'}
+
+EMOTIONS AFTER:
+${emotsAfter||'Not rated'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Aatmiya Hospital · Dr. Dhaivat Mehta, Gandhidham`;
+
+  const out=document.getElementById('tr-out');
+  out.textContent=text; out.classList.add('visible');
+  navigator.clipboard?.writeText(text);
+  // Switch to record tab if not there
+  switchTab('record',document.querySelector('.tab:nth-child(2)'));
+  out.scrollIntoView({behavior:'smooth'});
+}
+
+function resetRecord(){
+  document.querySelectorAll('#tab-record textarea,#tab-record input[type=range],#tab-record input[type=text]').forEach(el=>{
+    if(el.tagName==='TEXTAREA') el.value='';
+    else if(el.type==='range') el.value=el.id.includes('belief')?(el.id.includes('after')?'40':'80'):'0';
+  });
+  document.querySelectorAll('#tr-dist-chips .dist-chip.on').forEach(c=>c.classList.remove('on'));
+  // Reset displayed values
+  EMOTIONS.slice(0,6).forEach(e=>{
+    const bv=document.getElementById(`emo-b-val-${e}`);
+    const av=document.getElementById(`emo-a-val-${e}`);
+    if(bv) bv.textContent='0%'; if(av) av.textContent='0%';
+  });
+  document.getElementById('bv-before').textContent='80%';
+  document.getElementById('bv-after').textContent='40%';
+  document.getElementById('tr-out')?.classList.remove('visible');
+}
+
+renderDistGrid();
+renderEmotionSliders();
+renderTRDistChips();
+</script>
+</body>
+</html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychoeducation Handout Generator — Aatmiya Hospital</title>
+<style>
+  :root{
+    --bg:#F5F2EC;--surface:#FFF;--surface2:#EEEAE2;--border:#DDD9D0;
+    --text:#1A1610;--text2:#5A5448;--text3:#9A9488;
+    --accent:#1A5C42;--accent-light:#E3F0EB;
+    --gold:#8B6200;--gold-light:#FFF8E1;
+    --blue:#1A3D70;--blue-light:#E8EEF8;
+    --red:#7B1818;--red-light:#FBEBEE;
+    --purple:#4C2D8E;--purple-light:#EDE8FA;
+    --radius:12px;--shadow:0 2px 12px rgba(26,92,66,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;transition:background .15s}
+  .bg:hover{background:rgba(255,255,255,.25)}
+  .wrap{max-width:1140px;margin:0 auto;padding:16px;display:grid;grid-template-columns:260px 1fr;gap:16px}
+  @media(max-width:800px){.wrap{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:13px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:1px}
+  /* Condition list */
+  .cond-list{padding:8px}
+  .cond-item{padding:9px 12px;border-radius:8px;cursor:pointer;border:1.5px solid transparent;margin-bottom:3px;display:flex;align-items:center;gap:8px;transition:all .12s}
+  .cond-item:hover{background:var(--surface2)}
+  .cond-item.active{background:var(--accent-light);border-color:var(--accent)}
+  .cond-icon{font-size:16px}
+  .cond-name{font-size:12px;font-weight:500}
+  .cond-item.active .cond-name{color:var(--accent);font-weight:600}
+  /* Options bar */
+  .options-bar{display:flex;gap:10px;align-items:center;padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+  .opt-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+  .lang-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-family:inherit;transition:all .12s}
+  .lang-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .level-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-family:inherit;transition:all .12s}
+  .level-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+  /* Handout preview */
+  .handout-wrap{padding:20px;overflow-x:auto}
+  .handout{background:#fff;border:1px solid var(--border);border-radius:8px;padding:28px 30px;max-width:700px;margin:0 auto;font-family:'Segoe UI',system-ui,sans-serif;box-shadow:0 4px 20px rgba(0,0,0,.1)}
+  /* Handout internal styles */
+  .h-header{background:var(--accent);color:#fff;padding:16px 20px;border-radius:6px 6px 0 0;margin:-28px -30px 20px;display:flex;align-items:center;justify-content:space-between}
+  .h-logo{font-size:20px;font-weight:800}
+  .h-hospital{font-size:12px;opacity:.85;text-align:right;line-height:1.4}
+  .h-title{font-size:22px;font-weight:800;color:var(--accent);margin-bottom:4px;margin-top:4px}
+  .h-subtitle{font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5}
+  .h-section{margin-bottom:14px}
+  .h-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;padding:5px 10px;border-radius:5px}
+  .h-text{font-size:12px;color:var(--text);line-height:1.75}
+  .h-text p{margin-bottom:6px}
+  .h-bullets{list-style:none;padding:0}
+  .h-bullets li{display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;font-size:12px;color:var(--text);line-height:1.55}
+  .h-bullets li::before{content:'•';color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px}
+  .h-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:500px){.h-two-col{grid-template-columns:1fr}}
+  .h-do{background:#E5F2E9;border-radius:6px;padding:10px 12px}
+  .h-dont{background:#FBEBEE;border-radius:6px;padding:10px 12px}
+  .h-col-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+  .h-col-item{font-size:11px;line-height:1.55;margin-bottom:4px}
+  .h-footer{margin-top:16px;padding-top:10px;border-top:2px solid var(--accent);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+  .h-footer-brand{font-size:10px;font-weight:700;color:var(--accent)}
+  .h-footer-contact{font-size:10px;color:var(--text3)}
+  .h-gujarati{font-size:12px;color:var(--text2);line-height:1.8;font-style:italic;border-left:3px solid var(--accent-light);padding-left:10px;margin-top:6px}
+  .h-highlight{background:var(--gold-light);border-left:3px solid var(--gold);padding:8px 12px;border-radius:0 6px 6px 0;font-size:12px;color:var(--gold);margin:8px 0}
+  .h-crisis{background:var(--red-light);border-radius:6px;padding:8px 12px;font-size:11px;color:var(--red);margin-top:8px}
+  /* Print */
+  @media print{
+    .header,.wrap>div:first-child,.options-bar,.ha{display:none!important}
+    .handout-wrap{padding:0}
+    .handout{box-shadow:none;border:none;border-radius:0;max-width:none;margin:0}
+    .h-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .h-do,.h-dont,.h-section-title,.h-highlight,.h-crisis{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{background:white}
+  }
+  .empty-state{padding:60px;text-align:center;color:var(--text3)}
+  .search-input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);margin:8px;width:calc(100% - 16px)}
+  .search-input:focus{outline:none;border-color:var(--accent);background:#fff}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Psychoeducation Handout Generator</div><div class="hs">Aatmiya Hospital · Tool 24 · 12 conditions · Bilingual · Print-ready</div></div>
+  </div>
+  <div class="ha">
+    <button class="bg" onclick="window.print()">🖨 Print handout</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- Left: condition list -->
+<div>
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Select condition</div></div></div>
+    <input class="search-input" id="cond-search" placeholder="Search conditions…" oninput="filterConditions()">
+    <div class="cond-list" id="cond-list"></div>
+  </div>
+</div>
+
+<!-- Right: handout -->
+<div class="panel">
+  <div class="options-bar">
+    <span class="opt-label">Language:</span>
+    <button class="lang-btn active" id="lb-en" onclick="setLang('en',this)">English</button>
+    <button class="lang-btn" id="lb-bi" onclick="setLang('bi',this)">+ ગુજરાતી</button>
+    <span class="opt-label" style="margin-left:10px">Literacy:</span>
+    <button class="level-btn active" id="lv-std" onclick="setLevel('std',this)">Standard</button>
+    <button class="level-btn" id="lv-simple" onclick="setLevel('simple',this)">Simple</button>
+  </div>
+  <div class="handout-wrap" id="handout-wrap">
+    <div class="empty-state">
+      <div style="font-size:32px;margin-bottom:8px">📄</div>
+      Select a condition on the left to generate a handout
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+let activeLang='en';
+let activeLevel='std';
+let activeCondId=null;
+
+const CONDITIONS=[
+  {
+    id:'depression',icon:'😔',name:'Depression',
+    gujarati_name:'ડિપ્રેશન (હતાશા)',
+    tagline:'A medical condition of the brain — treatable with help',
+    tagline_gu:'મગજની એક તબીબી સ્થિતિ — મદદ સાથે સારવારપાત્ર',
+    what:{
+      std:'Depression is a medical illness caused by changes in brain chemistry — specifically in neurotransmitters like serotonin, norepinephrine, and dopamine that regulate mood, energy, and thinking. It is not weakness, laziness, or a character flaw. It is no different in nature from diabetes or hypertension — a biological condition that responds to treatment.',
+      simple:'Depression is an illness of the brain. The brain\'s chemicals are not working normally. It is not the person\'s fault. It is not laziness. It needs treatment like any other illness.',
+      gu:'ડિપ્રેશન મગજની બીમારી છે. મગજના રાસાયણિક પદાર્થો (neurochemicals) બરાબર કામ નથી કરી રહ્યા. આ વ્યક્તિની ભૂલ નથી. આ ડાયાબિટીસ જેવી જ એક તબીબી સ્થિતિ છે.'
+    },
+    symptoms:{
+      std:['Persistent low mood, sadness, or emptiness lasting more than 2 weeks','Loss of interest or pleasure in things that were previously enjoyed','Fatigue and low energy even without physical exertion','Sleep disturbances — insomnia or sleeping too much','Changes in appetite — reduced or increased','Difficulty concentrating, remembering, or making decisions','Feelings of worthlessness, guilt, or hopelessness','In the Indian context: headaches, bodily pains, and fatigue may be the primary presentation rather than low mood'],
+      simple:['Always feeling sad or empty','No interest in things they used to enjoy','Very tired all the time','Cannot sleep OR sleeping too much','Not eating OR eating too much','Cannot think clearly or concentrate','Feeling worthless or hopeless','In India: headaches and body pain are often signs of depression']
+    },
+    dos:['Be present without pressure — sit with them in silence if needed','Ensure they take their medication regularly as prescribed','Gently encourage small activities — a 10-minute walk, a brief outing','Accompany to doctor\'s appointments','Celebrate any small step forward','Say: "I\'m here with you. This will get better."'],
+    donts:['Do not say "think positive" or "count your blessings"','Do not say "you have everything — why are you sad?"','Do not pressure them to perform duties before they are ready','Do not dismiss it as laziness or weakness','Do not tell others about their diagnosis without consent','Do not give up on them'],
+    treatment:'Depression is treated with a combination of medication (antidepressants take 2–4 weeks to work — do not stop early), psychotherapy (CBT, supportive), and lifestyle changes (sleep, exercise, routine). Most people recover fully with proper treatment.',
+    treatment_simple:'Medicine (tablets) + talking therapy + sleep and exercise. Medicine takes 2–4 weeks to work. Do not stop medicine early. Most people get better with treatment.',
+    myth:{myth:'Depression is not real — it is just sadness or weakness.',fact:'Depression is a real medical illness with measurable changes in brain chemistry. It is as real as diabetes. It requires treatment, not willpower.'},
+    crisis:'iCall: 9152987821 | Vandrevala: 1860-2662-345',
+    color:'#1A3D70',colorLight:'#E8EEF8'
+  },
+  {
+    id:'anxiety',icon:'😰',name:'Anxiety disorders',
+    gujarati_name:'ચિંતા વિકાર',
+    tagline:'More than worry — a treatable brain condition',
+    tagline_gu:'ચિંતા કરતાં વધારે — એક સારવારપાત્ર સ્થિતિ',
+    what:{
+      std:'Anxiety disorders involve excessive, uncontrollable fear or worry that is disproportionate to the actual threat, persists over time, and significantly impairs daily functioning. The brain\'s threat-detection system (amygdala) is overactive, producing physical symptoms of the fight-or-flight response even in the absence of real danger.',
+      simple:'The brain\'s alarm system gets stuck in the "on" position. The person feels scared or worried even when there is no real danger. The body reacts as if there is real danger — fast heartbeat, breathlessness, sweating. This is a brain illness, not weakness.',
+      gu:'ચિંતા વિકારમાં, મગજની "ભય" સિસ્ટમ જ્યારે ન જોઈએ ત્યારે પણ ચાલુ રહે છે. વ્યક્તિ ભયભીત અથવા ચિંતિત અનુભવે છે. શરીર ઝડપી ધબકારા, શ્વાસ ચઢવો, પરસેવો — ખતરો ન હોવા છતાં.'
+    },
+    symptoms:{
+      std:['Persistent excessive worry difficult to control','Physical symptoms: racing heart, breathlessness, sweating, trembling, chest tightness','Panic attacks — sudden intense fear with physical symptoms, often mistaken for heart attacks','Avoidance of situations that trigger anxiety','Irritability, difficulty concentrating, sleep disturbance','Muscle tension, headaches, fatigue'],
+      simple:['Constant worry that will not stop','Racing heart, breathlessness, sweating without exercise','Panic attacks — sudden intense fear (not a heart attack)','Avoids places or situations due to fear','Restless, irritable, tense','Trouble sleeping']
+    },
+    dos:['Stay calm when they have a panic attack — your calm regulates theirs','Guide slow breathing: breathe in 4 counts, out 6 counts','Say: "You are safe. This will pass. I\'m here."','Encourage gradual exposure to feared situations (with clinical guidance)','Validate the fear without reinforcing avoidance','Ensure medication is taken regularly'],
+    donts:['Do not say "there is nothing to worry about"','Do not rush to hospital for every panic attack — this reinforces the fear','Do not enable avoidance by doing everything for them','Do not get frustrated or dismiss the physical symptoms as "in the head"','Do not push too hard too fast — graduated exposure takes time'],
+    treatment:'CBT (especially exposure therapy) is the most evidence-based treatment. Medications (SSRIs, SNRIs, buspirone) reduce anxiety biology. Breathing techniques and mindfulness are important adjuncts. Recovery takes weeks to months — consistency is key.',
+    treatment_simple:'Talking therapy (CBT) + medicine + breathing practices. Both are needed. Recovery takes time but most people improve greatly.',
+    myth:{myth:'Anxiety is just "overthinking" — the person can stop if they try harder.',fact:'Anxiety is a biological brain disorder. The person cannot simply "stop worrying" any more than someone with diabetes can stop having high blood sugar through willpower alone.'},
+    crisis:'iCall: 9152987821 | Vandrevala: 1860-2662-345',
+    color:'#4C2D8E',colorLight:'#EDE8FA'
+  },
+  {
+    id:'schizophrenia',icon:'🧠',name:'Schizophrenia',
+    gujarati_name:'સ્કિઝોફ્રેનિયા',
+    tagline:'A serious but treatable brain disorder',
+    tagline_gu:'એક ગંભીર પણ સારવારપાત્ર મગજ વિકાર',
+    what:{
+      std:'Schizophrenia is a severe mental illness involving disturbances in perception, thought, emotion, and behaviour. It is caused by abnormalities in dopamine and glutamate neurotransmitter systems and has a strong genetic component. It is not caused by bad parenting, black magic, or moral failing. With medication and support, most people can live meaningful lives.',
+      simple:'Schizophrenia is a serious brain illness. The brain sends wrong signals — causing the person to hear, see, or believe things that are not real. It is not the family\'s fault or the person\'s fault. With medicine and support, most people can live good lives.',
+      gu:'સ્કિઝોફ્રેનિયા એ ગંભીર મગજ બીમારી છે. મગજ ખોટા સંકેત મોકલે છે — ભ્રમ (hallucinations), ભ્રામક વિચારો (delusions). ભૂત-પ્રેત નથી. પરિવારની ભૂલ નથી. દવા અને ટેકોથી, ઘણા લોકો સારું જીવન જીવે છે.'
+    },
+    symptoms:{
+      std:['Positive symptoms: hallucinations (hearing voices, seeing things), delusions (false fixed beliefs — persecution, grandeur, reference), disorganised thinking and speech','Negative symptoms: flat affect, reduced speech, social withdrawal, lack of motivation (avolition), inability to feel pleasure (anhedonia)','Cognitive symptoms: memory and attention difficulties','Important: negative symptoms are often mistaken for laziness — they are part of the illness'],
+      simple:['Hearing voices no one else hears','Believing things that are not true (e.g. being followed, having special powers)','Talking in a confused way that does not make sense','Feeling flat, withdrawn, no motivation (this is the illness — not laziness)','Difficulty with memory and attention']
+    },
+    dos:['Ensure medication is taken every day — this is the most important thing','Maintain a calm, low-stress household environment','Keep daily routine consistent — regular meals, sleep, activity','Be patient — recovery is slow and non-linear','Come to appointments together','Reduce expressed emotion — less criticism, less hostility'],
+    donts:['Do not argue with delusions — it does not help and causes distress','Do not stop medication because they "seem better"','Do not use religious treatment as a substitute for medication','Do not express frustration or criticism openly','Do not leave them completely unsupervised if there is a safety risk','Do not tell them they are "mad"'],
+    treatment:'Long-term antipsychotic medication is the foundation. Depot injections improve adherence. Psychosocial rehabilitation, family therapy, and occupational therapy support recovery. Many people achieve good quality of life with ongoing treatment.',
+    treatment_simple:'Daily medication (antipsychotic tablets or injections). Injections given by doctor every 2–4 weeks are an option. Therapy and routine support recovery. Medicine must continue long-term — do not stop.',
+    myth:{myth:'People with schizophrenia are dangerous and violent.',fact:'People with schizophrenia are far more likely to be victims of violence than perpetrators. Most are not dangerous. With treatment, risk is minimal.'},
+    crisis:'iCall: 9152987821 | Aatmiya Hospital emergency line',
+    color:'#7B1818',colorLight:'#FBEBEE'
+  },
+  {
+    id:'bipolar',icon:'🔄',name:'Bipolar disorder',
+    gujarati_name:'બાઇપોલર ડિસઓર્ડર',
+    tagline:'High mood and low mood — both part of the same illness',
+    tagline_gu:'ઉચ્ચ મૂડ અને નીચો મૂડ — બંને એક જ બીમારીના ભાગ',
+    what:{
+      std:'Bipolar disorder involves episodes of mania (abnormally elevated, expansive, or irritable mood with increased energy) and depression, separated by periods of normal mood. It is a biological brain disorder with a strong genetic basis affecting the circadian and mood-regulation circuits. It is not moodiness or a personality flaw — it is an episodic medical condition.',
+      simple:'Bipolar disorder means the mood goes very high (mania) and very low (depression) at different times. During the high episode, the person feels full of energy, needs no sleep, and may make bad decisions. During the low episode, they feel deeply sad and hopeless. Both are part of the same brain illness.',
+      gu:'બાઇપોલર ડિસઓર્ડરમાં ક્યારેક મૂડ ખૂબ ઊંચો (mania) અને ક્યારેક ખૂબ નીચો (depression) થઈ જાય છે. ઊંચા એપિસોડ દરમિયાન: ઘણી ઊર્જા, ઓછી ઊંઘ, ઝડપી નિર્ણયો, ઘણો ખર્ચ. નીચા એપિસોડ: ઊંડી ઉદાસી, નિરાશા.'
+    },
+    symptoms:{
+      std:['Mania: decreased need for sleep (may feel rested after 2–3 hours), elevated or irritable mood, grandiose ideas, racing thoughts, rapid speech, impulsive decisions (spending, business ventures, sexual behaviour), poor judgement','Depression: same as depressive episode — low mood, anhedonia, fatigue, hopelessness','Mixed states: features of both simultaneously','Triggers: sleep deprivation, substance use, stress, stopping medication'],
+      simple:['HIGH episode: feels unusually happy or irritable, very little sleep but feels fine, spending lots of money, talking very fast, big plans and risky decisions','LOW episode: deeply sad, no energy, hopeless, sleeping too much','Stopping medicine is the most common trigger for a new episode']
+    },
+    dos:['Ensure mood stabiliser is taken every day — missing doses is the most common cause of relapse','Protect sleep rigorously — even one night of poor sleep can trigger mania','Keep a mood diary (Tool 05 in our toolkit)','Have a clear relapse prevention plan agreed with Dr. Mehta','Watch for early warning signs — act immediately when they appear'],
+    donts:['Do not stop lithium / valproate because they "feel better" — this causes relapse','Do not enable spending sprees or risky decisions during a high episode','Do not dismiss mania as the person "finally being happy"','Do not add stimulants — even strong tea can worsen mania in some','Do not wait — when warning signs appear, call Aatmiya immediately'],
+    treatment:'Mood stabilisers (lithium, valproate, lamotrigine) are the foundation. Requires long-term — often lifelong — treatment. Psychoeducation and family involvement significantly reduce relapse rates. Regular TDM (blood levels) at Param Lab.',
+    treatment_simple:'Mood stabiliser tablets every day — for life. Regular blood tests at Param Lab to check medicine levels. Protecting sleep is as important as medicine. Most people with bipolar disorder live full lives with treatment.',
+    myth:{myth:'Bipolar disorder cannot be treated — the person will always be unstable.',fact:'With consistent mood stabiliser treatment and family support, most people with bipolar disorder have long stable periods and lead productive lives.'},
+    crisis:'iCall: 9152987821 | Aatmiya Hospital',
+    color:'#8B5E00',colorLight:'#FFF8E1'
+  },
+  {
+    id:'ocd',icon:'🔁',name:'OCD',
+    gujarati_name:'ઓ.સી.ડી. (OCD)',
+    tagline:'Unwanted thoughts and rituals — a treatable brain condition',
+    tagline_gu:'અનિચ્છિત વિચારો અને ક્રિયાઓ — સારવારપાત્ર',
+    what:{
+      std:'OCD (Obsessive-Compulsive Disorder) involves intrusive, unwanted, distressing thoughts, images, or urges (obsessions) and repetitive behaviours or mental acts performed to reduce the anxiety caused by obsessions (compulsions). It is a neurobiological disorder — not a choice, not a personality quirk, and not demonic influence.',
+      simple:'OCD means the brain gets stuck on a thought (obsession) and the person does something over and over again (compulsion) to feel better for a short time. Then the thought comes back. It is a brain circuit problem — not their fault, not a bad character.',
+      gu:'OCD માં, મગજ એક વિચાર (obsession) પર ફસાઈ જાય છે. ચિંતા ઘટાડવા, વ્યક્તિ વારંવાર કોઈ ક્રિયા (compulsion) કરે છે. થોડી વારે ફરી ચિંતા. આ મગજ ચક્ર (brain circuit) ની સમસ્યા છે.'
+    },
+    symptoms:{
+      std:['Contamination obsessions: fear of germs, dirt, disease — leads to excessive handwashing, cleaning','Harm obsessions: fear of hurting others (even though they don\'t want to)','Religious / blasphemous obsessions (especially common in Indian context)','Symmetry and order obsessions','Checking compulsions: locks, gas, electrical switches','Mental rituals: counting, praying, repeating phrases'],
+      simple:['Fear of germs — washing hands many times','Fear of hurting someone — checking over and over','Religious thoughts that feel wrong — saying prayers to "undo" them','Checking locks and switches many times','Arranging things in exact order']
+    },
+    dos:['Do not reassure them that their fears are unfounded — this temporarily helps but maintains the cycle','Support them in resisting compulsions (with clinical guidance)','Maintain patience — recovery from OCD is gradual','Accompany to ERP therapy sessions if needed','Praise efforts to resist compulsions, however small'],
+    donts:['Do not participate in rituals — this worsens OCD in the long run','Do not say "just stop doing it"','Do not dismiss the thoughts as meaningless — they feel very real','Do not make them feel guilty for having the thoughts','Do not enable avoidance of feared situations'],
+    treatment:'ERP (Exposure and Response Prevention) is the most evidence-based therapy. SSRIs at higher doses than used for depression. Combination is most effective. Recovery is possible but takes months of consistent work.',
+    treatment_simple:'Two treatments together: talking therapy (learning to face fears without doing the ritual) + medicine (SSRI tablets). Takes months but works. Do not give up.',
+    myth:{myth:'OCD means being clean and tidy.',fact:'OCD is a serious neurological disorder causing severe distress. It is about unwanted intrusive thoughts and the rituals done to cope — not neatness. Many people with OCD have thoughts about harming others that are deeply contrary to their values.'},
+    crisis:'iCall: 9152987821',
+    color:'#4C2D8E',colorLight:'#EDE8FA'
+  },
+  {
+    id:'ptsd',icon:'⚡',name:'PTSD / trauma',
+    gujarati_name:'PTSD / આઘાત',
+    tagline:'A normal response to abnormal events — healing is possible',
+    tagline_gu:'અસામાન્ય ઘટનાઓ પ્રત્યે સ્વાભાવિક પ્રતિક્રિયા — સ્વસ્થ થવું શક્ય છે',
+    what:{
+      std:'PTSD (Post-Traumatic Stress Disorder) develops in some people after experiencing or witnessing a traumatic event — violence, accident, natural disaster, sexual assault, prolonged abuse. It reflects how the brain and body get "stuck" in threat-mode long after the danger has passed. It is not weakness — it is a normal stress response that has become dysregulated.',
+      simple:'After a very frightening event, the brain sometimes gets stuck in "danger mode" even after the danger is gone. This is PTSD. It is not weakness. Many brave soldiers, survivors of accidents, and abuse survivors develop PTSD. It is a brain response to overwhelming events.',
+      gu:'કોઈ ભયાનક ઘટના પછી (અકસ્માત, હિંસા, ધરતીકંપ, દુર્વ્યવહાર), મગજ ક્યારેક "ખતરા" ની સ્થિતિમાં ફસાઈ જાય છે. આ PTSD છે. નબળાઈ નથી. ઘટના પછી સ્વાભાવિક પ્રતિક્રિયા.'
+    },
+    symptoms:{
+      std:['Re-experiencing: flashbacks, nightmares, intense distress at reminders of the trauma','Avoidance: staying away from places, people, or thoughts related to the trauma','Hypervigilance: constant alertness, being easily startled, difficulty relaxing','Negative changes in thinking and mood: guilt, shame, inability to feel positive emotions','Emotional numbing, feeling detached from others','Sleep disturbances, irritability, concentration difficulties'],
+      simple:['Nightmares about the event','Flashbacks — feeling like it is happening again','Avoiding things that remind them of the event','Always on alert, easily startled','Feeling disconnected, numb, or unable to feel happy','Trouble sleeping, anger, concentration problems']
+    },
+    dos:['Create a safe, predictable environment','Be patient — healing from trauma takes time','Allow them to talk about the trauma if they want to — do not push','Understand triggers and avoid them where possible','Accompany to trauma therapy sessions','Validate their experience: "What happened to you was real and it makes sense that you feel this way"'],
+    donts:['Do not say "it\'s over, move on"','Do not force them to talk about the trauma before they are ready','Do not expose them to triggers suddenly','Do not minimise what happened','Do not make them feel weak or broken','Do not express frustration with slow progress'],
+    treatment:'Trauma-focused CBT (TF-CBT), EMDR (Eye Movement Desensitisation and Reprocessing), and Prolonged Exposure are highly effective. SSRIs reduce symptoms. Recovery is possible and is facilitated by a safe, supportive environment.',
+    treatment_simple:'Talking therapy focused on the trauma (TF-CBT, EMDR) + medicine (SSRI) + a safe environment at home. Recovery is possible — many people heal fully from PTSD.',
+    myth:{myth:'People with PTSD should just "get over it" — it happened in the past.',fact:'Trauma literally changes the brain\'s structure and chemistry. Telling someone to "get over it" is like telling someone with a broken bone to "just walk normally." The brain needs time and treatment to heal.'},
+    crisis:'iCall: 9152987821 | Vandrevala: 1860-2662-345',
+    color:'#1A5C42',colorLight:'#E3F0EB'
+  },
+  {
+    id:'alcohol',icon:'🍺',name:'Alcohol use disorder',
+    gujarati_name:'દારૂ વ્યસન',
+    tagline:'A brain disease — not a moral failure',
+    tagline_gu:'મગજ બીમારી — નૈતિક નિષ્ફળતા નહીં',
+    what:{
+      std:'Alcohol Use Disorder (AUD) is a chronic relapsing brain disease characterised by compulsive alcohol use, loss of control over drinking, and a negative emotional state when not drinking. Repeated alcohol exposure changes the brain\'s reward, motivation, and stress circuits — making stopping genuinely difficult without support. In Gujarat, alcohol use is common despite prohibition — secrecy and shame delay help-seeking.',
+      simple:'Alcohol addiction is a disease of the brain. After using alcohol for a long time, the brain changes — and the person cannot easily control their drinking. Stopping suddenly can be dangerous (seizures, delirium). This is not weak willpower — the brain has physically changed. Treatment works.',
+      gu:'દારૂ વ્યસન એ મગજ બીમારી છે. ઘણા સમય સુધી દારૂ પીવાથી, મગજ ફેરફારો. અચાનક બંધ કરવું ખતરનાક છે (ઝટકા, DTs). ઇચ્છાશક્તિ નબળાઈ નથી — ઉપચાર સાથે ઠીક થઈ શકે છે.'
+    },
+    symptoms:{
+      std:['Inability to control or stop drinking despite wanting to','Continuing to drink despite harm to health, relationships, and work','Withdrawal symptoms when stopping: sweating, trembling, anxiety, seizures, confusion (DTs)','Tolerance: needing more alcohol for the same effect','Craving: strong urge to drink','Neglecting family, work, and interests'],
+      simple:['Cannot stop drinking even though they want to','Feels very unwell when they stop (sweating, trembling, seizures — these need medical attention)','Needs more and more alcohol to feel the same','Strong craving for alcohol','Family and work suffering','Drinking secretly']
+    },
+    dos:['Support treatment — accompany to appointments, ensure medications are taken','Remove alcohol from the home','Control access to money during active use (compassionately)','Attend Al-Anon or family support group','Express concern calmly: "I am worried about you. I want you to get help."','Celebrate sobriety milestones — even one week'],
+    donts:['Do not enable: do not give money for alcohol, cover up consequences, or call in sick on their behalf','Do not use angry threats — ultimatums rarely work and delay help','Do not drink alcohol in front of them','Do not give up — most people with AUD recover with sustained treatment','Do not take over all responsibilities — some structure helps'],
+    treatment:'Medical management of withdrawal (CIWA monitoring at Aatmiya OPD), medications (naltrexone, acamprosate, disulfiram), motivational interviewing, CBT, relapse prevention, and family involvement. Long-term recovery is common — multiple relapses are normal, not failure.',
+    treatment_simple:'1. Safe medical withdrawal (at Aatmiya — do not withdraw alone at home). 2. Tablets to reduce craving (naltrexone) or create deterrent (disulfiram/Esperal). 3. Counselling and MI. 4. Family involvement. Recovery is possible.',
+    myth:{myth:'The person can stop any time they want if they really try.',fact:'Alcohol changes the brain\'s chemistry and structure. The person cannot simply decide to stop any more than someone with diabetes can decide to stop having high blood sugar. Medical and psychological support is needed.'},
+    crisis:'Aatmiya Hospital OPD | iCall: 9152987821',
+    color:'#8B3A00',colorLight:'#FFF0E5'
+  },
+  {
+    id:'tobacco',icon:'🚬',name:'Tobacco / gutka addiction',
+    gujarati_name:'તમાકુ / ગુટ્કા વ્યસન',
+    tagline:'Nicotine addiction is a brain disease — quitting saves lives',
+    tagline_gu:'નિકોટિન વ્યસન એ મગજ બીમારી — છોડવું જીવ બચાવે',
+    what:{
+      std:'Tobacco and gutka addiction is driven by nicotine — one of the most addictive substances known, acting on the brain\'s reward system within seconds of use. Gutka, pan masala, and bidi are widely used in Gujarat and Kutch and carry significant risks of oral cancer, cardiovascular disease, and pulmonary disease. Nicotine dependence is a recognised medical condition requiring treatment — not just willpower.',
+      simple:'Nicotine in tobacco and gutka is very addictive — as addictive as heroin or cocaine, scientifically. When a person stops, the brain feels the absence. This causes craving, irritability, and physical symptoms. Quitting needs help — not just willpower.',
+      gu:'ગુટ્કા, બીડી, સિગારેટ — બધામાં નિકોટિન હોય છે, ખૂબ જ અઠળ. મગજ તેનું આદી બની જાય છે. છોડવા માટે, સહાય અને કેટલીક વખત દવાઓ ઉપયોગી છે. ફક્ત ઇચ્છાશક્તિ પૂરતી નથી.'
+    },
+    symptoms:{
+      std:['Inability to stop despite wanting to','Craving within minutes of last use','Withdrawal: irritability, anxiety, difficulty concentrating, increased appetite, headache','Using tobacco in situations where it is clearly harmful','Continuing despite awareness of health risks'],
+      simple:['Cannot stop even though they know it is harmful','Strong urge to use tobacco/gutka within 30–60 minutes of waking','Irritable, anxious, restless without it','Headache, difficulty concentrating when trying to stop']
+    },
+    dos:['Support the quit attempt — remove tobacco products from home','Set a quit date together','Encourage use of NRT (nicotine patches/gum) or medication','Praise every smoke-free day','Help identify and plan for triggers (chai break, after meals, stress)','Use breathing exercises during craving'],
+    donts:['Do not say "just stop" — it minimises a real addiction','Do not smoke or use gutka in front of them','Do not keep tobacco products in the house','Do not give up if they relapse — each attempt builds the path to quitting'],
+    treatment:'Brief advice (ABC), NRT (patches, gum, lozenges), varenicline (Champix) or bupropion, behavioural support. Combination of medication + support doubles quit rates. Aatmiya OPD can provide tobacco cessation support.',
+    treatment_simple:'Nicotine replacement (patch or gum) + tablets (Champix/Wellbutrin) + counselling. Combination works much better than willpower alone. Most people need 2–3 attempts before succeeding — that is normal.',
+    myth:{myth:'Tobacco addiction is not a real addiction — people can stop if they choose.',fact:'Nicotine is one of the most addictive substances scientifically known. The brain undergoes real physical changes with regular use. Quitting often requires medical support.'},
+    crisis:'Aatmiya Hospital OPD for tobacco cessation',
+    color:'#7B3500',colorLight:'#FAEEE5'
+  },
+  {
+    id:'adhd',icon:'⚡',name:'ADHD',
+    gujarati_name:'ADHD (ધ્યાન-ઘટ વ્યાધિ)',
+    tagline:'A real neurodevelopmental condition — not naughtiness or laziness',
+    tagline_gu:'વાસ્તવિક ન્યુરોડેવેલોપમેન્ટ સ્થિતિ — ઉદ્ધતતા અથવા આળસ નહીં',
+    what:{
+      std:'ADHD (Attention-Deficit/Hyperactivity Disorder) is a neurodevelopmental condition characterised by persistent inattention, hyperactivity, and impulsivity that interfere with functioning and development. It has a strong genetic basis and reflects differences in the prefrontal cortex and dopamine/norepinephrine systems. It is not caused by bad parenting, too much screen time, or sugar — it is a brain-based condition present from childhood.',
+      simple:'ADHD means the brain has difficulty with attention, controlling impulses, and sitting still. The child is not naughty — their brain works differently. It is caused by brain structure and chemistry, not bad upbringing. With the right help, children with ADHD can do very well.',
+      gu:'ADHD માં, મગજ ધ્યાન, આવેગ-નિયંત્રણ, અને ચૂપ બેસવામાં મુશ્કેલ અનુભવે છે. બાળક ઉદ્ધત નથી — મગજ અલગ રીતે કામ કરે છે. ખરાબ ઉછેર નથી. યોગ્ય મદદ સાથે, ADHD વાળા બાળકો ખૂબ સારી કામગીરી કરી શકે છે.'
+    },
+    symptoms:{
+      std:['Inattentive type: easily distracted, difficulty sustaining attention, forgets instructions, loses things, makes careless mistakes, does not seem to listen','Hyperactive-impulsive type: fidgets, cannot stay seated, runs when should be still, talks excessively, blurts out answers, difficulty waiting','Combined type (most common): features of both','Academic underperformance despite intelligence is a key flag'],
+      simple:['Cannot sit still — always moving','Cannot pay attention for long — distracted by anything','Starts tasks but does not finish them','Forgets instructions very quickly','Impulsive — acts before thinking','Talks too much, interrupts others','School work suffers despite the child being intelligent']
+    },
+    dos:['Break instructions into small steps — one at a time','Use visual schedules and reminders','Create a quiet, distraction-free study space','Give frequent positive reinforcement for on-task behaviour','Work closely with school — teacher awareness is crucial','Ensure sleep is adequate — sleep deprivation worsens ADHD severely'],
+    donts:['Do not say "just concentrate"','Do not compare them to siblings or classmates','Do not take away all privileges — structure and reward work better than punishment','Do not blame yourself (parent) — you did not cause ADHD','Do not put excessive pressure on academic performance','Do not delay treatment assessment'],
+    treatment:'Multimodal: medication (methylphenidate — Ritalin; atomoxetine), parent training in behaviour management, school accommodations, and behavioural therapy. Medication is highly effective and safe under medical supervision. Most children with ADHD do very well with support.',
+    treatment_simple:'Medicine (helps the brain focus — very safe under doctor supervision) + parent training + working with school. Most children improve a great deal. ADHD does not mean the child cannot succeed — many successful adults have ADHD.',
+    myth:{myth:'ADHD is not real — the child is just naughty and badly raised.',fact:'ADHD is one of the best-studied neurodevelopmental conditions with clear biological and genetic evidence. Brain imaging shows measurable differences. It responds to specific treatment.'},
+    crisis:'Aatmiya Hospital OPD — Child and Adolescent Services',
+    color:'#1A3D70',colorLight:'#E8EEF8'
+  },
+  {
+    id:'dementia',icon:'🧩',name:'Dementia / Alzheimer\'s',
+    gujarati_name:'ઉન્માદ / અલ્ઝાઈમર',
+    tagline:'Memory loss as illness — understanding and supporting your loved one',
+    tagline_gu:'યાદશક્તિ ગુમાવવી — બીમારી — સ્વજનને સમજો અને ટેકો આપો',
+    what:{
+      std:'Dementia is a syndrome of cognitive decline — memory, language, problem-solving, and other thinking skills deteriorate over time, severe enough to affect daily life. Alzheimer\'s disease (60–70% of cases) is caused by accumulation of amyloid plaques and tau tangles in the brain. It is a progressive condition — not a normal part of ageing, and not caused by lifestyle failures.',
+      simple:'Dementia is a brain illness that slowly takes away memory and thinking skills. It is not normal ageing and it is not the person\'s fault. The brain cells are dying. The person is not being difficult on purpose — the illness affects their behaviour and memory.',
+      gu:'ઉન્માદ (Dementia) એ ધીમે ધીમે વધતી મગજ બીમારી છે. યાદ, ભાષા, નિર્ણય — બધું ઘટે છે. સામાન્ય વૃદ્ધત્વ નથી. વ્યક્તિ ઇરાદાપૂર્વક ભૂલ નથી કરી — મગજ કોષ ઘટી રહ્યા છે.'
+    },
+    symptoms:{
+      std:['Early: forgetting recent events and conversations, repeating questions, difficulty finding words, getting lost in familiar places','Middle: significant memory loss, confusion about time and place, personality changes, sleep disruption, wandering, functional decline','Late: dependent for all activities of daily living, loss of recognition of family, immobility, swallowing difficulties','Behavioural symptoms (BPSD): agitation, aggression, hallucinations, depression — common at all stages'],
+      simple:['Forgetting recent events but remembering old ones','Repeating the same question many times','Getting lost in familiar places','Confusion about who people are','Personality changes — may become suspicious or aggressive','Wandering — especially at night','Needing help with bathing, dressing, eating']
+    },
+    dos:['Keep their environment familiar and consistent — avoid rearranging furniture','Use simple, short sentences — one instruction at a time','Maintain daily routine — it provides structure and reduces confusion','Label objects and rooms clearly (signs can help)','Engage in familiar activities: music, prayers, looking at old photos','Ensure medications are taken — some can help slow decline','Care for yourself — caregiver burnout is very real'],
+    donts:['Do not argue or try to correct delusions or false memories','Do not say "I just told you that" — they cannot help forgetting','Do not use complex explanations or multiple choices','Do not leave them alone for long periods as the disease progresses','Do not feel guilty for feeling frustrated — it is a natural response to an incredibly difficult situation','Do not use restraints — seek professional advice for safety management'],
+    treatment:'No cure currently. Medications (donepezil, memantine) slow progression and help symptoms in some. Focus is on quality of life, caregiver support, managing BPSD, and safety. Param Lab and EEG (64-ch) can help differential diagnosis.',
+    treatment_simple:'No complete cure yet. Two medicines (donepezil — Aricept; memantine — Admenta) can slow the disease and help with some symptoms. Most important: good routines, safe environment, caregiver support, and Param Lab tests to rule out treatable causes.',
+    myth:{myth:'Memory loss in old age is normal — nothing can be done.',fact:'Some memory loss is normal with ageing but dementia is not normal. It is a disease. Some causes of dementia are reversible (B12 deficiency, thyroid, infections). Even irreversible forms can be managed and quality of life maintained.'},
+    crisis:'Aatmiya Hospital Geriatric Services | iCall: 9152987821',
+    color:'#1E5E32',colorLight:'#E5F2E9'
+  },
+  {
+    id:'sleepinsomnia',icon:'🌙',name:'Insomnia / sleep disorders',
+    gujarati_name:'અઘૂણ / ઊંઘ ન આવવી',
+    tagline:'Poor sleep is a treatable medical problem — not just bad habits',
+    tagline_gu:'ઊંઘ ન આવવી — સારવારપાત્ર — ફક્ત ખરાબ ટેવ નથી',
+    what:{
+      std:'Chronic insomnia (lasting > 3 months, occurring > 3 nights per week) affects brain function, mood, immunity, and cardiovascular health. It is maintained by a cycle of hyperarousal, dysfunctional beliefs about sleep, and learned associations between bed and wakefulness. CBT-I (Cognitive Behavioural Therapy for Insomnia) is the first-line treatment — more effective than medication long-term.',
+      simple:'Chronic insomnia means regularly not being able to sleep despite trying. This is not just bad habits — the brain\'s sleep system is disrupted. It causes real harm to health and mood. It can be treated very effectively without long-term sleeping tablets.',
+      gu:'ઘણા સમય સુધી ઊંઘ ન આવવી — ઇચ્છા હોવા છતાં. ફક્ત ખરાબ ટેવ નહીં — ઊંઘ-વ્યવસ્થા ખોરવાઈ ગઈ. ઊંઘ ટેબ્લેટ વગર, CBT-I ઉપચારથી ઘણું સારું થઈ શકે.'
+    },
+    symptoms:{
+      std:['Difficulty falling asleep (onset insomnia), staying asleep (maintenance), or early morning waking','Daytime consequences: fatigue, mood disturbance, concentration difficulties, irritability','Worry about sleep itself becomes a maintaining factor','Spending too much time in bed makes insomnia worse (counterintuitively)','Secondary insomnia: driven by anxiety, depression, pain, medications, or substances'],
+      simple:['Cannot fall asleep even when tired','Waking up many times during the night','Waking up very early and not able to return to sleep','Feeling exhausted all day','Irritable, cannot concentrate','Worrying about not sleeping makes it worse']
+    },
+    dos:['Maintain consistent wake time every day — even weekends — this is the most important rule','Use the bedroom only for sleep — no screens, no work in bed','Create a 30-minute wind-down routine before bed','Keep the room cool and dark','Exercise daily — earlier in the day is better'],
+    donts:['Do not spend long periods in bed awake — get up and return when sleepy','Do not use sleeping tablets long-term — they do not address the cause and carry dependence risk','Do not sleep in after a bad night — this worsens the cycle','Do not use alcohol to sleep — it fragments sleep architecture','Do not use screens in bed'],
+    treatment:'CBT-I (sleep restriction, stimulus control, cognitive restructuring, sleep hygiene). Short-course medication for acute insomnia only. Melatonin for circadian rhythm disorders. Tool 17 (Sleep & Screen Hygiene Planner) and Tool 02 (Breathing Timer) in our toolkit.',
+    treatment_simple:'CBT-I (special therapy for sleep — 4–8 sessions, works better than tablets long-term). Short-term: melatonin for jet lag / shift work. Tablet only for very short time if absolutely needed. Our Tool 17 generates a personalised sleep plan.',
+    myth:{myth:'Sleeping tablets are the best treatment for insomnia.',fact:'CBT-I (a specific talking therapy) is more effective than sleeping tablets in the long term and has no dependence risk. Tablets address the symptom — CBT-I addresses the cause.'},
+    crisis:'Aatmiya Hospital OPD — Sleep disorders clinic',
+    color:'#4C2D8E',colorLight:'#EDE8FA'
+  },
+  {
+    id:'grief',icon:'💔',name:'Grief and bereavement',
+    gujarati_name:'શોક અને ગુમ',
+    tagline:'Loss is universal — but complicated grief needs support',
+    tagline_gu:'ગુમ સૌ માટે છે — પણ જટિલ શોકને ટેકો ચોક્કસ જોઈએ',
+    what:{
+      std:'Grief is a natural response to loss — of a person, relationship, role, health, or future. Most people move through grief without professional intervention. Complicated grief (prolonged grief disorder) — where intense grief persists for more than 6–12 months and significantly impairs functioning — benefits from professional support. There is no "right" way to grieve.',
+      simple:'After a loss, it is completely normal to feel very sad, cry, be angry, or feel nothing at all. Grief takes different forms for different people. Most people recover over months. When grief is still very intense after 6+ months and stops a person from living their life, that is when professional help is needed.',
+      gu:'નુકસાન પછી, ઊંડો શોક સ્વાભાવિક છે. દરેક વ્યક્તિ અલગ રીતે શોક અનુભવે છે. ૬ + મહિના પછી પણ ઊંડો ઉદ્વેગ, ઊઘ, ખાવાનું, કામ — બધું ઠીક ન થઈ રહ્યું હોય, ત્યારે વ્યાવસાયિક ટેકો ઉપયોગી.'
+    },
+    symptoms:{
+      std:['Waves of intense sadness, yearning, longing','Disbelief, difficulty accepting the loss','Difficulty engaging in activities or planning for the future','Feeling that life has no meaning without the person','Avoiding reminders of the person — or being preoccupied with them','Bitterness or anger about the loss — sometimes directed at God, doctors, or family','Physical: fatigue, appetite and sleep changes'],
+      simple:['Intense sadness and crying','Missing the person constantly','Difficulty believing they are gone','No interest in activities or future plans','Feeling life has no meaning','Anger about the loss','Sleep and appetite changes']
+    },
+    dos:['Be present — sitting with someone in grief is more powerful than words','Allow them to talk about the person who died — say their name','Allow expression of all emotions — anger, guilt, numbness are all normal','Offer practical help — food, transport, accompanying to appointments','Maintain gentle contact — grief is often isolating','Mark anniversaries and significant dates with them'],
+    donts:['Do not say "they are in a better place" — well-intentioned but can feel dismissive','Do not say "you need to move on" or "life must go on" — grief takes as long as it takes','Do not avoid mentioning the person who died — most bereaved people want to talk about them','Do not expect grief to follow a fixed timeline or sequence of stages','Do not compare their grief to others\' experiences'],
+    treatment:'Most grief does not require professional treatment. For complicated grief: Prolonged Grief Disorder therapy, supportive psychotherapy, grief groups. If depression has developed, treat the depression. HSM practices can support spiritual aspects of grief processing.',
+    treatment_simple:'Most grief heals naturally with time and support. For prolonged or complicated grief: talking therapy focused on grief. If the person becomes depressed, antidepressants can help. HSM meditation and prayer can support the spiritual aspects of loss.',
+    myth:{myth:'You should be over grief after a few months.',fact:'Grief has no set timeline. Some losses — especially of a child, spouse, or sudden unexpected death — can take years to integrate. There is no "correct" way to grieve, and no deadline for recovery.'},
+    crisis:'iCall: 9152987821 | Vandrevala: 1860-2662-345',
+    color:'#8B5E00',colorLight:'#FFF8E1'
+  },
+];
+
+function renderConditions(list){
+  document.getElementById('cond-list').innerHTML=list.map(c=>`
+    <div class="cond-item${c.id===activeCondId?' active':''}" id="ci-${c.id}" onclick="selectCondition('${c.id}')">
+      <span class="cond-icon">${c.icon}</span>
+      <span class="cond-name">${c.name}</span>
+    </div>`).join('');
+}
+
+function filterConditions(){
+  const q=document.getElementById('cond-search').value.toLowerCase();
+  renderConditions(CONDITIONS.filter(c=>c.name.toLowerCase().includes(q)||c.gujarati_name.toLowerCase().includes(q)));
+}
+
+function selectCondition(id){
+  activeCondId=id;
+  renderConditions(CONDITIONS);
+  renderHandout(CONDITIONS.find(c=>c.id===id));
+}
+
+function setLang(lang,btn){
+  activeLang=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(activeCondId) renderHandout(CONDITIONS.find(c=>c.id===activeCondId));
+}
+
+function setLevel(level,btn){
+  activeLevel=level;
+  document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(activeCondId) renderHandout(CONDITIONS.find(c=>c.id===activeCondId));
+}
+
+function renderHandout(c){
+  if(!c) return;
+  const isSimple=activeLevel==='simple';
+  const isGu=activeLang==='bi';
+  const whatText=isSimple?c.what.simple:c.what.std;
+  const syms=isSimple?c.symptoms.simple:c.symptoms.std;
+  const txText=isSimple?c.treatment_simple:c.treatment;
+  const today=new Date().toLocaleDateString('en-IN',{dateStyle:'medium'});
+
+  document.getElementById('handout-wrap').innerHTML=`
+    <div class="handout">
+      <div class="h-header" style="background:${c.color}">
+        <div>
+          <div class="h-logo">A Aatmiya</div>
+          <div style="font-size:11px;opacity:.8;margin-top:2px">Aatmiya Hospital · Gandhidham, Kutch</div>
+        </div>
+        <div class="h-hospital">
+          Param Diagnostic Lab<br>
+          Aatmiya Pharmacy<br>
+          <span style="font-size:10px;opacity:.7">${today}</span>
+        </div>
+      </div>
+
+      <div class="h-title" style="color:${c.color}">${c.icon} ${c.name}</div>
+      ${isGu?`<div style="font-size:15px;font-weight:600;color:${c.color};margin-bottom:4px">${c.gujarati_name}</div>`:''}
+      <div class="h-subtitle">${c.tagline}${isGu?`<br><em style="color:var(--text3);font-size:12px">${c.tagline_gu}</em>`:''}</div>
+
+      <div class="h-section">
+        <div class="h-section-title" style="background:${c.colorLight};color:${c.color}">What is it?</div>
+        <div class="h-text"><p>${whatText}</p></div>
+        ${isGu&&c.what.gu?`<div class="h-gujarati">${c.what.gu}</div>`:''}
+      </div>
+
+      <div class="h-section">
+        <div class="h-section-title" style="background:${c.colorLight};color:${c.color}">Signs and symptoms</div>
+        <ul class="h-bullets">${syms.map(s=>`<li>${s}</li>`).join('')}</ul>
+      </div>
+
+      <div class="h-section">
+        <div class="h-section-title" style="background:${c.colorLight};color:${c.color}">How family can help</div>
+        <div class="h-two-col">
+          <div class="h-do">
+            <div class="h-col-title" style="color:var(--green)">✓ Helpful</div>
+            ${c.dos.map(d=>`<div class="h-col-item" style="color:#1A4020">✓ ${d}</div>`).join('')}
+          </div>
+          <div class="h-dont">
+            <div class="h-col-title" style="color:var(--red)">✗ Avoid</div>
+            ${c.donts.map(d=>`<div class="h-col-item" style="color:#5A1010">✗ ${d}</div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="h-section">
+        <div class="h-section-title" style="background:${c.colorLight};color:${c.color}">Treatment</div>
+        <div class="h-text"><p>${txText}</p></div>
+      </div>
+
+      <div class="h-highlight" style="background:${c.colorLight};border-left-color:${c.color};color:${c.color}">
+        <strong>Myth vs Fact:</strong> <em>"${c.myth.myth}"</em><br>
+        <strong>Fact:</strong> ${c.myth.fact}
+      </div>
+
+      <div class="h-crisis">
+        <strong>🆘 Need help urgently?</strong> ${c.crisis} | Ambulance: 108 | Police: 100
+      </div>
+
+      <div class="h-footer">
+        <div class="h-footer-brand">Aatmiya Hospital · Dr. Dhaivat Mehta, Consultant Psychiatrist</div>
+        <div class="h-footer-contact">Gandhidham, Kutch · Param Diagnostic Lab on-site</div>
+      </div>
+    </div>`;
+}
+
+renderConditions(CONDITIONS);
+</script>
+</body>
+</html>

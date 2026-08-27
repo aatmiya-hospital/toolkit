@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinical Screener Suite — Aatmiya Hospital</title>
+<style>
+  :root{
+    --bg:#F3F1F8;--surface:#FFF;--surface2:#ECEAF4;--border:#D8D4EC;
+    --text:#16122A;--text2:#4A4660;--text3:#9A97B0;
+    --accent:#3D2080;--accent-light:#EAE4FA;
+    --green:#1E5E32;--green-light:#E5F2E9;
+    --amber:#8B5E00;--amber-light:#FFF8E1;
+    --red:#7B1818;--red-light:#FBEBEE;
+    --blue:#1A3D70;--blue-light:#E8EEF8;
+    --radius:12px;--shadow:0 2px 14px rgba(61,32,128,.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  /* Screener tabs */
+  .stabs{background:#2e1860;display:flex;overflow-x:auto;gap:0}
+  .stab{padding:10px 16px;font-size:12px;font-weight:500;color:rgba(255,255,255,.65);cursor:pointer;border:none;background:transparent;font-family:inherit;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .15s}
+  .stab.active{color:#fff;border-bottom-color:#A08AEE;background:rgba(255,255,255,.07)}
+  .wrap{max-width:920px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 300px;gap:16px}
+  @media(max-width:800px){.wrap{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:13px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:1px}
+  .pb{padding:14px 18px}
+  /* Progress */
+  .prog-track{height:5px;background:var(--border);border-radius:3px;margin-bottom:12px}
+  .prog-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s}
+  /* Questions */
+  .q-block{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+  .q-block:last-child{border-bottom:none;margin-bottom:0}
+  .q-num{font-size:10px;font-weight:700;color:var(--text3);margin-bottom:3px}
+  .q-text{font-size:13px;color:var(--text);margin-bottom:10px;line-height:1.5;font-weight:500}
+  .q-opts{display:grid;gap:6px}
+  .q-opt{padding:8px 12px;border-radius:8px;font-size:12px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:8px}
+  .q-opt:hover{border-color:var(--accent)}
+  .q-opt.sel{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600}
+  .q-opt-score{font-size:11px;font-weight:700;min-width:20px;color:var(--text3)}
+  .q-opt.sel .q-opt-score{color:var(--accent)}
+  /* Right panel */
+  .score-display{text-align:center;padding:16px;border-bottom:1px solid var(--border)}
+  .sd-num{font-size:48px;font-weight:900;color:var(--accent);line-height:1}
+  .sd-max{font-size:16px;font-weight:400;color:var(--text3)}
+  .sd-label{font-size:14px;font-weight:700;margin-top:4px}
+  .sd-sub{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.5}
+  /* Severity bars */
+  .sev-table{width:100%;border-collapse:collapse;font-size:11px}
+  .sev-table td{padding:5px 10px}
+  .sev-table tr.active-row td{font-weight:700}
+  .sev-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+  /* Clinical action */
+  .action-box{border-radius:8px;padding:10px 12px;margin:10px 14px;font-size:12px;line-height:1.55;display:none}
+  .action-box.visible{display:block}
+  /* Summary */
+  .summary-row{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border)}
+  .summary-name{font-size:12px;font-weight:500;flex:1}
+  .summary-score{font-size:12px;font-weight:700}
+  .summary-label{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600}
+  /* Output */
+  .out-area{background:var(--surface2);border-radius:8px;padding:12px;font-size:11px;line-height:1.8;white-space:pre-wrap;color:var(--text);border:1px solid var(--border);display:none;margin:0 14px 14px}
+  .out-area.visible{display:block}
+  .act-row{display:flex;gap:8px;padding:14px;flex-wrap:wrap;border-top:1px solid var(--border)}
+  .bp{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .screener-content{display:none}.screener-content.active{display:block}
+  .screener-info{background:var(--surface2);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.55;border-left:3px solid var(--accent)}
+  .pt-row{display:flex;gap:10px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--border)}
+  .pt-field{display:flex;flex-direction:column;gap:3px;flex:1;min-width:120px}
+  .pt-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)}
+  .pt-input{padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .pt-input:focus{outline:none;border-color:var(--accent);background:#fff}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Clinical Screener Suite</div><div class="hs">Aatmiya Hospital · Tool 19 · PHQ-9 · GAD-7 · AUDIT · DAST · PC-PTSD</div></div>
+  </div>
+  <div class="ha">
+    <button class="bg" onclick="generateSummary()">Summary report</button>
+    <button class="bg" onclick="window.print()">Print</button>
+  </div>
+</div>
+
+<div class="stabs" id="stabs"></div>
+
+<div class="wrap">
+<div>
+
+<!-- Patient row -->
+<div class="panel">
+  <div class="pt-row">
+    <div class="pt-field"><div class="pt-label">Patient code</div><input class="pt-input" id="pt-id" placeholder="PT-2024-001"></div>
+    <div class="pt-field"><div class="pt-label">Date</div><input class="pt-input" type="date" id="pt-date"></div>
+    <div class="pt-field"><div class="pt-label">Timeframe</div><input class="pt-input" id="pt-timeframe" value="Over the last 2 weeks" placeholder="Over the last 2 weeks"></div>
+  </div>
+</div>
+
+<!-- Screener panels -->
+<div id="screeners-wrap"></div>
+
+</div><!-- end left -->
+
+<!-- Right: live scoring -->
+<div>
+  <div class="panel" style="position:sticky;top:16px">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Live scores</div><div class="phs">Updates as you answer</div></div></div>
+    <div id="score-summary"></div>
+    <div class="act-row">
+      <button class="bp" onclick="generateSummary()">Generate report</button>
+      <button class="bpo" onclick="resetAll()">Reset all</button>
+    </div>
+    <div class="out-area" id="out-area"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const SCREENERS = [
+  {
+    id:'phq9', label:'PHQ-9', color:'#1A3D70', colorLight:'#E8EEF8',
+    title:'Patient Health Questionnaire — 9 (PHQ-9)',
+    desc:'Validated depression screener. Time period: over the last 2 weeks. Max score 27.',
+    cite:'Kroenke K, Spitzer RL, Williams JB. 2001.',
+    bands:[
+      {min:0,max:4,label:'Minimal / none',color:'#1E5E32',bg:'#E5F2E9',action:'No or minimal symptoms. Watchful waiting.'},
+      {min:5,max:9,label:'Mild',color:'#8B5E00',bg:'#FFF8E1',action:'Mild depression. Psychoeducation, watchful waiting, or active monitoring. Consider therapy if functional impairment present.'},
+      {min:10,max:14,label:'Moderate',color:'#B85C00',bg:'#FFF0E0',action:'Moderate depression. Initiate treatment — CBT, medication (SSRI), or both. Assess suicide risk (item 9).'},
+      {min:15,max:19,label:'Moderately severe',color:'#C62828',bg:'#FFEBEE',action:'Active treatment with medication + psychotherapy. Monitor closely. Assess safety.'},
+      {min:20,max:27,label:'Severe',color:'#7B1818',bg:'#FBEBEE',action:'Severe depression. Aggressive treatment required. Consider referral for ECT / hospitalisation if not responding. Urgent safety assessment.'},
+    ],
+    questions:[
+      {text:'Little interest or pleasure in doing things.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Feeling down, depressed, or hopeless.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Trouble falling or staying asleep, or sleeping too much.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Feeling tired or having little energy.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Poor appetite or overeating.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Feeling bad about yourself — or that you are a failure or have let yourself or your family down.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Trouble concentrating on things, such as reading or watching television.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Moving or speaking so slowly that other people could have noticed — or being so fidgety or restless that you have been moving around a lot more than usual.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Thoughts that you would be better off dead, or of hurting yourself in some way.',opts:['Not at all','Several days','More than half the days','Nearly every day'],urgent:true},
+    ]
+  },
+  {
+    id:'gad7', label:'GAD-7', color:'#4C2D8E', colorLight:'#EDE8FA',
+    title:'Generalised Anxiety Disorder — 7 (GAD-7)',
+    desc:'Validated anxiety screener. Time period: over the last 2 weeks. Max score 21.',
+    cite:'Spitzer RL, Kroenke K, Williams JB, Löwe B. 2006.',
+    bands:[
+      {min:0,max:4,label:'Minimal',color:'#1E5E32',bg:'#E5F2E9',action:'Minimal anxiety. Monitor if presenting complaint includes anxiety.'},
+      {min:5,max:9,label:'Mild',color:'#8B5E00',bg:'#FFF8E1',action:'Mild anxiety. Psychoeducation, lifestyle measures, relaxation techniques.'},
+      {min:10,max:14,label:'Moderate',color:'#B85C00',bg:'#FFF0E0',action:'Moderate anxiety. Consider CBT, SSRI, or both. Assess for GAD, panic disorder, social anxiety.'},
+      {min:15,max:21,label:'Severe',color:'#C62828',bg:'#FFEBEE',action:'Severe anxiety. Active treatment required. Assess for safety if panic is prominent. Consider specialist referral.'},
+    ],
+    questions:[
+      {text:'Feeling nervous, anxious, or on edge.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Not being able to stop or control worrying.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Worrying too much about different things.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Trouble relaxing.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Being so restless that it is hard to sit still.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Becoming easily annoyed or irritable.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+      {text:'Feeling afraid, as if something awful might happen.',opts:['Not at all','Several days','More than half the days','Nearly every day']},
+    ]
+  },
+  {
+    id:'audit', label:'AUDIT-C', color:'#7B3500', colorLight:'#FAEEE5',
+    title:'Alcohol Use Disorders Identification Test — C (AUDIT-C)',
+    desc:'3-item alcohol use screener. Positive screen: ≥3 women, ≥4 men. Note: In Gujarat (dry state), any regular use is significant.',
+    cite:'Bush K et al. 1998. Modified for Indian context.',
+    bands:[
+      {min:0,max:2,label:'Low risk / negative screen',color:'#1E5E32',bg:'#E5F2E9',action:'Low-risk or negative. Brief advice if context warrants.'},
+      {min:3,max:5,label:'Positive screen (women ≥3, men ≥4)',color:'#8B5E00',bg:'#FFF8E1',action:'Positive screen. Full AUDIT recommended. Brief intervention — FRAMES. Assess quantity, pattern, consequences.'},
+      {min:6,max:12,label:'Hazardous / harmful use likely',color:'#C62828',bg:'#FFEBEE',action:'Hazardous/harmful use highly likely. Full assessment — CAGE, quantity/frequency, LFT, GGT. Consider brief intervention or structured treatment.'},
+    ],
+    questions:[
+      {text:'How often do you have a drink containing alcohol?',opts:['Never','Monthly or less','2–4 times a month','2–3 times a week','4 or more times a week'],scores:[0,1,2,3,4]},
+      {text:'How many units of alcohol do you drink on a typical day when you are drinking?',opts:['1–2','3–4','5–6','7–9','10 or more'],scores:[0,1,2,3,4]},
+      {text:'How often have you had 6 or more units if female, or 8 or more units if male, on a single occasion in the last year?',opts:['Never','Less than monthly','Monthly','Weekly','Daily or almost daily'],scores:[0,1,2,3,4]},
+    ]
+  },
+  {
+    id:'dast', label:'DAST-10', color:'#8B3A00', colorLight:'#FFF0E5',
+    title:'Drug Abuse Screening Test — 10 (DAST-10)',
+    desc:'10-item drug (non-alcohol) use screener. Each Yes = 1 point (except Q3 reversed). Time period: last 12 months.',
+    cite:'Skinner HA. 1982.',
+    bands:[
+      {min:0,max:2,label:'Low level (0–2)',color:'#1E5E32',bg:'#E5F2E9',action:'Low level. No intervention or simple education.'},
+      {min:3,max:5,label:'Intermediate (3–5)',color:'#8B5E00',bg:'#FFF8E1',action:'Intermediate level. Brief intervention, further assessment, monitoring.'},
+      {min:6,max:8,label:'Substantial (6–8)',color:'#C62828',bg:'#FFEBEE',action:'Substantial level. Intensive assessment and treatment.'},
+      {min:9,max:10,label:'Severe (9–10)',color:'#7B1818',bg:'#FBEBEE',action:'Severe level. Intensive assessment and treatment required.'},
+    ],
+    questions:[
+      {text:'Have you used drugs other than those required for medical reasons?',opts:['No','Yes'],scores:[0,1]},
+      {text:'Do you abuse more than one drug at a time?',opts:['No','Yes'],scores:[0,1]},
+      {text:'Are you always able to stop using drugs when you want to?',opts:['Yes (no problem)','No (cannot always stop)'],scores:[0,1]},
+      {text:'Have you had "blackouts" or "flashbacks" as a result of drug use?',opts:['No','Yes'],scores:[0,1]},
+      {text:'Do you ever feel bad or guilty about your drug use?',opts:['No','Yes'],scores:[0,1]},
+      {text:'Does your spouse (or parents) ever complain about your involvement with drugs?',opts:['No','Yes'],scores:[0,1]},
+      {text:'Have you neglected your family because of your use of drugs?',opts:['No','Yes'],scores:[0,1]},
+      {text:'Have you engaged in illegal activities in order to obtain drugs?',opts:['No','Yes'],scores:[0,1]},
+      {text:'Have you ever experienced withdrawal symptoms (felt sick) when you stopped taking drugs?',opts:['No','Yes'],scores:[0,1]},
+      {text:'Have you had medical problems as a result of your drug use (e.g. memory loss, hepatitis, convulsions, bleeding)?',opts:['No','Yes'],scores:[0,1]},
+    ]
+  },
+  {
+    id:'pcptsd', label:'PC-PTSD-5', color:'#1A5C42', colorLight:'#E3F0EB',
+    title:'Primary Care PTSD Screen for DSM-5 (PC-PTSD-5)',
+    desc:'5-item PTSD screen. Cut-off ≥3 is optimal for further PTSD assessment. Preceded by trauma exposure question.',
+    cite:'Prins A et al. 2016.',
+    bands:[
+      {min:0,max:2,label:'Below threshold (< 3)',color:'#1E5E32',bg:'#E5F2E9',action:'Below threshold for PTSD. Review if clinical suspicion remains.'},
+      {min:3,max:5,label:'Positive screen (≥ 3)',color:'#C62828',bg:'#FFEBEE',action:'Positive PTSD screen. Full assessment with PCL-5 or clinician-administered CAPS-5. Consider trauma-focused therapy (TF-CBT, EMDR, PE).'},
+    ],
+    intro:'Before the questions below: In your life, have you ever had any experience that was so frightening, horrible, or upsetting that, in the past month, you...',
+    questions:[
+      {text:'Have had nightmares about it or thought about it when you did not want to?',opts:['No','Yes'],scores:[0,1]},
+      {text:'Tried hard not to think about it or went out of your way to avoid situations that reminded you of it?',opts:['No','Yes'],scores:[0,1]},
+      {text:'Were constantly on guard, watchful, or easily startled?',opts:['No','Yes'],scores:[0,1]},
+      {text:'Felt numb or detached from others, activities, or your surroundings?',opts:['No','Yes'],scores:[0,1]},
+      {text:'Felt guilty or unable to stop blaming yourself or others for the event or any problems the event may have caused?',opts:['No','Yes'],scores:[0,1]},
+    ]
+  },
+];
+
+let answers = {}; // {screenerId_qIdx: score}
+let activeScreener = 'phq9';
+
+// Init
+document.getElementById('pt-date').value = new Date().toISOString().split('T')[0];
+
+function renderTabs(){
+  document.getElementById('stabs').innerHTML = SCREENERS.map(s=>
+    `<button class="stab${s.id===activeScreener?' active':''}" onclick="switchScreener('${s.id}',this)">${s.label}</button>`
+  ).join('');
+}
+
+function switchScreener(id, btn){
+  activeScreener=id;
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderScreeners();
+}
+
+function renderScreeners(){
+  document.getElementById('screeners-wrap').innerHTML = SCREENERS.map(s=>`
+    <div class="screener-content${s.id===activeScreener?' active':''}" id="sc-${s.id}">
+      <div class="panel">
+        <div class="ph"><div class="phd" style="background:${s.color}"></div>
+          <div><div class="pht">${s.title}</div><div class="phs">${s.desc}</div></div>
+        </div>
+        ${s.intro?`<div class="screener-info" style="margin:14px 18px 0;border-left-color:${s.color}">${s.intro}</div>`:''}
+        <div class="pb" style="display:flex;flex-direction:column;gap:0">
+          <div class="prog-track"><div class="prog-fill" id="prog-${s.id}" style="width:0%;background:${s.color}"></div></div>
+          ${s.questions.map((q,i)=>`
+            <div class="q-block" id="qb-${s.id}-${i}">
+              <div class="q-num" style="color:${s.color}">${s.id.toUpperCase()} ${i+1}</div>
+              <div class="q-text">${q.text}${q.urgent?'<span style="color:#C62828;font-size:10px;margin-left:6px">⚠ assess immediately if endorsed</span>':''}</div>
+              <div class="q-opts">
+                ${q.opts.map((opt,v)=>{
+                  const score = q.scores ? q.scores[v] : v;
+                  const key = `${s.id}_${i}`;
+                  const sel = answers[key]===score;
+                  return `<div class="q-opt${sel?' sel':''}" onclick="setAns('${s.id}',${i},${score},this,'${s.id}')">
+                    <span class="q-opt-score">${score}</span>${opt}
+                  </div>`;
+                }).join('')}
+              </div>
+            </div>
+          `).join('')}
+          ${s.id==='phq9'?'<div class="screener-info" style="margin-top:8px;border-left-color:#C62828;background:#FBEBEE;color:#7B1818">If item 9 is endorsed (any response other than "Not at all") — conduct immediate safety assessment and document.</div>':''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function setAns(screenerId, qIdx, score, el, sid){
+  const key=`${screenerId}_${qIdx}`;
+  answers[key]=score;
+  // Re-render current screener to update selections
+  const sc=SCREENERS.find(s=>s.id===screenerId);
+  const container=document.getElementById(`sc-${screenerId}`);
+  const qBlock=container.querySelector(`#qb-${screenerId}-${qIdx}`);
+  qBlock.querySelectorAll('.q-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  // Progress
+  const answered=sc.questions.filter((_,i)=>answers[`${screenerId}_${i}`]!==undefined).length;
+  const prog=document.getElementById(`prog-${screenerId}`);
+  if(prog) prog.style.width=(answered/sc.questions.length*100)+'%';
+  updateSummary();
+  // Auto-scroll
+  const nextBlock=container.querySelector(`#qb-${screenerId}-${qIdx+1}`);
+  if(nextBlock) setTimeout(()=>nextBlock.scrollIntoView({behavior:'smooth',block:'nearest'}),120);
+}
+
+function getScore(s){
+  return s.questions.reduce((sum,_,i)=>{
+    const v=answers[`${s.id}_${i}`];
+    return sum+(v!==undefined?v:0);
+  },0);
+}
+
+function getBand(s){
+  const score=getScore(s);
+  const answered=s.questions.filter((_,i)=>answers[`${s.id}_${i}`]!==undefined).length;
+  if(!answered) return null;
+  return s.bands.find(b=>score>=b.min&&score<=b.max)||s.bands[s.bands.length-1];
+}
+
+function updateSummary(){
+  const html=SCREENERS.map(s=>{
+    const score=getScore(s);
+    const answered=s.questions.filter((_,i)=>answers[`${s.id}_${i}`]!==undefined).length;
+    const band=getBand(s);
+    if(!answered) return `<div class="summary-row"><div class="summary-name" style="color:${s.color}">${s.label}</div><div style="font-size:11px;color:var(--text3)">Not started</div></div>`;
+    return `<div class="summary-row">
+      <div class="summary-name" style="color:${s.color}">${s.label}</div>
+      <div class="summary-score" style="color:${band?.color||s.color}">${score}</div>
+      ${band?`<div class="summary-label" style="background:${band.bg};color:${band.color}">${band.label}</div>`:''}
+    </div>`;
+  }).join('');
+  document.getElementById('score-summary').innerHTML=html;
+}
+
+function generateSummary(){
+  const now=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const ptId=document.getElementById('pt-id').value||'—';
+  const ptDate=document.getElementById('pt-date').value||now;
+  let text=`AATMIYA HOSPITAL — CLINICAL SCREENER SUMMARY\nDate: ${ptDate} · Patient: ${ptId}\n\n`;
+  SCREENERS.forEach(s=>{
+    const score=getScore(s);
+    const answered=s.questions.filter((_,i)=>answers[`${s.id}_${i}`]!==undefined).length;
+    const band=getBand(s);
+    text+=`${s.label}: ${answered?score+'/'+s.questions.length*((s.questions[0]?.opts?.length||4)-1):'Not administered'}`;
+    if(band) text+=` — ${band.label}\n  Action: ${band.action}\n`;
+    text+='\n';
+  });
+  // PHQ-9 item 9 flag
+  if(answers['phq9_8']!==undefined&&answers['phq9_8']>0){
+    text+=`⚠ PHQ-9 ITEM 9 ENDORSED (score ${answers['phq9_8']}) — Suicidality present. Immediate safety assessment required.\n\n`;
+  }
+  text+=`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nAatmiya Hospital · Dr. Dhaivat Mehta, Gandhidham`;
+  const out=document.getElementById('out-area');
+  out.textContent=text; out.classList.add('visible');
+  navigator.clipboard?.writeText(text);
+}
+
+function resetAll(){
+  answers={};
+  document.getElementById('out-area').classList.remove('visible');
+  renderScreeners();
+  updateSummary();
+}
+
+renderTabs();
+renderScreeners();
+updateSummary();
+</script>
+</body>
+</html>

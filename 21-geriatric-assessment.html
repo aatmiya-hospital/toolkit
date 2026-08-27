@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geriatric Assessment — Aatmiya Hospital</title>
+<style>
+  :root{
+    --bg:#F4F6F4;--surface:#FFF;--surface2:#ECEEE9;--border:#D4DAD2;
+    --text:#141A10;--text2:#485840;--text3:#8A9880;
+    --accent:#2D5E1E;--accent-light:#E4F0DC;
+    --blue:#1A3D70;--blue-light:#E8EEF8;
+    --amber:#8B5E00;--amber-light:#FFF8E1;
+    --red:#7B1818;--red-light:#FBEBEE;
+    --purple:#4C2D8E;--purple-light:#EDE8FA;
+    --radius:12px;--shadow:0 2px 14px rgba(45,94,30,.09);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .stabs{background:#235a16;display:flex;overflow-x:auto}
+  .stab{flex:1;min-width:80px;padding:10px 8px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.65);cursor:pointer;border:none;background:transparent;font-family:inherit;border-bottom:2.5px solid transparent;white-space:nowrap}
+  .stab.active{color:#fff;border-bottom-color:#8EC87A}
+  .wrap{max-width:960px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 280px;gap:16px}
+  @media(max-width:780px){.wrap{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:13px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:1px}
+  .pb{padding:14px 18px}
+  .fl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
+  .fi{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .fi:focus{outline:none;border-color:var(--accent);background:#fff}
+  select.fi{cursor:pointer}
+  .q-block{margin-bottom:12px}
+  .q-text{font-size:13px;color:var(--text);margin-bottom:8px;line-height:1.4;font-weight:500}
+  .q-note{font-size:11px;color:var(--text3);font-style:italic;margin-bottom:6px}
+  .q-opts{display:flex;gap:6px;flex-wrap:wrap}
+  .q-opt{padding:7px 14px;border-radius:8px;font-size:12px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .12s;font-weight:500}
+  .q-opt:hover{border-color:var(--accent)}
+  .q-opt.sel{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:700}
+  /* ADL grid */
+  .adl-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  @media(max-width:480px){.adl-grid{grid-template-columns:1fr}}
+  .adl-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border-radius:8px;padding:8px 12px}
+  .adl-label{font-size:12px;color:var(--text);font-weight:500}
+  .adl-btns{display:flex;gap:4px}
+  .adl-btn{padding:4px 10px;border-radius:6px;font-size:10px;font-weight:600;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-family:inherit;transition:all .12s}
+  .adl-btn.ind.sel{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+  .adl-btn.dep.sel{background:var(--red-light);border-color:var(--red);color:var(--red)}
+  /* MMSE inputs */
+  .mmse-item{display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:8px 10px;background:var(--surface2);border-radius:8px}
+  .mmse-label{font-size:12px;color:var(--text);flex:1;line-height:1.4}
+  .mmse-score-input{width:50px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center;font-family:inherit;background:#fff;color:var(--text)}
+  .mmse-max{font-size:11px;color:var(--text3);min-width:30px}
+  /* Right panel */
+  .score-panel{padding:14px;border-bottom:1px solid var(--border)}
+  .sp-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px}
+  .sp-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--border)}
+  .sp-row:last-child{border-bottom:none}
+  .sp-name{font-size:12px;color:var(--text)}
+  .sp-score{font-size:13px;font-weight:700}
+  .sp-badge{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600}
+  .out-area{background:var(--surface2);border-radius:8px;padding:12px;font-size:11px;line-height:1.8;white-space:pre-wrap;color:var(--text);border:1px solid var(--border);display:none;margin:14px}
+  .out-area.visible{display:block}
+  .act-row{display:flex;gap:8px;padding:14px;flex-wrap:wrap;border-top:1px solid var(--border)}
+  .bp{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .screener-content{display:none}.screener-content.active{display:block}
+  .pt-row{display:flex;gap:10px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--border)}
+  .pt-field{display:flex;flex-direction:column;gap:3px;flex:1;min-width:110px}
+  .pt-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)}
+  .pt-input{padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .pt-input:focus{outline:none;border-color:var(--accent);background:#fff}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+  .chip{padding:5px 10px;border-radius:20px;font-size:11px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;user-select:none;transition:all .12s}
+  .chip.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Geriatric Assessment Suite</div><div class="hs">Aatmiya Hospital · Tool 21 · GDS-15 · MMSE · ADL · IADL · Falls</div></div>
+  </div>
+  <div class="ha">
+    <button class="bg" onclick="generateReport()">Generate report</button>
+    <button class="bg" onclick="window.print()">Print</button>
+  </div>
+</div>
+<div class="stabs">
+  <button class="stab active" onclick="switchTab('gds',this)">GDS-15</button>
+  <button class="stab" onclick="switchTab('mmse',this)">MMSE</button>
+  <button class="stab" onclick="switchTab('adl',this)">ADL / IADL</button>
+  <button class="stab" onclick="switchTab('falls',this)">Fall risk</button>
+  <button class="stab" onclick="switchTab('meds',this)">Polypharmacy</button>
+</div>
+<div class="wrap">
+<div>
+
+<!-- Patient -->
+<div class="panel">
+  <div class="pt-row">
+    <div class="pt-field"><div class="pt-label">Patient code</div><input class="pt-input" id="pt-id" placeholder="PT-001"></div>
+    <div class="pt-field"><div class="pt-label">Age</div><input class="pt-input" id="pt-age" type="number" placeholder="72"></div>
+    <div class="pt-field"><div class="pt-label">Date</div><input class="pt-input" type="date" id="pt-date"></div>
+    <div class="pt-field"><div class="pt-label">Education</div>
+      <select class="pt-input">
+        <option>Illiterate</option><option>Primary (1–5)</option><option>Secondary (6–12)</option><option>Graduate+</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- GDS-15 -->
+<div class="screener-content active" id="tab-gds">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--blue)"></div><div><div class="pht">Geriatric Depression Scale — Short Form (GDS-15)</div><div class="phs">Yes/No format · Score ≥5 suggests depression · ≥10 severe depression</div></div></div>
+    <div class="pb">
+      <div style="background:var(--blue-light);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--blue)">Ask: "Referring to the past week — please answer Yes or No."</div>
+      <div id="gds-questions"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MMSE -->
+<div class="screener-content" id="tab-mmse">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--purple)"></div><div><div class="pht">Mini-Mental State Examination (MMSE)</div><div class="phs">Administer verbally · Adjust for education · Max 30 · ≤23 cognitive impairment</div></div></div>
+    <div class="pb">
+      <div style="background:var(--purple-light);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--purple)">Note: Raw MMSE scores should be adjusted for age and education. A score of 23 or below warrants further investigation. This tool provides the score — clinical interpretation remains with the clinician.</div>
+      <div id="mmse-items"></div>
+      <div style="margin-top:12px">
+        <div class="fl">Clock drawing test (CDT) observation</div>
+        <div class="chips" style="margin-top:5px">
+          <div class="chip" onclick="toggleChip(this)">Draws circle</div>
+          <div class="chip" onclick="toggleChip(this)">All 12 numbers present</div>
+          <div class="chip" onclick="toggleChip(this)">Numbers correctly positioned</div>
+          <div class="chip" onclick="toggleChip(this)">Both hands present</div>
+          <div class="chip" onclick="toggleChip(this)">Correct time indicated</div>
+          <div class="chip" onclick="toggleChip(this)">Significant errors noted</div>
+          <div class="chip" onclick="toggleChip(this)">Unable to complete</div>
+        </div>
+        <div style="margin-top:8px"><div class="fl">CDT notes</div>
+          <textarea class="fi" id="cdt-notes" rows="2" placeholder="Describe clock drawing findings…" style="resize:none;line-height:1.55;margin-top:4px"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADL / IADL -->
+<div class="screener-content" id="tab-adl">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--amber)"></div><div><div class="pht">Activities of Daily Living (ADL + IADL)</div><div class="phs">Katz ADL + Lawton IADL · Mark as Independent or Dependent</div></div></div>
+    <div class="pb">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Basic ADL (Katz)</div>
+      <div class="adl-grid" id="adl-basic"></div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px">Instrumental ADL (Lawton)</div>
+      <div class="adl-grid" id="adl-iadl"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Fall risk -->
+<div class="screener-content" id="tab-falls">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--red)"></div><div><div class="pht">Fall risk assessment</div><div class="phs">MORSE-adapted · Timed Up and Go · Environmental checklist</div></div></div>
+    <div class="pb">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Risk factors</div>
+      <div style="display:flex;flex-direction:column;gap:6px" id="fall-items"></div>
+      <div style="margin-top:14px">
+        <div class="fl">Timed Up and Go (TUG) test result</div>
+        <div style="display:flex;gap:8px;margin-top:5px">
+          <input class="fi" id="tug-time" placeholder="Time in seconds" type="number" style="flex:1">
+          <div style="display:flex;gap:6px;align-items:center">
+            <div class="q-opt" onclick="selectTUG('<10',this)" id="tug-low">< 10s — Normal</div>
+            <div class="q-opt" onclick="selectTUG('10-20',this)" id="tug-mod">10–20s — Moderate</div>
+            <div class="q-opt" onclick="selectTUG('>20',this)" id="tug-high">> 20s — High risk</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="fl">Environmental hazards at home</div>
+        <div class="chips" style="margin-top:5px">
+          <div class="chip" onclick="toggleChip(this)">Loose rugs / mats</div>
+          <div class="chip" onclick="toggleChip(this)">Poor lighting</div>
+          <div class="chip" onclick="toggleChip(this)">No grab bars (bathroom)</div>
+          <div class="chip" onclick="toggleChip(this)">Slippery floor (wet)</div>
+          <div class="chip" onclick="toggleChip(this)">Steps without handrail</div>
+          <div class="chip" onclick="toggleChip(this)">Cluttered pathways</div>
+          <div class="chip" onclick="toggleChip(this)">Inadequate footwear</div>
+          <div class="chip" onclick="toggleChip(this)">Home assessed — safe</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Polypharmacy -->
+<div class="screener-content" id="tab-meds">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Polypharmacy review flags</div><div class="phs">Common high-risk medications in elderly — flag for review</div></div></div>
+    <div class="pb">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Total medications</div>
+      <div style="display:flex;gap:6px;margin-bottom:14px">
+        <div class="q-opt" onclick="selectMedCount('0-4',this)">0–4 (acceptable)</div>
+        <div class="q-opt" onclick="selectMedCount('5-9',this)">5–9 (polypharmacy)</div>
+        <div class="q-opt" onclick="selectMedCount('10+',this)">10+ (hyper-polypharmacy)</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Beers Criteria / high-risk drugs present</div>
+      <div class="chips" style="margin-bottom:12px">
+        <div class="chip" onclick="toggleChip(this)">Benzodiazepines (fall + cognitive risk)</div>
+        <div class="chip" onclick="toggleChip(this)">Anticholinergics (cognitive risk)</div>
+        <div class="chip" onclick="toggleChip(this)">NSAIDs (GI + renal + cardiac risk)</div>
+        <div class="chip" onclick="toggleChip(this)">Antipsychotics (stroke / EPS risk)</div>
+        <div class="chip" onclick="toggleChip(this)">Digoxin > 0.125mg/day</div>
+        <div class="chip" onclick="toggleChip(this)">Tricyclic antidepressants</div>
+        <div class="chip" onclick="toggleChip(this)">Sedating antihistamines</div>
+        <div class="chip" onclick="toggleChip(this)">Muscle relaxants</div>
+        <div class="chip" onclick="toggleChip(this)">Opioids</div>
+        <div class="chip" onclick="toggleChip(this)">No high-risk drugs identified</div>
+      </div>
+      <div class="fl" style="margin-bottom:5px">Medication list / notes</div>
+      <textarea class="fi" id="med-list" rows="4" placeholder="List all medications with doses for review…" style="resize:none;line-height:1.55"></textarea>
+      <div style="margin-top:10px">
+        <div class="fl" style="margin-bottom:5px">Adherence issues noted</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Forgets doses</div>
+          <div class="chip" onclick="toggleChip(this)">Cannot open packaging</div>
+          <div class="chip" onclick="toggleChip(this)">Confusion about regimen</div>
+          <div class="chip" onclick="toggleChip(this)">Financial barrier</div>
+          <div class="chip" onclick="toggleChip(this)">No adherence concerns</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end left -->
+
+<!-- Right: score summary -->
+<div>
+  <div class="panel" style="position:sticky;top:16px">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Assessment scores</div></div></div>
+    <div id="score-panel"></div>
+    <div class="act-row">
+      <button class="bp" onclick="generateReport()">Generate report</button>
+      <button class="bpo" onclick="resetAll()">Reset</button>
+    </div>
+    <div class="out-area" id="out-area"></div>
+  </div>
+</div>
+</div>
+
+<script>
+const GDS_QS=[
+  {q:'Are you basically satisfied with your life?',score_yes:0,score_no:1},
+  {q:'Have you dropped many of your activities and interests?',score_yes:1,score_no:0},
+  {q:'Do you feel that your life is empty?',score_yes:1,score_no:0},
+  {q:'Do you often get bored?',score_yes:1,score_no:0},
+  {q:'Are you in good spirits most of the time?',score_yes:0,score_no:1},
+  {q:'Are you afraid that something bad is going to happen to you?',score_yes:1,score_no:0},
+  {q:'Do you feel happy most of the time?',score_yes:0,score_no:1},
+  {q:'Do you often feel helpless?',score_yes:1,score_no:0},
+  {q:'Do you prefer to stay at home, rather than going out and doing new things?',score_yes:1,score_no:0},
+  {q:'Do you feel you have more problems with memory than most?',score_yes:1,score_no:0},
+  {q:'Do you think it is wonderful to be alive now?',score_yes:0,score_no:1},
+  {q:'Do you feel pretty worthless the way you are now?',score_yes:1,score_no:0},
+  {q:'Do you feel full of energy?',score_yes:0,score_no:1},
+  {q:'Do you feel that your situation is hopeless?',score_yes:1,score_no:0},
+  {q:'Do you think that most people are better off than you?',score_yes:1,score_no:0},
+];
+const MMSE_ITEMS=[
+  {label:'Orientation to time — Year, season, month, date, day (1 pt each)',max:5,id:'mm-time'},
+  {label:'Orientation to place — Country, state, city, hospital, floor (1 pt each)',max:5,id:'mm-place'},
+  {label:'Registration — Name 3 objects, ask to repeat (1 pt each)',max:3,id:'mm-reg'},
+  {label:'Attention / calculation — Serial 7s (5 subtractions) or spell "WORLD" backwards',max:5,id:'mm-attn'},
+  {label:'Recall — Ask for 3 objects registered earlier (1 pt each)',max:3,id:'mm-recall'},
+  {label:'Naming — Show watch, pen (1 pt each)',max:2,id:'mm-name'},
+  {label:'Repetition — "No ifs, ands, or buts"',max:1,id:'mm-rep'},
+  {label:'3-stage command — "Take paper in right hand, fold in half, put on floor"',max:3,id:'mm-cmd'},
+  {label:'Reading — "Close your eyes" (follows written instruction)',max:1,id:'mm-read'},
+  {label:'Writing — Write a sentence (subject + verb)',max:1,id:'mm-write'},
+  {label:'Copying — Copy intersecting pentagons',max:1,id:'mm-copy'},
+];
+const ADL_BASIC=['Bathing','Dressing','Toileting','Transferring','Continence','Feeding'];
+const ADL_IADL=['Using telephone','Shopping','Food preparation','Housekeeping','Laundry','Transportation','Managing medications','Managing finances'];
+const FALL_ITEMS=[
+  {label:'History of falls in past year',weight:25},
+  {label:'Secondary diagnosis present',weight:15},
+  {label:'Requires ambulatory aid (walking stick, frame)',weight:15},
+  {label:'IV / heparin lock',weight:20},
+  {label:'Gait: weak / impaired',weight:10},
+  {label:'Mental status: impaired awareness of limitations',weight:15},
+];
+
+let gdsAnswers={};
+let mmseScores={};
+let adlStatus={};
+let tugResult='';
+let medCount='';
+let fallFlags={};
+
+document.getElementById('pt-date').value=new Date().toISOString().split('T')[0];
+
+function switchTab(name,btn){
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.screener-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  updateScores();
+}
+function toggleChip(el){el.classList.toggle('on')}
+
+// GDS
+function renderGDS(){
+  document.getElementById('gds-questions').innerHTML=GDS_QS.map((q,i)=>`
+    <div class="q-block">
+      <div class="q-text"><span style="font-size:10px;font-weight:700;color:var(--text3);margin-right:8px">${i+1}</span>${q.q}</div>
+      <div class="q-opts">
+        <div class="q-opt${gdsAnswers[i]==='yes'?' sel':''}" onclick="setGDS(${i},'yes',${q.score_yes},this)">Yes</div>
+        <div class="q-opt${gdsAnswers[i]==='no'?' sel':''}" onclick="setGDS(${i},'no',${q.score_no},this)">No</div>
+      </div>
+    </div>`).join('');
+}
+function setGDS(idx,val,score,el){
+  gdsAnswers[idx]={val,score};
+  el.closest('.q-opts').querySelectorAll('.q-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  updateScores();
+}
+
+// MMSE
+function renderMMSE(){
+  document.getElementById('mmse-items').innerHTML=MMSE_ITEMS.map(item=>`
+    <div class="mmse-item">
+      <div class="mmse-label">${item.label}</div>
+      <input class="mmse-score-input" type="number" id="${item.id}" min="0" max="${item.max}" value="" placeholder="0"
+        oninput="this.value=Math.min(${item.max},Math.max(0,this.value));updateScores()">
+      <span class="mmse-max">/ ${item.max}</span>
+    </div>`).join('');
+}
+
+// ADL
+function renderADL(){
+  document.getElementById('adl-basic').innerHTML=ADL_BASIC.map(a=>`
+    <div class="adl-item">
+      <div class="adl-label">${a}</div>
+      <div class="adl-btns">
+        <button class="adl-btn ind${adlStatus['b_'+a]==='ind'?' sel':''}" onclick="setADL('b_${a}','ind',this)">Ind.</button>
+        <button class="adl-btn dep${adlStatus['b_'+a]==='dep'?' sel':''}" onclick="setADL('b_${a}','dep',this)">Dep.</button>
+      </div>
+    </div>`).join('');
+  document.getElementById('adl-iadl').innerHTML=ADL_IADL.map(a=>`
+    <div class="adl-item">
+      <div class="adl-label">${a}</div>
+      <div class="adl-btns">
+        <button class="adl-btn ind${adlStatus['i_'+a]==='ind'?' sel':''}" onclick="setADL('i_${a}','ind',this)">Ind.</button>
+        <button class="adl-btn dep${adlStatus['i_'+a]==='dep'?' sel':''}" onclick="setADL('i_${a}','dep',this)">Dep.</button>
+      </div>
+    </div>`).join('');
+}
+function setADL(key,val,el){
+  adlStatus[key]=val;
+  el.closest('.adl-btns').querySelectorAll('.adl-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  updateScores();
+}
+
+// Falls
+function renderFalls(){
+  document.getElementById('fall-items').innerHTML=FALL_ITEMS.map((f,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border-radius:8px;padding:9px 12px">
+      <div style="font-size:12px;color:var(--text);flex:1">${f.label} <span style="color:var(--text3);font-size:11px">(${f.weight} pts)</span></div>
+      <div style="display:flex;gap:6px">
+        <div class="q-opt${fallFlags[i]==='yes'?' sel':''}" onclick="setFall(${i},'yes',this)" style="padding:5px 10px;font-size:11px">Yes</div>
+        <div class="q-opt${fallFlags[i]==='no'?' sel':''}" onclick="setFall(${i},'no',this)" style="padding:5px 10px;font-size:11px">No</div>
+      </div>
+    </div>`).join('');
+}
+function setFall(i,val,el){
+  fallFlags[i]=val;
+  el.closest('div').querySelectorAll('.q-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  updateScores();
+}
+function selectTUG(val,el){
+  tugResult=val;
+  document.querySelectorAll('#tab-falls .q-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  updateScores();
+}
+function selectMedCount(val,el){
+  medCount=val;
+  document.querySelectorAll('#tab-meds .q-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  updateScores();
+}
+
+function updateScores(){
+  const gdsScore=Object.values(gdsAnswers).reduce((s,v)=>s+(v.score||0),0);
+  const gdsAnswered=Object.keys(gdsAnswers).length;
+  let gdsLabel='',gdsColor='var(--text3)',gdsBg='var(--surface2)';
+  if(gdsAnswered===15){
+    if(gdsScore>=10){gdsLabel='Severe depression likely';gdsColor='#C62828';gdsBg='#FFEBEE'}
+    else if(gdsScore>=5){gdsLabel='Depression likely';gdsColor='#8B5E00';gdsBg='#FFF8E1'}
+    else{gdsLabel='Normal';gdsColor='#1E5E32';gdsBg='#E5F2E9'}
+  }
+  const mmseTotal=MMSE_ITEMS.reduce((s,item)=>{
+    const el=document.getElementById(item.id);
+    return s+(el?parseInt(el.value||0):0);
+  },0);
+  let mmseLabel='',mmseColor='var(--text3)';
+  if(mmseTotal<=10){mmseLabel='Severe impairment';mmseColor='#C62828'}
+  else if(mmseTotal<=17){mmseLabel='Moderate impairment';mmseColor='#8B5E00'}
+  else if(mmseTotal<=23){mmseLabel='Mild impairment';mmseColor='#B85C00'}
+  else{mmseLabel='Normal range';mmseColor='#1E5E32'}
+
+  const adlIndep=Object.entries(adlStatus).filter(([k,v])=>k.startsWith('b_')&&v==='ind').length;
+  const iadlIndep=Object.entries(adlStatus).filter(([k,v])=>k.startsWith('i_')&&v==='ind').length;
+  const morseScore=FALL_ITEMS.reduce((s,f,i)=>s+(fallFlags[i]==='yes'?f.weight:0),0);
+  let fallLabel='',fallColor='var(--text3)';
+  if(morseScore>44){fallLabel='High fall risk';fallColor='#C62828'}
+  else if(morseScore>=25){fallLabel='Moderate risk';fallColor='#8B5E00'}
+  else if(morseScore>0){fallLabel='Low risk';fallColor='#1E5E32'}
+
+  document.getElementById('score-panel').innerHTML=`
+    <div class="score-panel">
+      <div class="sp-title">Scores</div>
+      <div class="sp-row">
+        <span class="sp-name">GDS-15</span>
+        <span class="sp-score" style="color:${gdsColor}">${gdsAnswered===15?gdsScore:gdsAnswered+'/15'}</span>
+        ${gdsLabel?`<span class="sp-badge" style="background:${gdsBg};color:${gdsColor}">${gdsLabel}</span>`:''}
+      </div>
+      <div class="sp-row">
+        <span class="sp-name">MMSE</span>
+        <span class="sp-score" style="color:${mmseColor}">${mmseTotal}/30</span>
+        ${mmseLabel?`<span class="sp-badge" style="background:var(--surface2);color:${mmseColor}">${mmseLabel}</span>`:''}
+      </div>
+      <div class="sp-row">
+        <span class="sp-name">ADL</span>
+        <span class="sp-score" style="color:var(--accent)">${adlIndep}/${ADL_BASIC.length} indep.</span>
+      </div>
+      <div class="sp-row">
+        <span class="sp-name">IADL</span>
+        <span class="sp-score" style="color:var(--amber)">${iadlIndep}/${ADL_IADL.length} indep.</span>
+      </div>
+      <div class="sp-row">
+        <span class="sp-name">Morse fall risk</span>
+        <span class="sp-score" style="color:${fallColor}">${morseScore}</span>
+        ${fallLabel?`<span class="sp-badge" style="background:var(--surface2);color:${fallColor}">${fallLabel}</span>`:''}
+      </div>
+      ${tugResult?`<div class="sp-row"><span class="sp-name">TUG</span><span class="sp-score">${tugResult}</span></div>`:''}
+    </div>`;
+}
+
+function generateReport(){
+  const now=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const gdsScore=Object.values(gdsAnswers).reduce((s,v)=>s+(v.score||0),0);
+  const mmseTotal=MMSE_ITEMS.reduce((s,item)=>{const el=document.getElementById(item.id);return s+(el?parseInt(el.value||0):0);},0);
+  const adlDep=ADL_BASIC.filter(a=>adlStatus['b_'+a]==='dep');
+  const iadlDep=ADL_IADL.filter(a=>adlStatus['i_'+a]==='dep');
+  const morseScore=FALL_ITEMS.reduce((s,f,i)=>s+(fallFlags[i]==='yes'?f.weight:0),0);
+  const highRisk=[...document.querySelectorAll('#tab-meds .chip.on')].map(c=>c.textContent).join(', ');
+  const cdtFindings=[...document.querySelectorAll('#tab-mmse .chip.on')].map(c=>c.textContent).join(', ');
+  const text=`AATMIYA HOSPITAL — GERIATRIC ASSESSMENT
+Generated: ${now} · Patient: ${document.getElementById('pt-id').value||'—'} · Age: ${document.getElementById('pt-age').value||'—'}
+
+GDS-15: ${gdsScore}/15 ${gdsScore>=10?'— Severe depression likely':gdsScore>=5?'— Depression likely':'— Normal range'}
+
+MMSE: ${mmseTotal}/30 ${mmseTotal<=10?'— Severe impairment':mmseTotal<=17?'— Moderate impairment':mmseTotal<=23?'— Mild impairment':'— Normal range'}
+Clock drawing: ${cdtFindings||'Not done'}
+CDT notes: ${document.getElementById('cdt-notes').value||'—'}
+
+ADL: ${ADL_BASIC.length-adlDep.length}/${ADL_BASIC.length} independent
+Dependent in: ${adlDep.join(', ')||'None'}
+
+IADL: ${ADL_IADL.length-iadlDep.length}/${ADL_IADL.length} independent
+Dependent in: ${iadlDep.join(', ')||'None'}
+
+FALL RISK (Morse): ${morseScore} pts ${morseScore>44?'— HIGH risk':morseScore>=25?'— Moderate risk':'— Low risk'}
+TUG: ${tugResult||'Not done'}
+
+POLYPHARMACY: ${medCount||'Not assessed'}
+High-risk medications: ${highRisk||'None flagged'}
+Medication notes: ${document.getElementById('med-list').value||'—'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Aatmiya Hospital · Dr. Dhaivat Mehta, Gandhidham`;
+  const out=document.getElementById('out-area');
+  out.textContent=text; out.classList.add('visible');
+  navigator.clipboard?.writeText(text);
+}
+
+function resetAll(){
+  gdsAnswers={};mmseScores={};adlStatus={};tugResult='';medCount='';fallFlags={};
+  document.querySelectorAll('input[type=number]').forEach(el=>el.value='');
+  document.querySelectorAll('.chip.on,.q-opt.sel,.adl-btn.sel').forEach(el=>el.classList.remove('on','sel'));
+  document.getElementById('out-area').classList.remove('visible');
+  document.getElementById('cdt-notes').value='';
+  document.getElementById('med-list').value='';
+  renderGDS();updateScores();
+}
+
+renderGDS();renderMMSE();renderADL();renderFalls();updateScores();
+</script>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Param Lab Test Selector — Aatmiya</title>
+<style>
+  :root{
+    --bg:#F0F4F8;--surface:#FFF;--surface2:#E8EEF4;--border:#D0DAE8;
+    --text:#101820;--text2:#485460;--text3:#90A0B0;
+    --accent:#1A3D70;--accent-light:#E8EEF8;
+    --green:#1E5E32;--green-light:#E5F2E9;
+    --amber:#8B5E00;--amber-light:#FFF8E1;
+    --red:#7B1818;--red-light:#FBEBEE;
+    --purple:#4C2D8E;--purple-light:#EDE8FA;
+    --teal:#1A5C52;--teal-light:#E0F2EE;
+    --radius:12px;--shadow:0 2px 14px rgba(26,61,112,.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .wrap{max-width:1060px;margin:0 auto;padding:16px;display:grid;grid-template-columns:300px 1fr;gap:16px}
+  @media(max-width:780px){.wrap{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:13px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:1px}
+  .pb{padding:14px 18px}
+  /* Scenario selector */
+  .scenario-list{padding:8px}
+  .scenario-item{padding:10px 12px;border-radius:8px;cursor:pointer;transition:all .12s;border:1.5px solid transparent;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .scenario-item:hover{background:var(--surface2);border-color:var(--border)}
+  .scenario-item.active{background:var(--accent-light);border-color:var(--accent)}
+  .scenario-icon{font-size:16px;flex-shrink:0}
+  .scenario-name{font-size:12px;font-weight:500;color:var(--text)}
+  .scenario-tag{font-size:10px;padding:1px 7px;border-radius:20px;font-weight:500;margin-left:auto;flex-shrink:0}
+  /* Search */
+  .search-input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);margin:8px;width:calc(100% - 16px)}
+  .search-input:focus{outline:none;border-color:var(--accent);background:#fff}
+  /* Test panel display */
+  .panel-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px}
+  .scenario-big-icon{font-size:28px}
+  .panel-title{font-size:16px;font-weight:700;color:var(--text)}
+  .panel-desc{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.55}
+  /* Test groups */
+  .test-groups{padding:14px 18px;display:flex;flex-direction:column;gap:12px}
+  .test-group{border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+  .tg-head{padding:10px 14px;display:flex;align-items:center;gap:8px;cursor:pointer}
+  .tg-icon{font-size:14px}
+  .tg-title{font-size:12px;font-weight:700;color:#fff;flex:1}
+  .tg-badge{font-size:10px;font-weight:600;background:rgba(255,255,255,.25);color:#fff;padding:2px 8px;border-radius:20px}
+  .tg-body{padding:10px 14px;background:var(--surface)}
+  .test-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px}
+  .test-check{width:18px;height:18px;border-radius:4px;border:2px solid var(--border);cursor:pointer;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .12s}
+  .test-check.checked{background:var(--accent);border-color:var(--accent);color:#fff}
+  .test-info{flex:1}
+  .test-name{font-size:12px;font-weight:500;color:var(--text)}
+  .test-note{font-size:11px;color:var(--text3);margin-top:1px;line-height:1.4}
+  .test-priority{font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;margin-left:6px;vertical-align:middle}
+  /* Selected summary */
+  .selected-panel{padding:14px;border-top:1px solid var(--border);background:var(--surface2)}
+  .selected-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px}
+  .selected-list{display:flex;flex-wrap:wrap;gap:4px;min-height:30px}
+  .selected-chip{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--accent-light);border:1px solid var(--accent);color:var(--accent);font-weight:500}
+  /* Monitoring schedule */
+  .monitor-row{display:flex;align-items:center;gap:10px;padding:6px 10px;background:var(--surface2);border-radius:8px;margin-bottom:4px}
+  .monitor-drug{font-size:12px;font-weight:600;color:var(--text);min-width:120px}
+  .monitor-tests{font-size:11px;color:var(--text2);flex:1}
+  .monitor-freq{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--amber-light);color:var(--amber)}
+  /* Print / out */
+  .out-area{background:var(--surface2);border-radius:8px;padding:12px;font-size:11px;line-height:1.8;white-space:pre-wrap;color:var(--text);border:1px solid var(--border);display:none;margin:0 18px 14px}
+  .out-area.visible{display:block}
+  .act-row{display:flex;gap:8px;padding:14px 18px;flex-wrap:wrap;border-top:1px solid var(--border)}
+  .bp{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Param Lab Test Selector</div><div class="hs">Aatmiya Hospital · Tool 23 · Param Diagnostic Microbiology Laboratory</div></div>
+  </div>
+  <div class="ha">
+    <button class="bg" onclick="generateSlip()">Generate lab slip</button>
+    <button class="bg" onclick="window.print()">Print</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- Left: scenario selector -->
+<div>
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Clinical scenario</div><div class="phs">Select the context for test recommendations</div></div></div>
+    <input class="search-input" id="scenario-search" placeholder="Search scenarios…" oninput="filterScenarios()">
+    <div class="scenario-list" id="scenario-list"></div>
+  </div>
+
+  <!-- TDM quick ref -->
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--purple)"></div><div><div class="pht">TDM reference</div><div class="phs">Therapeutic drug monitoring via Param Lab</div></div></div>
+    <div class="pb" style="padding:10px 14px">
+      <div class="monitor-row"><div class="monitor-drug">Lithium</div><div class="monitor-tests">S. Lithium level</div><div class="monitor-freq">Weekly × 4, then monthly</div></div>
+      <div class="monitor-row"><div class="monitor-drug">Valproate</div><div class="monitor-tests">S. Valproate level + LFT</div><div class="monitor-freq">Monthly × 3, then 3-monthly</div></div>
+      <div class="monitor-row"><div class="monitor-drug">Carbamazepine</div><div class="monitor-tests">S. Carbamazepine + LFT + CBC</div><div class="monitor-freq">Monthly × 3</div></div>
+      <div class="monitor-row"><div class="monitor-drug">Clozapine</div><div class="monitor-tests">CBC (ANC) weekly</div><div class="monitor-freq">Weekly × 26, then monthly</div></div>
+      <div class="monitor-row"><div class="monitor-drug">Antipsychotics</div><div class="monitor-tests">FBS, lipids, weight, Prolactin</div><div class="monitor-freq">3-monthly</div></div>
+      <div class="monitor-row"><div class="monitor-drug">SSRIs (long-term)</div><div class="monitor-tests">S. Sodium (elderly), LFT</div><div class="monitor-freq">6-monthly</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Right: test panel -->
+<div>
+  <div class="panel" id="test-panel">
+    <div style="padding:40px;text-align:center;color:var(--text3)">
+      <div style="font-size:28px;margin-bottom:8px">🧪</div>
+      <div style="font-size:14px">Select a clinical scenario on the left to see recommended tests</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const SCENARIOS=[
+  {
+    id:'new-psych',icon:'🧠',name:'New psychiatric patient — baseline',tag:'Baseline',tagColor:'#1A3D70',tagBg:'#E8EEF8',
+    desc:'First presentation to Aatmiya. Full baseline before starting any medication.',
+    groups:[
+      {title:'Mandatory baseline',color:'#1A3D70',icon:'⭐',tests:[
+        {name:'CBC (complete blood count)',note:'Baseline before any medication',priority:'must'},
+        {name:'Blood glucose (fasting)',note:'Metabolic baseline — many psychiatric meds affect glucose',priority:'must'},
+        {name:'LFT (liver function)',note:'Baseline before mood stabilisers, antipsychotics',priority:'must'},
+        {name:'RFT (renal function) + electrolytes',note:'Required before lithium; baseline for others',priority:'must'},
+        {name:'TFT (thyroid function — TSH)',note:'Thyroid dysfunction mimics depression/mania',priority:'must'},
+        {name:'ECG',note:'QTc baseline before antipsychotics / TCAs',priority:'must'},
+      ]},
+      {title:'Strongly recommended',color:'#1E5E32',icon:'✓',tests:[
+        {name:'Fasting lipid profile',note:'Metabolic risk — especially before olanzapine/quetiapine',priority:'high'},
+        {name:'HbA1c',note:'If fasting glucose borderline or metabolic risk factors',priority:'high'},
+        {name:'Vitamin B12 + Folate',note:'Deficiency common, mimics/worsens depression',priority:'high'},
+        {name:'S. Calcium',note:'Hypercalcaemia can cause psychiatric symptoms',priority:'moderate'},
+        {name:'25-OH Vitamin D',note:'Deficiency linked to depression, fatigue, pain',priority:'moderate'},
+      ]},
+      {title:'If clinically indicated',color:'#8B5E00',icon:'→',tests:[
+        {name:'HIV / HBsAg / HCV',note:'Before buprenorphine or if substance use / risk factors',priority:'situational'},
+        {name:'S. Cortisol (morning)',note:'If Cushing\'s or adrenal insufficiency suspected',priority:'situational'},
+        {name:'ANA / complement',note:'If autoimmune encephalitis in differential',priority:'situational'},
+        {name:'EEG (Param Lab — 64ch)',note:'If seizure disorder, atypical presentation, or treatment resistance',priority:'situational'},
+      ]},
+    ]
+  },
+  {
+    id:'depression',icon:'😔',name:'Depression — initiating SSRI/SNRI',tag:'Depression',tagColor:'#1A3D70',tagBg:'#E8EEF8',
+    desc:'Starting or reviewing antidepressant treatment for depressive episode.',
+    groups:[
+      {title:'Before starting',color:'#1A3D70',icon:'⭐',tests:[
+        {name:'TFT — TSH',note:'Hypothyroidism mimics/causes depression — rule out first',priority:'must'},
+        {name:'CBC',note:'Anaemia can cause fatigue and depressive symptoms',priority:'must'},
+        {name:'Vitamin B12',note:'Deficiency causes depression, fatigue, neuropathy',priority:'must'},
+        {name:'Vitamin D',note:'Strongly linked to depression severity',priority:'must'},
+        {name:'Fasting glucose',note:'Metabolic context',priority:'high'},
+        {name:'LFT',note:'SSRIs metabolised hepatically — baseline important',priority:'high'},
+      ]},
+      {title:'At 3 months or if poor response',color:'#1E5E32',icon:'✓',tests:[
+        {name:'Repeat TFT',note:'Thyroid can change over time; treatment resistance warrants recheck',priority:'high'},
+        {name:'S. Sodium',note:'SSRIs cause SIADH — especially in elderly',priority:'situational'},
+        {name:'Folate',note:'Low folate predicts poor antidepressant response',priority:'moderate'},
+        {name:'Cortisol (morning)',note:'If atypical features or treatment resistance',priority:'situational'},
+      ]},
+    ]
+  },
+  {
+    id:'bipolar',icon:'🔄',name:'Bipolar disorder — mood stabiliser initiation',tag:'Bipolar',tagColor:'#4C2D8E',tagBg:'#EDE8FA',
+    desc:'Starting lithium, valproate, or carbamazepine. Mandatory monitoring protocol.',
+    groups:[
+      {title:'Before lithium',color:'#4C2D8E',icon:'⭐',tests:[
+        {name:'S. Creatinine + eGFR',note:'Lithium is nephrotoxic — baseline essential',priority:'must'},
+        {name:'S. Electrolytes',note:'Sodium fluctuation affects lithium levels',priority:'must'},
+        {name:'TFT',note:'Lithium causes hypothyroidism in 20–40% long-term',priority:'must'},
+        {name:'ECG',note:'Lithium can cause T-wave changes',priority:'must'},
+        {name:'CBC',note:'Baseline',priority:'must'},
+      ]},
+      {title:'Before valproate',color:'#7B1818',icon:'⭐',tests:[
+        {name:'LFT',note:'Valproate hepatotoxic — baseline mandatory; avoid if liver disease',priority:'must'},
+        {name:'CBC with platelets',note:'Valproate causes thrombocytopenia',priority:'must'},
+        {name:'Coagulation — PT/APTT',note:'Valproate affects coagulation',priority:'high'},
+        {name:'Pregnancy test (women of childbearing age)',note:'Valproate is teratogenic — verify before prescribing',priority:'must'},
+      ]},
+      {title:'Before carbamazepine',color:'#8B5E00',icon:'⭐',tests:[
+        {name:'CBC',note:'Risk of aplastic anaemia (rare but serious)',priority:'must'},
+        {name:'LFT',note:'Hepatic enzyme induction',priority:'must'},
+        {name:'HLA-B*1502 (if South/East Asian)',note:'Risk of Stevens-Johnson syndrome',priority:'high'},
+        {name:'S. Sodium',note:'Carbamazepine causes SIADH',priority:'must'},
+      ]},
+      {title:'Monitoring (all mood stabilisers)',color:'#1E5E32',icon:'→',tests:[
+        {name:'S. Lithium level (lithium only)',note:'Therapeutic range 0.6–1.0 mmol/L (acute 0.8–1.2)',priority:'must'},
+        {name:'S. Valproate level',note:'Therapeutic range 50–100 µg/mL',priority:'must'},
+        {name:'S. Carbamazepine level',note:'Therapeutic range 4–12 µg/mL',priority:'must'},
+        {name:'Weight + BMI',note:'Monthly — valproate and lithium cause weight gain',priority:'high'},
+      ]},
+    ]
+  },
+  {
+    id:'antipsychotic',icon:'💊',name:'Antipsychotic initiation / review',tag:'Antipsychotic',tagColor:'#7B1818',tagBg:'#FBEBEE',
+    desc:'Starting or monitoring antipsychotic therapy — metabolic and safety monitoring.',
+    groups:[
+      {title:'Before starting',color:'#7B1818',icon:'⭐',tests:[
+        {name:'Fasting glucose + HbA1c',note:'Antipsychotics (esp. olanzapine, clozapine) cause insulin resistance',priority:'must'},
+        {name:'Fasting lipid profile',note:'Metabolic syndrome risk',priority:'must'},
+        {name:'Weight + BMI',note:'Baseline — monthly monitoring recommended',priority:'must'},
+        {name:'ECG (QTc)',note:'Haloperidol, ziprasidone, quetiapine — QT prolongation risk',priority:'must'},
+        {name:'Prolactin',note:'Especially for risperidone / haloperidol — galactorrhoea, amenorrhoea',priority:'high'},
+        {name:'LFT',note:'Baseline',priority:'high'},
+      ]},
+      {title:'Clozapine specific (mandatory)',color:'#C62828',icon:'🚨',tests:[
+        {name:'CBC — ANC (Absolute neutrophil count)',note:'Weekly × 26 weeks, then monthly. ANC < 1500 = clozapine must be stopped',priority:'must'},
+        {name:'Fasting glucose',note:'Monthly × 3, then 3-monthly',priority:'must'},
+        {name:'Lipid profile',note:'3-monthly',priority:'must'},
+        {name:'ECG',note:'Baseline + if symptoms',priority:'must'},
+      ]},
+    ]
+  },
+  {
+    id:'sud-deaddiction',icon:'🏥',name:'SUD / de-addiction — initial workup',tag:'De-addiction',tagColor:'#8B3A00',tagBg:'#FFF0E5',
+    desc:'Walk-in or referred patient with substance use disorder. Comprehensive safety and organ function panel.',
+    groups:[
+      {title:'Mandatory',color:'#8B3A00',icon:'⭐',tests:[
+        {name:'UDS (urine drug screen — multi-panel)',note:'Confirm substances present. 5-panel minimum: opioids, benzodiazepines, cannabis, amphetamines, cocaine',priority:'must'},
+        {name:'Blood alcohol level (BAL)',note:'If acute alcohol intoxication suspected',priority:'situational'},
+        {name:'LFT (full panel)',note:'GGT is most sensitive alcohol marker; check for cirrhosis',priority:'must'},
+        {name:'CBC',note:'Macrocytosis in alcoholism; anaemia common',priority:'must'},
+        {name:'Blood glucose',note:'Hypoglycaemia risk in alcohol withdrawal',priority:'must'},
+        {name:'S. Electrolytes',note:'Hyponatraemia, hypokalaemia in alcohol withdrawal',priority:'must'},
+      ]},
+      {title:'Infection screen (opioid / IV drug use)',color:'#7B1818',icon:'🔴',tests:[
+        {name:'HIV (ELISA + Western blot if positive)',note:'High-risk behaviour',priority:'must'},
+        {name:'HBsAg (Hepatitis B surface antigen)',note:'Baseline and if not vaccinated',priority:'must'},
+        {name:'Anti-HCV (Hepatitis C antibody)',note:'IV drug use significantly increases HCV risk',priority:'must'},
+        {name:'RPR / VDRL (syphilis)',note:'Particularly if high-risk sexual behaviour',priority:'high'},
+      ]},
+      {title:'Before buprenorphine/naloxone initiation',color:'#4C2D8E',icon:'💊',tests:[
+        {name:'LFT',note:'Buprenorphine metabolised hepatically — contraindicated in severe hepatic impairment',priority:'must'},
+        {name:'RFT',note:'Baseline',priority:'high'},
+        {name:'ECG',note:'QTc — methadone has significant QT risk',priority:'high'},
+        {name:'Pregnancy test (women)',note:'Before initiating opioid agonist therapy',priority:'must'},
+      ]},
+    ]
+  },
+  {
+    id:'wellness',icon:'✅',name:'Corporate wellness package',tag:'Wellness AMC',tagColor:'#1A5C52',tagBg:'#E0F2EE',
+    desc:'Employee wellness AMC — Aatmiya corporate wellness panel. Screening + preventive.',
+    groups:[
+      {title:'Core wellness panel',color:'#1A5C52',icon:'⭐',tests:[
+        {name:'CBC (with differential)',note:'Anaemia, infection, haematological disorders',priority:'must'},
+        {name:'Fasting blood glucose',note:'Diabetes / pre-diabetes screening',priority:'must'},
+        {name:'HbA1c',note:'3-month glucose control — screen for pre-diabetes',priority:'must'},
+        {name:'Fasting lipid profile (full)',note:'Cardiovascular risk',priority:'must'},
+        {name:'LFT',note:'Liver health screen',priority:'must'},
+        {name:'RFT + electrolytes',note:'Kidney function',priority:'must'},
+        {name:'TFT (TSH)',note:'Thyroid — often missed cause of fatigue, weight change, mood',priority:'must'},
+        {name:'Urine routine + microscopy',note:'Kidney, UTI screen',priority:'must'},
+        {name:'ECG',note:'Baseline cardiac rhythm',priority:'must'},
+      ]},
+      {title:'Mental wellness add-on',color:'#4C2D8E',icon:'🧠',tests:[
+        {name:'Vitamin B12',note:'Low B12 linked to fatigue, depression, cognitive problems',priority:'high'},
+        {name:'Vitamin D (25-OH)',note:'Epidemic deficiency in India — fatigue, depression, musculoskeletal pain',priority:'high'},
+        {name:'S. Ferritin',note:'Iron deficiency even without anaemia causes fatigue and poor concentration',priority:'moderate'},
+        {name:'DHEA-S',note:'Adrenal stress marker — burnout screen add-on',priority:'situational'},
+      ]},
+      {title:'For 40+ or high-risk employees',color:'#8B5E00',icon:'→',tests:[
+        {name:'PSA (men 40+)',note:'Prostate cancer screen',priority:'moderate'},
+        {name:'Pap smear referral (women)',note:'Cervical cancer screen — refer to gynaecology if not recently done',priority:'high'},
+        {name:'Serum uric acid',note:'Gout risk',priority:'moderate'},
+        {name:'hs-CRP',note:'Inflammatory / cardiovascular risk marker',priority:'moderate'},
+      ]},
+    ]
+  },
+  {
+    id:'geriatric',icon:'👴',name:'Geriatric mental health screen',tag:'Geriatric',tagColor:'#1E5E32',tagBg:'#E5F2E9',
+    desc:'Elderly patient — cognitive decline, depression, fall risk, polypharmacy context.',
+    groups:[
+      {title:'Essential geriatric screen',color:'#1E5E32',icon:'⭐',tests:[
+        {name:'CBC',note:'Anaemia very common in elderly — fatigue, cognitive symptoms',priority:'must'},
+        {name:'B12 + Folate',note:'Deficiency causes dementia-like symptoms and depression — treatable',priority:'must'},
+        {name:'TFT — TSH',note:'Hypothyroidism common in elderly, mimics dementia',priority:'must'},
+        {name:'RFT + electrolytes',note:'Hyponatraemia causes confusion; renal function guides medication dosing',priority:'must'},
+        {name:'Blood glucose / HbA1c',note:'Diabetes affects cognition',priority:'must'},
+        {name:'Calcium',note:'Hypercalcaemia causes confusion, depression',priority:'high'},
+      ]},
+      {title:'If cognitive impairment suspected',color:'#4C2D8E',icon:'🧠',tests:[
+        {name:'VDRL / RPR',note:'Neurosyphilis — treatable cause of dementia',priority:'high'},
+        {name:'HIV',note:'HIV dementia — rare but relevant in some populations',priority:'situational'},
+        {name:'LFT',note:'Hepatic encephalopathy differential',priority:'high'},
+        {name:'Ammonia',note:'If hepatic encephalopathy suspected',priority:'situational'},
+        {name:'EEG (Param Lab)',note:'Rule out non-convulsive status epilepticus; useful in behavioural change',priority:'situational'},
+      ]},
+    ]
+  },
+  {
+    id:'migraine',icon:'🤕',name:'Headache / migraine interface',tag:'Neurology CL',tagColor:'#1A3D70',tagBg:'#E8EEF8',
+    desc:'Comorbid headache / migraine with psychiatric presentation. CL psychiatry interface.',
+    groups:[
+      {title:'Headache baseline',color:'#1A3D70',icon:'⭐',tests:[
+        {name:'CBC',note:'Anaemia as headache cause',priority:'must'},
+        {name:'Blood pressure (vitals)',note:'Hypertension headache',priority:'must'},
+        {name:'Blood glucose',note:'Hypoglycaemia trigger',priority:'high'},
+        {name:'TFT',note:'Thyroid disorders associated with headache',priority:'high'},
+        {name:'S. Magnesium',note:'Magnesium deficiency is a migraine trigger — deficiency is common in India',priority:'high'},
+      ]},
+      {title:'If on preventive medication',color:'#1E5E32',icon:'→',tests:[
+        {name:'LFT (if on valproate for migraine)',note:'Hepatic monitoring',priority:'must'},
+        {name:'CBC + platelets (if on valproate)',note:'Thrombocytopenia risk',priority:'must'},
+        {name:'Renal function (if on topiramate)',note:'Kidney stones risk',priority:'high'},
+      ]},
+    ]
+  },
+];
+
+let selectedTests={};
+let activeScenarioId=null;
+
+function switchScenario(id){
+  activeScenarioId=id;
+  const sc=SCENARIOS.find(s=>s.id===id);
+  if(!sc) return;
+  document.querySelectorAll('.scenario-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('si-'+id)?.classList.add('active');
+  renderTestPanel(sc);
+}
+
+function renderScenarios(){
+  const list=document.getElementById('scenario-list');
+  list.innerHTML=SCENARIOS.map(s=>`
+    <div class="scenario-item" id="si-${s.id}" onclick="switchScenario('${s.id}')">
+      <span class="scenario-icon">${s.icon}</span>
+      <span class="scenario-name">${s.name}</span>
+      <span class="scenario-tag" style="background:${s.tagBg};color:${s.tagColor}">${s.tag}</span>
+    </div>`).join('');
+}
+
+function filterScenarios(){
+  const q=document.getElementById('scenario-search').value.toLowerCase();
+  document.querySelectorAll('.scenario-item').forEach(el=>{
+    el.style.display=el.textContent.toLowerCase().includes(q)?'flex':'none';
+  });
+}
+
+function renderTestPanel(sc){
+  const priorityColors={must:'#C62828',high:'#8B5E00',moderate:'#4C2D8E',situational:'#5A5448'};
+  const priorityBgs={must:'#FBEBEE',high:'#FFF8E1',moderate:'#EDE8FA',situational:'#F0F2F5'};
+  const priorityLabels={must:'Required',high:'Recommended',moderate:'Consider',situational:'If indicated'};
+
+  const groupsHTML=sc.groups.map((g,gi)=>`
+    <div class="test-group">
+      <div class="tg-head" style="background:${g.color}">
+        <span class="tg-icon">${g.icon}</span>
+        <span class="tg-title">${g.title}</span>
+        <span class="tg-badge">${g.tests.length} tests</span>
+      </div>
+      <div class="tg-body">
+        ${g.tests.map((t,ti)=>{
+          const key=`${sc.id}_${gi}_${ti}`;
+          const checked=selectedTests[key];
+          return `<div class="test-row">
+            <div class="test-check${checked?' checked':''}" onclick="toggleTest('${key}',this)">${checked?'✓':''}</div>
+            <div class="test-info">
+              <div class="test-name">${t.name}<span class="test-priority" style="background:${priorityBgs[t.priority]};color:${priorityColors[t.priority]}">${priorityLabels[t.priority]}</span></div>
+              ${t.note?`<div class="test-note">${t.note}</div>`:''}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+
+  const selected=Object.entries(selectedTests).filter(([k,v])=>v&&k.startsWith(sc.id+'_'));
+
+  document.getElementById('test-panel').innerHTML=`
+    <div class="panel-header">
+      <span class="scenario-big-icon">${sc.icon}</span>
+      <div>
+        <div class="panel-title">${sc.name}</div>
+        <div class="panel-desc">${sc.desc}</div>
+      </div>
+    </div>
+    <div class="test-groups">${groupsHTML}</div>
+    <div class="selected-panel">
+      <div class="selected-title">Selected for requisition (${selected.length})</div>
+      <div class="selected-list" id="selected-list">
+        ${selected.length?selected.map(([k])=>{
+          const [sid,gi,ti]=k.split('_');
+          const grp=sc.groups[parseInt(gi)];
+          const test=grp?.tests[parseInt(ti)];
+          return test?`<span class="selected-chip">${test.name}</span>`:'';
+        }).join(''):'<span style="font-size:11px;color:var(--text3)">Tick tests above to add to slip</span>'}
+      </div>
+    </div>
+    <div class="act-row">
+      <button class="bp" onclick="generateSlip()">Generate lab requisition</button>
+      <button class="bpo" onclick="selectAll('${sc.id}')">Select all required</button>
+      <button class="bpo" onclick="clearSelection('${sc.id}')">Clear</button>
+    </div>
+    <div class="out-area" id="out-area"></div>`;
+}
+
+function toggleTest(key,el){
+  selectedTests[key]=!selectedTests[key];
+  el.classList.toggle('checked');
+  el.textContent=selectedTests[key]?'✓':'';
+  // Update selected panel
+  const sc=SCENARIOS.find(s=>s.id===activeScenarioId);
+  if(sc) refreshSelectedPanel(sc);
+}
+
+function refreshSelectedPanel(sc){
+  const selected=Object.entries(selectedTests).filter(([k,v])=>v&&k.startsWith(sc.id+'_'));
+  const list=document.getElementById('selected-list');
+  if(!list) return;
+  list.innerHTML=selected.length?selected.map(([k])=>{
+    const [sid,gi,ti]=k.split('_');
+    const grp=sc.groups[parseInt(gi)];
+    const test=grp?.tests[parseInt(ti)];
+    return test?`<span class="selected-chip">${test.name}</span>`:'';
+  }).join(''):'<span style="font-size:11px;color:var(--text3)">Tick tests above to add to slip</span>';
+}
+
+function selectAll(scId){
+  const sc=SCENARIOS.find(s=>s.id===scId);
+  if(!sc) return;
+  sc.groups.forEach((g,gi)=>{
+    g.tests.forEach((t,ti)=>{
+      if(t.priority==='must'||t.priority==='high'){
+        const key=`${scId}_${gi}_${ti}`;
+        selectedTests[key]=true;
+      }
+    });
+  });
+  switchScenario(scId);
+}
+
+function clearSelection(scId){
+  Object.keys(selectedTests).forEach(k=>{if(k.startsWith(scId+'_')) delete selectedTests[k];});
+  switchScenario(scId);
+}
+
+function generateSlip(){
+  const sc=SCENARIOS.find(s=>s.id===activeScenarioId);
+  if(!sc){alert('Please select a clinical scenario first.');return;}
+  const selected=Object.entries(selectedTests).filter(([k,v])=>v&&k.startsWith(sc.id+'_'))
+    .map(([k])=>{
+      const [sid,gi,ti]=k.split('_');
+      const grp=sc.groups[parseInt(gi)];
+      return grp?.tests[parseInt(ti)]?.name;
+    }).filter(Boolean);
+  const now=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const text=`PARAM DIAGNOSTIC MICROBIOLOGY LABORATORY
+Aatmiya Hospital, Gandhidham — Lab Requisition
+Generated: ${now}
+
+Clinical context: ${sc.name}
+Referring clinician: Dr. Dhaivat Mehta, Consultant Psychiatrist
+
+TESTS REQUESTED:
+${selected.map((t,i)=>`  ${i+1}. ${t}`).join('\n')||'  (No tests selected — tick tests above)'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Param Diagnostic Microbiology Laboratory
+Aatmiya Hospital ecosystem · Gandhidham, Kutch`;
+
+  const out=document.getElementById('out-area');
+  if(out){out.textContent=text;out.classList.add('visible');}
+  navigator.clipboard?.writeText(text);
+}
+
+renderScenarios();
+</script>
+</body>
+</html>

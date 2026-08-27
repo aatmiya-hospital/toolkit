@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Child & Adolescent Tracker — Aatmiya Hospital</title>
+<style>
+  :root{
+    --bg:#F3F8F5;--surface:#FFF;--surface2:#EBF3EE;--border:#D0E4D8;
+    --text:#101E14;--text2:#405848;--text3:#88A890;
+    --accent:#1A6E3E;--accent-light:#E0F2E8;
+    --blue:#1A3D70;--blue-light:#E8EEF8;
+    --amber:#8B5E00;--amber-light:#FFF8E1;
+    --red:#7B1818;--red-light:#FBEBEE;
+    --purple:#4C2D8E;--purple-light:#EDE8FA;
+    --yellow:#8B7200;--yellow-light:#FFFBE0;
+    --radius:12px;--shadow:0 2px 14px rgba(26,110,62,.09);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hl{display:flex;align-items:center;gap:12px}
+  .lm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .ht{font-size:16px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:8px}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .stabs{background:#135430;display:flex;overflow-x:auto}
+  .stab{flex:1;min-width:90px;padding:10px 8px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.65);cursor:pointer;border:none;background:transparent;font-family:inherit;border-bottom:2.5px solid transparent;white-space:nowrap}
+  .stab.active{color:#fff;border-bottom-color:#7AE0A0}
+  .wrap{max-width:960px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 280px;gap:16px}
+  @media(max-width:760px){.wrap{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .ph{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .phd{width:8px;height:8px;border-radius:50%}
+  .pht{font-size:13px;font-weight:600}.phs{font-size:11px;color:var(--text3);margin-top:1px}
+  .pb{padding:14px 18px}
+  .fl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
+  .fi{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text)}
+  .fi:focus{outline:none;border-color:var(--accent);background:#fff}
+  select.fi,textarea.fi{cursor:pointer}
+  textarea.fi{resize:vertical;line-height:1.55;cursor:text}
+  .fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:480px){.fg{grid-template-columns:1fr}}
+  .frow{margin-bottom:10px}
+  .screener-content{display:none}.screener-content.active{display:block}
+  /* SDQ question style */
+  .sdq-section{margin-bottom:16px}
+  .sdq-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding:6px 10px;border-radius:6px}
+  .sdq-item{display:flex;align-items:center;gap:10px;margin-bottom:6px;padding:8px 10px;background:var(--surface2);border-radius:8px}
+  .sdq-text{font-size:12px;color:var(--text);flex:1;line-height:1.4}
+  .sdq-opts{display:flex;gap:4px;flex-shrink:0}
+  .sdq-opt{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:500;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-family:inherit;transition:all .12s;white-space:nowrap}
+  .sdq-opt:hover{border-color:var(--accent)}
+  .sdq-opt.sel{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:700}
+  /* Mood calendar */
+  .mood-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .cal-head{font-size:9px;font-weight:700;text-align:center;color:var(--text3);text-transform:uppercase;padding:3px}
+  .cal-day{border-radius:8px;padding:6px 4px;text-align:center;cursor:pointer;border:2px solid transparent;background:var(--surface2);transition:all .12s}
+  .cal-day:hover{border-color:var(--border)}
+  .cal-day .day-num{font-size:11px;font-weight:600;color:var(--text2)}
+  .cal-day .day-emoji{font-size:18px;line-height:1.3;display:block}
+  .cal-day.selected{border-color:var(--accent)}
+  /* Emotion picker */
+  .emoji-picker{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .ep-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 8px;border-radius:8px;border:2px solid transparent;transition:all .12s;min-width:50px}
+  .ep-item:hover{border-color:var(--border);background:var(--surface2)}
+  .ep-item.sel{border-color:var(--accent);background:var(--accent-light)}
+  .ep-emoji{font-size:24px}
+  .ep-label{font-size:9px;color:var(--text3);text-align:center;font-weight:500}
+  /* Chips */
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+  .chip{padding:5px 10px;border-radius:20px;font-size:11px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;user-select:none;transition:all .12s}
+  .chip.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600}
+  /* Right panel */
+  .score-panel{padding:12px 14px}
+  .sp-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px}
+  .sp-domain{margin-bottom:8px}
+  .sp-dom-name{font-size:11px;font-weight:600;color:var(--text);margin-bottom:3px}
+  .sp-dom-bar-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+  .sp-dom-bar{height:100%;border-radius:3px;transition:width .3s}
+  .sp-dom-score{font-size:10px;color:var(--text3);margin-top:2px;display:flex;justify-content:space-between}
+  /* Out */
+  .out-area{background:var(--surface2);border-radius:8px;padding:12px;font-size:11px;line-height:1.8;white-space:pre-wrap;color:var(--text);border:1px solid var(--border);display:none;margin:0 14px 14px}
+  .out-area.visible{display:block}
+  .act-row{display:flex;gap:8px;padding:14px;flex-wrap:wrap;border-top:1px solid var(--border)}
+  .bp{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+  /* Age-appropriate styles */
+  .child-style .sdq-text{font-size:13px}
+  .child-style .sdq-item{padding:10px 12px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Child &amp; Adolescent Tracker</div><div class="hs">Aatmiya Hospital · Tool 22 · SDQ · Mood calendar · Behaviour log</div></div>
+  </div>
+  <div class="ha">
+    <button class="bg" onclick="generateReport()">Generate report</button>
+    <button class="bg" onclick="window.print()">Print</button>
+  </div>
+</div>
+<div class="stabs">
+  <button class="stab active" onclick="switchTab('info',this)">Patient info</button>
+  <button class="stab" onclick="switchTab('sdq',this)">SDQ (parent)</button>
+  <button class="stab" onclick="switchTab('self',this)">Self-report</button>
+  <button class="stab" onclick="switchTab('mood',this)">Mood calendar</button>
+  <button class="stab" onclick="switchTab('school',this)">School / function</button>
+  <button class="stab" onclick="switchTab('risk',this)">Risk screen</button>
+</div>
+
+<div class="wrap">
+<div>
+
+<!-- INFO TAB -->
+<div class="screener-content active" id="tab-info">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">Child / adolescent details</div></div></div>
+    <div class="pb">
+      <div class="fg">
+        <div class="frow"><div class="fl">Name code / initials</div><input class="fi" id="child-id" placeholder="e.g. AK / Child-001"></div>
+        <div class="frow"><div class="fl">Age</div><input class="fi" id="child-age" type="number" placeholder="e.g. 12"></div>
+        <div class="frow"><div class="fl">Gender</div>
+          <select class="fi" id="child-gender">
+            <option>Male</option><option>Female</option><option>Other / prefer not to say</option>
+          </select>
+        </div>
+        <div class="frow"><div class="fl">Date of assessment</div><input class="fi" type="date" id="assess-date"></div>
+      </div>
+      <div class="fg">
+        <div class="frow"><div class="fl">Class / grade</div><input class="fi" id="child-class" placeholder="e.g. Class 7 / Standard 9"></div>
+        <div class="frow"><div class="fl">School type</div>
+          <select class="fi" id="child-school">
+            <option>Government school</option><option>Private English medium</option>
+            <option>Private Gujarati medium</option><option>Not attending school</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow"><div class="fl">Informant</div>
+        <select class="fi" id="informant">
+          <option>Mother</option><option>Father</option><option>Both parents</option>
+          <option>Grandparent</option><option>Teacher</option><option>Self (adolescent)</option>
+        </select>
+      </div>
+      <div class="frow"><div class="fl">Presenting complaint</div>
+        <textarea class="fi" id="presenting" rows="2" placeholder="Main concern as described by parent / teacher / child…"></textarea>
+      </div>
+      <div class="frow"><div class="fl">Duration of problem</div>
+        <select class="fi" id="duration">
+          <option>< 1 month</option><option>1–3 months</option><option>3–6 months</option>
+          <option>6–12 months</option><option>> 1 year</option><option>Always / lifelong</option>
+        </select>
+      </div>
+      <div class="frow"><div class="fl">Developmental / perinatal history concerns</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Premature birth</div>
+          <div class="chip" onclick="toggleChip(this)">Delayed milestones</div>
+          <div class="chip" onclick="toggleChip(this)">Febrile seizures</div>
+          <div class="chip" onclick="toggleChip(this)">Head injury</div>
+          <div class="chip" onclick="toggleChip(this)">Speech delay</div>
+          <div class="chip" onclick="toggleChip(this)">No concerns noted</div>
+        </div>
+      </div>
+      <div class="frow"><div class="fl">Family psychiatric history</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Depression</div>
+          <div class="chip" onclick="toggleChip(this)">Anxiety disorder</div>
+          <div class="chip" onclick="toggleChip(this)">Bipolar disorder</div>
+          <div class="chip" onclick="toggleChip(this)">Schizophrenia</div>
+          <div class="chip" onclick="toggleChip(this)">ADHD</div>
+          <div class="chip" onclick="toggleChip(this)">Substance use</div>
+          <div class="chip" onclick="toggleChip(this)">None known</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SDQ TAB -->
+<div class="screener-content" id="tab-sdq">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--blue)"></div><div><div class="pht">Strengths &amp; Difficulties Questionnaire — Parent report (SDQ-P)</div><div class="phs">25 items · 5 domains · Not true / Somewhat true / Certainly true</div></div></div>
+    <div class="pb">
+      <div style="background:var(--blue-light);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--blue)">Ask the parent/guardian: "For each statement, please say how true it has been for your child over the last 6 months."</div>
+      <div id="sdq-questions"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SELF-REPORT TAB -->
+<div class="screener-content" id="tab-self">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--purple)"></div><div><div class="pht">Adolescent self-report (11+ years)</div><div class="phs">Simple mood and behaviour questions for the young person themselves</div></div></div>
+    <div class="pb">
+      <div style="background:var(--purple-light);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--purple)">Ask the young person to answer these questions themselves. For children under 11, skip this section.</div>
+
+      <div class="frow" style="margin-bottom:16px">
+        <div class="fl">How are you feeling in general these days?</div>
+        <div class="emoji-picker" id="self-mood-pick">
+          <div class="ep-item" onclick="selectSelfMood('😭','Very sad',this)"><span class="ep-emoji">😭</span><span class="ep-label">Very sad</span></div>
+          <div class="ep-item" onclick="selectSelfMood('😢','Sad',this)"><span class="ep-emoji">😢</span><span class="ep-label">Sad</span></div>
+          <div class="ep-item" onclick="selectSelfMood('😐','Okay',this)"><span class="ep-emoji">😐</span><span class="ep-label">Okay</span></div>
+          <div class="ep-item" onclick="selectSelfMood('🙂','Good',this)"><span class="ep-emoji">🙂</span><span class="ep-label">Good</span></div>
+          <div class="ep-item" onclick="selectSelfMood('😊','Happy',this)"><span class="ep-emoji">😊</span><span class="ep-label">Happy</span></div>
+          <div class="ep-item" onclick="selectSelfMood('😰','Worried',this)"><span class="ep-emoji">😰</span><span class="ep-label">Worried</span></div>
+          <div class="ep-item" onclick="selectSelfMood('😠','Angry',this)"><span class="ep-emoji">😠</span><span class="ep-label">Angry</span></div>
+          <div class="ep-item" onclick="selectSelfMood('😔','Lonely',this)"><span class="ep-emoji">😔</span><span class="ep-label">Lonely</span></div>
+        </div>
+      </div>
+
+      <div id="self-questions" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MOOD CALENDAR -->
+<div class="screener-content" id="tab-mood">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--yellow)"></div><div><div class="pht">Mood calendar — caregiver daily log</div><div class="phs">Tap a day to assign a mood. Builds a pattern over 4 weeks.</div></div></div>
+    <div class="pb">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Active mood to assign:</div>
+      <div class="emoji-picker" id="mood-picker" style="margin-bottom:12px">
+        <div class="ep-item sel" onclick="selectActiveMood('😊','Happy / calm',this)"><span class="ep-emoji">😊</span><span class="ep-label">Happy</span></div>
+        <div class="ep-item" onclick="selectActiveMood('😐','Neutral / okay',this)"><span class="ep-emoji">😐</span><span class="ep-label">Neutral</span></div>
+        <div class="ep-item" onclick="selectActiveMood('😢','Sad / low',this)"><span class="ep-emoji">😢</span><span class="ep-label">Sad</span></div>
+        <div class="ep-item" onclick="selectActiveMood('😠','Angry / irritable',this)"><span class="ep-emoji">😠</span><span class="ep-label">Angry</span></div>
+        <div class="ep-item" onclick="selectActiveMood('😰','Anxious / worried',this)"><span class="ep-emoji">😰</span><span class="ep-label">Anxious</span></div>
+        <div class="ep-item" onclick="selectActiveMood('🤯','Hyperactive / wild',this)"><span class="ep-emoji">🤯</span><span class="ep-label">Hyper</span></div>
+        <div class="ep-item" onclick="selectActiveMood('😴','Withdrawn / tired',this)"><span class="ep-emoji">😴</span><span class="ep-label">Withdrawn</span></div>
+        <div class="ep-item" onclick="selectActiveMood('🤒','Unwell / headache',this)"><span class="ep-emoji">🤒</span><span class="ep-label">Unwell</span></div>
+      </div>
+      <div id="mood-calendar"></div>
+      <div style="margin-top:12px">
+        <div class="fl" style="margin-bottom:5px">Notable events / notes</div>
+        <textarea class="fi" id="mood-notes" rows="3" placeholder="Note any significant events, school incidents, family stressors, medication changes…"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCHOOL / FUNCTION -->
+<div class="screener-content" id="tab-school">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--amber)"></div><div><div class="pht">School &amp; daily functioning</div></div></div>
+    <div class="pb" style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div class="fl">Academic performance</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Average / on grade level</div>
+          <div class="chip" onclick="toggleChip(this)">Below average</div>
+          <div class="chip" onclick="toggleChip(this)">Declining recently</div>
+          <div class="chip" onclick="toggleChip(this)">Above average</div>
+          <div class="chip" onclick="toggleChip(this)">Failing / at risk of failing</div>
+          <div class="chip" onclick="toggleChip(this)">Not currently in school</div>
+        </div>
+      </div>
+      <div>
+        <div class="fl">School attendance</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Regular attendance</div>
+          <div class="chip" onclick="toggleChip(this)">Frequent absences</div>
+          <div class="chip" onclick="toggleChip(this)">School refusal</div>
+          <div class="chip" onclick="toggleChip(this)">Truancy</div>
+          <div class="chip" onclick="toggleChip(this)">Suspended / expelled</div>
+        </div>
+      </div>
+      <div>
+        <div class="fl">Social / peer relationships</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Good friendships</div>
+          <div class="chip" onclick="toggleChip(this)">Few friends</div>
+          <div class="chip" onclick="toggleChip(this)">Socially isolated</div>
+          <div class="chip" onclick="toggleChip(this)">Bullied by peers</div>
+          <div class="chip" onclick="toggleChip(this)">Bullying others</div>
+          <div class="chip" onclick="toggleChip(this)">Conflict with teachers</div>
+        </div>
+      </div>
+      <div>
+        <div class="fl">Sleep pattern</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Normal for age</div>
+          <div class="chip" onclick="toggleChip(this)">Difficulty falling asleep</div>
+          <div class="chip" onclick="toggleChip(this)">Night waking / nightmares</div>
+          <div class="chip" onclick="toggleChip(this)">Co-sleeping beyond age</div>
+          <div class="chip" onclick="toggleChip(this)">Hypersomnia</div>
+          <div class="chip" onclick="toggleChip(this)">Excessive screen time at night</div>
+        </div>
+      </div>
+      <div>
+        <div class="fl">Eating and appetite</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Normal</div>
+          <div class="chip" onclick="toggleChip(this)">Reduced appetite</div>
+          <div class="chip" onclick="toggleChip(this)">Picky / food refusal</div>
+          <div class="chip" onclick="toggleChip(this)">Overeating</div>
+          <div class="chip" onclick="toggleChip(this)">Weight loss noted</div>
+        </div>
+      </div>
+      <div>
+        <div class="fl">Screen and phone use</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">&lt; 2 hrs/day</div>
+          <div class="chip" onclick="toggleChip(this)">2–4 hrs/day</div>
+          <div class="chip" onclick="toggleChip(this)">&gt; 4 hrs/day</div>
+          <div class="chip" onclick="toggleChip(this)">Gaming — excessive</div>
+          <div class="chip" onclick="toggleChip(this)">Social media conflicts</div>
+          <div class="chip" onclick="toggleChip(this)">Online bullying concern</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RISK SCREEN -->
+<div class="screener-content" id="tab-risk">
+  <div class="panel">
+    <div class="ph"><div class="phd" style="background:var(--red)"></div><div><div class="pht">Risk screen — child &amp; adolescent</div><div class="phs">Ask carefully, age-appropriately. Document responses.</div></div></div>
+    <div class="pb" style="display:flex;flex-direction:column;gap:12px">
+      <div style="background:var(--red-light);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--red);border-left:3px solid var(--red)">
+        <strong>Important:</strong> Suicidal ideation in children and adolescents must always be taken seriously. Never promise confidentiality before asking — explain that you may need to tell a trusted adult if they are in danger. Ask directly in an age-appropriate way.
+      </div>
+      <div id="risk-questions" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div>
+        <div class="fl" style="margin-bottom:5px">Risk assessment notes</div>
+        <textarea class="fi" id="risk-notes" rows="3" placeholder="Document responses, context, plan, safety measures taken…"></textarea>
+      </div>
+      <div>
+        <div class="fl" style="margin-bottom:5px">Protective factors present</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Supportive parent(s)</div>
+          <div class="chip" onclick="toggleChip(this)">At least one trusted adult</div>
+          <div class="chip" onclick="toggleChip(this)">School engagement</div>
+          <div class="chip" onclick="toggleChip(this)">Hobbies / interests</div>
+          <div class="chip" onclick="toggleChip(this)">Religious / spiritual anchor</div>
+          <div class="chip" onclick="toggleChip(this)">Good peer support</div>
+          <div class="chip" onclick="toggleChip(this)">Engaged with treatment</div>
+          <div class="chip" onclick="toggleChip(this)">Future orientation present</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end left -->
+
+<!-- Right: scores + summary -->
+<div>
+  <div class="panel" style="position:sticky;top:16px">
+    <div class="ph"><div class="phd" style="background:var(--accent)"></div><div><div class="pht">SDQ domain scores</div><div class="phs">Updates as you answer</div></div></div>
+    <div class="score-panel" id="score-panel">
+      <div style="font-size:12px;color:var(--text3)">Complete the SDQ tab to see scores.</div>
+    </div>
+    <div class="act-row">
+      <button class="bp" onclick="generateReport()">Generate report</button>
+      <button class="bpo" onclick="resetAll()">Reset all</button>
+    </div>
+    <div class="out-area" id="out-area"></div>
+  </div>
+</div>
+</div>
+
+<script>
+// SDQ 25 items — domains: Emotional(E), Conduct(C), Hyperactivity(H), Peer(P), Prosocial(Pro)
+// Score: Not true=0, Somewhat=1, Certainly=2. Prosocial: reversed for total difficulties.
+const SDQ_ITEMS=[
+  {text:'Considerate of other people\'s feelings',domain:'Pro',reverse:false},
+  {text:'Restless, overactive, cannot stay still for long',domain:'H',reverse:false},
+  {text:'Often complains of headaches, stomach-aches or sickness',domain:'E',reverse:false},
+  {text:'Shares readily with other children (treats, toys, pencils etc.)',domain:'Pro',reverse:false},
+  {text:'Often has temper tantrums or hot tempers',domain:'C',reverse:false},
+  {text:'Rather solitary, tends to play alone',domain:'P',reverse:false},
+  {text:'Generally obedient, usually does what adults request',domain:'C',reverse:true},
+  {text:'Many worries, often seems worried',domain:'E',reverse:false},
+  {text:'Helpful if someone is hurt, upset or feeling ill',domain:'Pro',reverse:false},
+  {text:'Constantly fidgeting or squirming',domain:'H',reverse:false},
+  {text:'Has at least one good friend',domain:'P',reverse:true},
+  {text:'Often fights with other children or bullies them',domain:'C',reverse:false},
+  {text:'Often unhappy, down-hearted or tearful',domain:'E',reverse:false},
+  {text:'Generally liked by other children',domain:'P',reverse:true},
+  {text:'Easily distracted, concentration wanders',domain:'H',reverse:false},
+  {text:'Nervous or clingy in new situations, easily loses confidence',domain:'E',reverse:false},
+  {text:'Kind to younger children',domain:'Pro',reverse:false},
+  {text:'Often lies or cheats',domain:'C',reverse:false},
+  {text:'Picked on or bullied by other children',domain:'P',reverse:false},
+  {text:'Often volunteers to help others (parents, teachers, other children)',domain:'Pro',reverse:false},
+  {text:'Thinks things out before acting',domain:'H',reverse:true},
+  {text:'Steals from home, school or elsewhere',domain:'C',reverse:false},
+  {text:'Gets along better with adults than with other children',domain:'P',reverse:false},
+  {text:'Many fears, easily scared',domain:'E',reverse:false},
+  {text:'Sees tasks through to the end, good attention span',domain:'H',reverse:true},
+];
+
+const SELF_QS=[
+  {text:'I often feel sad or cry without really knowing why.',domain:'mood'},
+  {text:'I worry a lot about things — school, family, the future.',domain:'anxiety'},
+  {text:'I get angry quickly and sometimes can\'t control it.',domain:'behaviour'},
+  {text:'I find it hard to concentrate or sit still for long.',domain:'attention'},
+  {text:'I feel like no one understands me or likes me.',domain:'social'},
+  {text:'I have trouble sleeping most nights.',domain:'sleep'},
+  {text:'I sometimes feel like I don\'t want to be here any more.',domain:'safety',sensitive:true},
+  {text:'When things get hard, I have someone I can talk to.',domain:'support',positive:true},
+];
+
+const RISK_QS=[
+  {text:'Has the child expressed a wish to be dead or not to wake up?',level:'low'},
+  {text:'Has the child talked about hurting or killing themselves?',level:'moderate'},
+  {text:'Has the child attempted to hurt themselves (cutting, burning, hitting)?',level:'moderate'},
+  {text:'Has the child been a victim of physical, sexual, or emotional abuse?',level:'high'},
+  {text:'Has the child witnessed domestic violence at home?',level:'moderate'},
+  {text:'Has the child consumed alcohol or used any substances?',level:'moderate'},
+  {text:'Is the child engaging in any risky online behaviour or contact with unknown adults?',level:'moderate'},
+  {text:'Is there access to means at home (medications, sharp objects)?',level:'high'},
+];
+
+let sdqAnswers={};
+let selfAnswers={};
+let riskAnswers={};
+let moodCalData={};
+let activeMood={emoji:'😊',label:'Happy / calm'};
+let selfMood='';
+
+document.getElementById('assess-date').value=new Date().toISOString().split('T')[0];
+
+function switchTab(name,btn){
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.screener-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='mood') renderMoodCalendar();
+  updateScores();
+}
+function toggleChip(el){el.classList.toggle('on')}
+
+// SDQ
+function renderSDQ(){
+  const domains={E:'Emotional symptoms',C:'Conduct problems',H:'Hyperactivity / inattention',P:'Peer problems',Pro:'Prosocial behaviour'};
+  const domColors={E:'#1A3D70',C:'#7B1818',H:'#8B5E00',P:'#4C2D8E',Pro:'#1A6E3E'};
+  const domBgs={E:'#E8EEF8',C:'#FBEBEE',H:'#FFF8E1',P:'#EDE8FA',Pro:'#E0F2E8'};
+  let html='';
+  Object.entries(domains).forEach(([dom,label])=>{
+    html+=`<div class="sdq-section">
+      <div class="sdq-section-title" style="background:${domBgs[dom]};color:${domColors[dom]}">${label}</div>`;
+    SDQ_ITEMS.forEach((item,i)=>{
+      if(item.domain!==dom) return;
+      const ans=sdqAnswers[i];
+      html+=`<div class="sdq-item">
+        <div class="sdq-text">${i+1}. ${item.text}</div>
+        <div class="sdq-opts">
+          ${['Not true','Somewhat true','Certainly true'].map((opt,v)=>`
+            <div class="sdq-opt${ans===v?' sel':''}" onclick="setSDQ(${i},${v},this)">${opt}</div>`).join('')}
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('sdq-questions').innerHTML=html;
+}
+
+function setSDQ(idx,val,el){
+  sdqAnswers[idx]=val;
+  el.closest('.sdq-opts').querySelectorAll('.sdq-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  updateScores();
+}
+
+// Self-report
+function renderSelf(){
+  document.getElementById('self-questions').innerHTML=SELF_QS.map((q,i)=>`
+    <div style="background:var(--surface2);border-radius:8px;padding:10px 12px;${q.sensitive?'border-left:3px solid var(--red)':''}">
+      ${q.sensitive?'<div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:4px;text-transform:uppercase">⚠ Sensitive — assess immediately if endorsed</div>':''}
+      <div style="font-size:13px;color:var(--text);margin-bottom:8px;line-height:1.4">${q.text}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${['Not at all','A little','Quite a lot','Very much'].map((opt,v)=>`
+          <div class="q-opt${selfAnswers[i]===v?' sel':''}" onclick="setSelf(${i},${v},this)"
+            style="padding:6px 10px;border-radius:8px;font-size:11px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .12s">
+            ${opt}
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function setSelf(idx,val,el){
+  selfAnswers[idx]=val;
+  el.closest('div').querySelectorAll('.q-opt,[onclick*="setSelf"]').forEach(o=>{
+    if(o.classList.contains('q-opt')||o.getAttribute('onclick')?.includes('setSelf'))
+      o.classList.remove('sel');
+  });
+  el.classList.add('sel');
+}
+
+function selectSelfMood(emoji,label,el){
+  selfMood=`${emoji} ${label}`;
+  document.querySelectorAll('#self-mood-pick .ep-item').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// Risk
+function renderRisk(){
+  document.getElementById('risk-questions').innerHTML=RISK_QS.map((q,i)=>`
+    <div style="background:${q.level==='high'?'var(--red-light)':q.level==='moderate'?'var(--amber-light)':'var(--surface2)'};border-radius:8px;padding:10px 12px;border-left:3px solid ${q.level==='high'?'var(--red)':q.level==='moderate'?'var(--amber)':'var(--border)'}">
+      <div style="font-size:12px;color:var(--text);margin-bottom:6px;line-height:1.4;font-weight:500">${q.text}</div>
+      <div style="display:flex;gap:6px">
+        ${['No','Uncertain','Yes'].map((opt,v)=>`
+          <div class="${riskAnswers[i]===v?'q-opt sel':'q-opt'}" onclick="setRisk(${i},${v},this)"
+            style="padding:5px 12px;border-radius:6px;font-size:11px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;transition:all .12s;font-weight:500">
+            ${opt}
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function setRisk(idx,val,el){
+  riskAnswers[idx]=val;
+  el.closest('div').querySelectorAll('.q-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// Mood calendar
+function selectActiveMood(emoji,label,el){
+  activeMood={emoji,label};
+  document.querySelectorAll('#mood-picker .ep-item').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function renderMoodCalendar(){
+  const now=new Date();
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html=`<div class="mood-cal">${days.map(d=>`<div class="cal-head">${d}</div>`).join('')}`;
+  const start=new Date(now.getFullYear(),now.getMonth()-1,1);
+  const firstDay=start.getDay();
+  for(let i=0;i<firstDay;i++) html+='<div></div>';
+  // 4 weeks = 28 days
+  for(let d=0;d<28;d++){
+    const date=new Date(start); date.setDate(d+1);
+    const key=date.toISOString().split('T')[0];
+    const mood=moodCalData[key];
+    const dayNum=date.getDate();
+    html+=`<div class="cal-day${mood?' selected':''}" onclick="toggleMoodDay('${key}',this)">
+      <span class="day-num">${dayNum}</span>
+      <span class="day-emoji">${mood||'·'}</span>
+    </div>`;
+  }
+  html+='</div>';
+  document.getElementById('mood-calendar').innerHTML=html;
+}
+
+function toggleMoodDay(key,el){
+  if(moodCalData[key]===activeMood.emoji){
+    delete moodCalData[key];
+    el.classList.remove('selected');
+    el.querySelector('.day-emoji').textContent='·';
+  } else {
+    moodCalData[key]=activeMood.emoji;
+    el.classList.add('selected');
+    el.querySelector('.day-emoji').textContent=activeMood.emoji;
+  }
+}
+
+// Scores
+const DOMAIN_CUTOFFS={E:{normal:4,borderline:6},C:{normal:3,borderline:4},H:{normal:6,borderline:7},P:{normal:3,borderline:5},Pro:{normal:5,borderline:4}};
+
+function getDomainScore(dom){
+  return SDQ_ITEMS.reduce((sum,item,i)=>{
+    if(item.domain!==dom) return sum;
+    const v=sdqAnswers[i];
+    if(v===undefined) return sum;
+    const score=item.reverse?(2-v):v;
+    return sum+score;
+  },0);
+}
+
+function updateScores(){
+  const answered=Object.keys(sdqAnswers).length;
+  if(!answered){document.getElementById('score-panel').innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px 0">Complete the SDQ tab to see scores.</div>';return;}
+  const domains=[
+    {id:'E',label:'Emotional symptoms',max:10},
+    {id:'C',label:'Conduct problems',max:10},
+    {id:'H',label:'Hyperactivity',max:10},
+    {id:'P',label:'Peer problems',max:10},
+    {id:'Pro',label:'Prosocial behaviour',max:10},
+  ];
+  const cuts={E:[4,6],C:[3,4],H:[6,7],P:[3,5],Pro:[6,5]};// [normal_max, borderline_max]
+  const total=['E','C','H','P'].reduce((s,d)=>s+getDomainScore(d),0);
+  let totLabel='',totColor='var(--text3)';
+  if(total<=15){totLabel='Normal';totColor='#1E5E32'}
+  else if(total<=19){totLabel='Borderline';totColor='#8B5E00'}
+  else{totLabel='Abnormal';totColor='#C62828'}
+
+  const html=`
+    <div class="sp-title">SDQ domain scores (${answered}/25 answered)</div>
+    ${domains.map(d=>{
+      const score=getDomainScore(d.id);
+      const pct=score/d.max*100;
+      const [norm,border]=cuts[d.id]||[4,6];
+      const isPro=d.id==='Pro';
+      const color=isPro?(score>=norm?'#1E5E32':score>=border?'#8B5E00':'#C62828'):(score<=norm?'#1E5E32':score<=border?'#8B5E00':'#C62828');
+      const label=isPro?(score>=norm?'Normal':score>=border?'Borderline':'Low'):(score<=norm?'Normal':score<=border?'Borderline':'Abnormal');
+      return `<div class="sp-domain">
+        <div class="sp-dom-name">${d.label}</div>
+        <div class="sp-dom-bar-track"><div class="sp-dom-bar" style="width:${pct}%;background:${color}"></div></div>
+        <div class="sp-dom-score"><span style="color:${color};font-weight:700">${score}/${d.max}</span><span style="color:${color}">${label}</span></div>
+      </div>`;
+    }).join('')}
+    <div style="padding:8px 0;border-top:1px solid var(--border);margin-top:4px">
+      <div style="font-size:11px;font-weight:600;color:var(--text)">Total difficulties: <span style="color:${totColor}">${total}/40 — ${totLabel}</span></div>
+    </div>`;
+  document.getElementById('score-panel').innerHTML=html;
+}
+
+function generateReport(){
+  const now=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const childId=document.getElementById('child-id').value||'—';
+  const age=document.getElementById('child-age').value||'—';
+  const domScores=['E','C','H','P','Pro'].map(d=>`  ${d}: ${getDomainScore(d)}/10`).join('\n');
+  const total=['E','C','H','P'].reduce((s,d)=>s+getDomainScore(d),0);
+  const riskFlags=RISK_QS.filter((_,i)=>riskAnswers[i]===2).map(q=>q.text);
+  const moodSummary=Object.entries(moodCalData).map(([k,v])=>`${k}: ${v}`).join(', ');
+  const selfFlag=selfAnswers[6]>=2;
+
+  const text=`AATMIYA HOSPITAL — CHILD/ADOLESCENT ASSESSMENT
+Generated: ${now}
+Child: ${childId} | Age: ${age} | Informant: ${document.getElementById('informant').value||'—'}
+Presenting concern: ${document.getElementById('presenting').value||'—'}
+
+SDQ — PARENT REPORT (${Object.keys(sdqAnswers).length}/25 items):
+${domScores}
+Total difficulties: ${total}/40
+
+${selfMood?`SELF-REPORTED MOOD: ${selfMood}`:''}
+${selfFlag?'\n⚠ ITEM 7 (SELF-HARM/DEATH WISH) ENDORSED — IMMEDIATE ASSESSMENT REQUIRED':''}
+
+RISK SCREEN:
+${riskFlags.length?riskFlags.map(r=>`⚠ ${r}`).join('\n'):'No high-risk items endorsed'}
+Risk notes: ${document.getElementById('risk-notes').value||'—'}
+
+MOOD CALENDAR: ${Object.keys(moodCalData).length} days logged
+${moodSummary||'No entries'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Aatmiya Hospital · Dr. Dhaivat Mehta, Gandhidham`;
+  const out=document.getElementById('out-area');
+  out.textContent=text; out.classList.add('visible');
+  navigator.clipboard?.writeText(text);
+}
+
+function resetAll(){
+  sdqAnswers={};selfAnswers={};riskAnswers={};moodCalData={};selfMood='';
+  document.querySelectorAll('.chip.on').forEach(c=>c.classList.remove('on'));
+  document.querySelectorAll('textarea').forEach(t=>t.value='');
+  document.getElementById('out-area').classList.remove('visible');
+  renderSDQ();renderSelf();renderRisk();renderMoodCalendar();updateScores();
+}
+
+// q-opt style in risk and self sections
+const style=document.createElement('style');
+style.textContent='.q-opt{padding:6px 12px;border-radius:8px;font-size:12px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .12s}.q-opt:hover{border-color:var(--accent)}.q-opt.sel{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:700}';
+document.head.appendChild(style);
+
+renderSDQ();renderSelf();renderRisk();renderMoodCalendar();
+</script>
+</body>
+</html>
