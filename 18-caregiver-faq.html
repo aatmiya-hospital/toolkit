@@ -67,10 +67,17 @@
   .empty{text-align:center;padding:40px;color:var(--text3);font-size:13px;display:none}
   .empty.visible{display:block}
   /* Print */
-  @media print{.search-bar,.sidebar,.ha{display:none!important}.wrap{grid-template-columns:1fr}}
+  @media print{.no-print-nav{display:none!important}.search-bar,.sidebar,.ha{display:none!important}.wrap{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
+  <!-- Back nav injected -->
+  <div class="no-print-nav" style="background:#1A1610;padding:6px 20px;display:flex;align-items:center;gap:12px;">
+    <a href="index.html" style="color:#9A9488;text-decoration:none;font-size:11px;font-family:Segoe UI,sans-serif;display:flex;align-items:center;gap:5px;">
+      ← Back to Aatmiya Toolkit
+    </a>
+  </div>
+
 <div class="header">
   <div class="hl">
     <div class="lm">A</div>

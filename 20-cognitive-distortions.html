@@ -74,9 +74,21 @@
   @media(max-width:480px){.emotion-compare{grid-template-columns:1fr}}
   .emo-box{border-radius:8px;padding:10px 12px}
   .emo-box-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+
+  @media print{.no-print-nav{display:none!important}
+    body{background:#fff!important}
+    .header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
 </style>
 </head>
 <body>
+  <!-- Back nav injected -->
+  <div class="no-print-nav" style="background:#1A1610;padding:6px 20px;display:flex;align-items:center;gap:12px;">
+    <a href="index.html" style="color:#9A9488;text-decoration:none;font-size:11px;font-family:Segoe UI,sans-serif;display:flex;align-items:center;gap:5px;">
+      ← Back to Aatmiya Toolkit
+    </a>
+  </div>
+
 <div class="header">
   <div class="hl">
     <div class="lm">A</div>

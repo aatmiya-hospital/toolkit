@@ -68,9 +68,21 @@
   .group-stat{text-align:center}
   .group-val{font-size:18px;font-weight:800;color:var(--accent)}
   .group-lbl{font-size:10px;color:var(--text3)}
+
+  @media print{.no-print-nav{display:none!important}
+    body{background:#fff!important}
+    .header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
 </style>
 </head>
 <body>
+  <!-- Back nav injected -->
+  <div class="no-print-nav" style="background:#1A1610;padding:6px 20px;display:flex;align-items:center;gap:12px;">
+    <a href="index.html" style="color:#9A9488;text-decoration:none;font-size:11px;font-family:Segoe UI,sans-serif;display:flex;align-items:center;gap:5px;">
+      ← Back to Aatmiya Toolkit
+    </a>
+  </div>
+
 <div class="header">
   <div class="hl">
     <div class="lm">A</div>

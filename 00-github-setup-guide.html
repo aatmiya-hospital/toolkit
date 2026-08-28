@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Setup Guide — Aatmiya Toolkit</title>
+<style>
+  :root {
+    --bg: #F5F3EE;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE8;
+    --border: #DDD9D2;
+    --text: #1A1815;
+    --text2: #5A5650;
+    --text3: #9A9690;
+    --accent: #2D6E5E;
+    --accent-light: #E3F0EC;
+    --amber: #9A5200;
+    --amber-light: #FFF3E0;
+    --blue: #1A4A7A;
+    --blue-light: #E8F0F8;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+
+  .header { background: var(--accent); color: #fff; padding: 14px 24px; display: flex; align-items: center; gap: 12px; }
+  .logo-mark { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; }
+  .header-title { font-size: 16px; font-weight: 600; }
+  .header-sub { font-size: 11px; opacity: 0.7; margin-top: 1px; }
+
+  .content { max-width: 820px; margin: 0 auto; padding: 24px 20px; }
+
+  .intro { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 24px; margin-bottom: 20px; }
+  .intro-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .intro-sub { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+  .phase { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden; }
+  .phase-head { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .phase-num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .phase-title { font-size: 15px; font-weight: 600; }
+  .phase-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  .steps { padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; }
+  .step { display: flex; gap: 14px; }
+  .step-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--accent); flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .step-text { font-size: 12px; color: var(--text2); line-height: 1.65; }
+
+  .code-block { background: var(--text); color: #A8E6CF; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-family: 'Courier New', monospace; margin: 8px 0; line-height: 1.5; }
+  .code-block .comment { color: #888; }
+
+  .tip { background: var(--accent-light); border: 1px solid #A5C9C1; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--accent); line-height: 1.5; margin: 8px 0; }
+  .tip::before { content: '💡 '; }
+
+  .warning { background: var(--amber-light); border: 1px solid #FFCC80; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--amber); line-height: 1.5; margin: 8px 0; }
+  .warning::before { content: '⚠️ '; }
+
+  .info { background: var(--blue-light); border: 1px solid #90B8D8; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--blue); line-height: 1.5; margin: 8px 0; }
+
+  .link-chip { display: inline-block; background: var(--blue-light); color: var(--blue); border: 1px solid #90B8D8; border-radius: 6px; padding: 3px 10px; font-size: 11px; font-weight: 500; text-decoration: none; }
+  .link-chip:hover { background: #D0E4F2; }
+
+  .file-structure { background: var(--surface2); border-radius: 8px; padding: 12px 16px; font-family: 'Courier New', monospace; font-size: 12px; color: var(--text2); line-height: 1.8; margin: 8px 0; }
+  .file-structure .folder { color: var(--accent); font-weight: 600; }
+  .file-structure .file { color: var(--text); }
+  .file-structure .note { color: var(--text3); font-style: italic; }
+
+  .status-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .status-chip { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+
+  .done-panel { background: var(--accent-light); border: 1px solid #A5C9C1; border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; }
+  .done-title { font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+  .done-list { font-size: 12px; color: var(--text2); line-height: 1.8; }
+  .done-list li { margin-left: 16px; }
+
+  img { max-width: 100%; border-radius: 8px; border: 1px solid var(--border); margin: 8px 0; }
+
+  .divider { height: 1px; background: var(--border); margin: 6px 0; }
+
+  @media print {
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+  <!-- Back nav injected -->
+  <div class="no-print-nav" style="background:#1A1610;padding:6px 20px;display:flex;align-items:center;gap:12px;">
+    <a href="index.html" style="color:#9A9488;text-decoration:none;font-size:11px;font-family:Segoe UI,sans-serif;display:flex;align-items:center;gap:5px;">
+      ← Back to Aatmiya Toolkit
+    </a>
+  </div>
+
+
+<div class="header">
+  <div class="logo-mark">A</div>
+  <div>
+    <div class="header-title">GitHub Setup — Aatmiya Toolkit Hosting</div>
+    <div class="header-sub">One-time setup · No technical background needed · ~20 minutes</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="intro">
+    <div class="intro-title">What this sets up</div>
+    <div class="intro-sub">
+      GitHub is a free website that stores files and makes them accessible via a web link. Once set up, every tool we build gets a permanent link — patients can open it on their phone, you can use it on the OPD tablet, and everything stays free forever. You just drag and drop files to update.
+    </div>
+    <div class="status-row" style="margin-top:12px">
+      <span class="status-chip" style="background:#E8F5EE;color:#2E7D52">✓ Free forever</span>
+      <span class="status-chip" style="background:#E8F0F8;color:#1A4A7A">✓ No coding needed to maintain</span>
+      <span class="status-chip" style="background:#FFF3E0;color:#9A5200">✓ No patient data stored online</span>
+      <span class="status-chip" style="background:#F3E5F5;color:#6A1B9A">✓ Custom domain later</span>
+    </div>
+  </div>
+
+  <!-- Phase 1 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">1</div>
+      <div>
+        <div class="phase-title">Create your GitHub account</div>
+        <div class="phase-sub">~3 minutes · One time only</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">1</div>
+        <div class="step-body">
+          <div class="step-title">Go to github.com</div>
+          <div class="step-text">Open <strong>github.com</strong> in any browser. Click the green <strong>"Sign up"</strong> button.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">2</div>
+        <div class="step-body">
+          <div class="step-title">Choose your username</div>
+          <div class="step-text">
+            Use something like <strong>aatmiya-hospital</strong> or <strong>dhaivat-mehta</strong>. This becomes part of your web address:<br>
+            <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:11px">https://aatmiya-hospital.github.io/toolkit</code>
+          </div>
+          <div class="tip">Choose a professional username — it appears in every tool's URL.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">3</div>
+        <div class="step-body">
+          <div class="step-title">Verify email and choose Free plan</div>
+          <div class="step-text">GitHub will ask you to verify your email. When asked about a plan, choose <strong>Free</strong>. Everything we need is on the free plan.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">2</div>
+      <div>
+        <div class="phase-title">Create the toolkit repository</div>
+        <div class="phase-sub">A repository is just a folder on GitHub that holds your files</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">1</div>
+        <div class="step-body">
+          <div class="step-title">Click "New repository"</div>
+          <div class="step-text">After logging in, click the <strong>+</strong> icon (top right) → <strong>New repository</strong>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">2</div>
+        <div class="step-body">
+          <div class="step-title">Fill in the details exactly as follows</div>
+          <div class="step-text">
+            <div class="file-structure" style="margin-top:6px">
+              <span class="file">Repository name:</span> <strong>toolkit</strong><br>
+              <span class="file">Description:</span> Aatmiya Hospital clinical tools<br>
+              <span class="file">Visibility:</span> ✓ Public (required for free hosting)<br>
+              <span class="file">Add README:</span> ✓ Check this box<br>
+            </div>
+          </div>
+          <div class="warning">The repository name must be <strong>toolkit</strong> (all lowercase) for the URLs to work correctly.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">3</div>
+        <div class="step-body">
+          <div class="step-title">Click "Create repository"</div>
+          <div class="step-text">You'll land on a page showing your new repository. It'll look mostly empty — that's fine.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">3</div>
+      <div>
+        <div class="phase-title">Enable GitHub Pages (the free web hosting)</div>
+        <div class="phase-sub">This turns your file folder into a live website</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">1</div>
+        <div class="step-body">
+          <div class="step-title">Go to Settings</div>
+          <div class="step-text">Inside your repository, click the <strong>Settings</strong> tab (the last tab in the row, with a gear icon).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">2</div>
+        <div class="step-body">
+          <div class="step-title">Find the Pages section</div>
+          <div class="step-text">In the left sidebar, scroll down and click <strong>Pages</strong>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">3</div>
+        <div class="step-body">
+          <div class="step-title">Set source to "main" branch</div>
+          <div class="step-text">Under <strong>Source</strong>, click the dropdown and select <strong>main</strong>. Leave folder as <strong>/ (root)</strong>. Click <strong>Save</strong>.</div>
+          <div class="tip">Wait 2–3 minutes. GitHub will show a green box: <strong>"Your site is published at https://[your-username].github.io/toolkit"</strong>. That's your permanent link.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">4</div>
+      <div>
+        <div class="phase-title">Upload your HTML tool files</div>
+        <div class="phase-sub">This is how you add tools — same process every time, no coding</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">1</div>
+        <div class="step-body">
+          <div class="step-title">Go back to the repository main page</div>
+          <div class="step-text">Click your repository name at the top. You'll see the list of files (currently just README.md).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">2</div>
+        <div class="step-body">
+          <div class="step-title">Click "Add file" → "Upload files"</div>
+          <div class="step-text">You'll see a large drag-and-drop area.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">3</div>
+        <div class="step-body">
+          <div class="step-title">Drag your HTML files here</div>
+          <div class="step-text">
+            Drag all the tool .html files from your downloads folder into this area. You can upload multiple files at once.<br><br>
+            After uploading, scroll down and click <strong>"Commit changes"</strong> (this is GitHub's word for "save").
+          </div>
+          <div class="tip">Each tool will be live at: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:11px">https://[username].github.io/toolkit/01-feelings-wheel.html</code></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">4</div>
+        <div class="step-body">
+          <div class="step-title">Create the index page (tool menu)</div>
+          <div class="step-text">We will build a central home page (index.html) that lists all tools with descriptions and links. This becomes the main URL patients and staff bookmark. Claude will generate this file automatically once more tools are ready.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 5: Folder structure -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">5</div>
+      <div>
+        <div class="phase-title">Recommended file structure</div>
+        <div class="phase-sub">How to organise as the toolkit grows</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">→</div>
+        <div class="step-body">
+          <div class="step-text">
+            <div class="file-structure">
+<span class="folder">toolkit/</span>  <span class="note">← your GitHub repository root</span>
+├── <span class="file">index.html</span>  <span class="note">← home page / tool menu</span>
+│
+├── <span class="folder">clinical/</span>  <span class="note">← clinician-only tools</span>
+│   ├── <span class="file">03-cows-ciwa.html</span>
+│   ├── <span class="file">04-soap-note.html</span>
+│   ├── <span class="file">05-case-formulation.html</span>
+│   └── <span class="file">06-treatment-plan.html</span>
+│
+├── <span class="folder">patient/</span>  <span class="note">← patient-facing tools</span>
+│   ├── <span class="file">01-feelings-wheel.html</span>
+│   ├── <span class="file">02-breathing-timer.html</span>
+│   ├── <span class="file">07-safety-plan.html</span>
+│   └── <span class="file">08-mood-checkin.html</span>
+│
+├── <span class="folder">de-addiction/</span>
+│   ├── <span class="file">09-readiness-ruler.html</span>
+│   └── <span class="file">10-craving-chain.html</span>
+│
+└── <span class="folder">corporate/</span>  <span class="note">← wellness AMC tools</span>
+    ├── <span class="file">11-burnout-screener.html</span>
+    └── <span class="file">12-stress-assessment.html</span>
+            </div>
+          </div>
+          <div class="info">To create folders on GitHub: when uploading, type the folder name followed by "/" in the filename field — GitHub creates the folder automatically. E.g., type <code>patient/01-feelings-wheel.html</code>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 6: Future updates -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">6</div>
+      <div>
+        <div class="phase-title">How to update tools in future</div>
+        <div class="phase-sub">Same 3-step process every time</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">1</div>
+        <div class="step-body">
+          <div class="step-title">Download the updated file from Claude</div>
+          <div class="step-text">When Claude builds you a new or updated tool, download the .html file to your computer.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">2</div>
+        <div class="step-body">
+          <div class="step-title">Go to the file on GitHub and click the pencil/upload icon</div>
+          <div class="step-text">Navigate to the file in your repository → click the pencil (edit) icon if editing, or use "Add file → Upload files" for new files.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">3</div>
+        <div class="step-body">
+          <div class="step-title">Upload and click "Commit changes"</div>
+          <div class="step-text">GitHub deploys the update automatically within 1–2 minutes. The live URL never changes — anyone who bookmarked it gets the latest version.</div>
+          <div class="tip">Bookmark your repository page: <strong>github.com/[your-username]/toolkit</strong> — you'll visit this every time you want to update a file.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Optional: Custom domain -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">7</div>
+      <div>
+        <div class="phase-title">Optional later: Custom domain</div>
+        <div class="phase-sub">tools.aatmiyahospital.com instead of username.github.io/toolkit — ~₹700/year</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">→</div>
+        <div class="step-body">
+          <div class="step-text">
+            When you're ready, buy a .com or .in domain from GoDaddy India or BigRock (~₹700–₹900/year). Then in GitHub Pages Settings, enter your custom domain and follow the DNS instructions (Claude can walk you through this step-by-step when needed). The toolkit stays free — you only pay for the domain name.
+          </div>
+          <div class="info">Suggested domain: <strong>tools.aatmiyahospital.com</strong> or <strong>aatmiyatools.in</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="done-panel">
+    <div class="done-title">✓ After setup, you'll have</div>
+    <div class="done-list">
+      <ul>
+        <li>A permanent free web address for every tool</li>
+        <li>Tools that work on mobile, tablet, and desktop</li>
+        <li>No patient data stored anywhere online</li>
+        <li>One-click updates: download from Claude → upload to GitHub → done</li>
+        <li>A foundation to add 20+ tools over the coming months</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

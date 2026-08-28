@@ -88,9 +88,21 @@
   /* Age-appropriate styles */
   .child-style .sdq-text{font-size:13px}
   .child-style .sdq-item{padding:10px 12px}
+
+  @media print{.no-print-nav{display:none!important}
+    body{background:#fff!important}
+    .header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
 </style>
 </head>
 <body>
+  <!-- Back nav injected -->
+  <div class="no-print-nav" style="background:#1A1610;padding:6px 20px;display:flex;align-items:center;gap:12px;">
+    <a href="index.html" style="color:#9A9488;text-decoration:none;font-size:11px;font-family:Segoe UI,sans-serif;display:flex;align-items:center;gap:5px;">
+      ← Back to Aatmiya Toolkit
+    </a>
+  </div>
+
 <div class="header">
   <div class="hl">
     <div class="lm">A</div>

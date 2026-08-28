@@ -3,951 +3,514 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Feelings Wheel + Body Map — Aatmiya Hospital</title>
+<title>Feelings Wheel — Aatmiya Hospital</title>
 <style>
-  :root {
-    --bg: #F7F4EF;
-    --surface: #FFFFFF;
-    --surface2: #F0EDE8;
-    --border: #DDD9D2;
-    --text: #1E1C18;
-    --text2: #6B6760;
-    --text3: #9E9B96;
-    --accent: #2D6E5E;
-    --accent-light: #E3F0EC;
-    --accent2: #8B4513;
-    --radius: 12px;
-    --shadow: 0 2px 12px rgba(0,0,0,0.07);
-
-    /* Emotion color palette */
-    --joy: #F5A623; --joy-light: #FEF3DC;
-    --trust: #4CAF50; --trust-light: #E8F5E9;
-    --fear: #9C6EAD; --fear-light: #F3EEF7;
-    --surprise: #2196F3; --surprise-light: #E3F2FD;
-    --sadness: #5C7AEA; --sadness-light: #EEF1FD;
-    --disgust: #795548; --disgust-light: #EFEBE9;
-    --anger: #E53935; --anger-light: #FFEBEE;
-    --anticipation: #FF9800; --anticipation-light: #FFF3E0;
+  :root{
+    --bg:#F5F2EC;--surface:#FFF;--surface2:#EEEAE2;--border:#DDD9D0;
+    --text:#1A1610;--text2:#5A5448;--text3:#9A9488;
+    --accent:#2D6E5E;--accent-light:#E3F0EC;
+    --radius:12px;--shadow:0 2px 14px rgba(45,110,94,.1);
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  /* Header */
-  .header {
-    background: var(--accent);
-    color: #fff;
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .logo-mark {
-    width: 36px; height: 36px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 700; color: #fff;
-    letter-spacing: -1px;
-  }
-  .header-title { font-size: 16px; font-weight: 600; }
-  .header-sub { font-size: 11px; opacity: 0.75; margin-top: 1px; }
-  .header-actions { display: flex; gap: 8px; }
-  .btn-ghost {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.25);
-    color: #fff;
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .btn-ghost:hover { background: rgba(255,255,255,0.25); }
-
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:var(--accent);color:#fff;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .hl{display:flex;align-items:center;gap:10px}
+  .lm{width:34px;height:34px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700}
+  .ht{font-size:15px;font-weight:600}.hs{font-size:11px;opacity:.7;margin-top:1px}
+  .ha{display:flex;gap:7px;flex-wrap:wrap}
+  .bg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 13px;border-radius:7px;font-size:11px;cursor:pointer;font-family:inherit}
   /* Layout */
-  .main {
-    display: grid;
-    grid-template-columns: 1fr 1fr 320px;
-    gap: 16px;
-    padding: 16px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  @media (max-width: 1100px) {
-    .main { grid-template-columns: 1fr 1fr; }
-    .panel-right { grid-column: 1 / -1; }
-  }
-  @media (max-width: 700px) {
-    .main { grid-template-columns: 1fr; }
-  }
-
-  .panel {
-    background: var(--surface);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
-  .panel-head {
-    padding: 14px 18px 12px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .panel-head-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent);
-  }
-  .panel-head-title { font-size: 13px; font-weight: 600; color: var(--text); }
-  .panel-head-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
-  .panel-body { padding: 16px; }
-
-  /* Feelings Wheel */
-  #wheel-svg { width: 100%; height: auto; cursor: pointer; }
-
-  .wheel-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 12px;
-  }
-
-  .layer-tabs {
-    display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; justify-content: center;
-  }
-  .layer-tab {
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 500;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--text2);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .layer-tab.active {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-  }
-
-  /* Body Map */
-  .body-map-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 12px;
-  }
-  #body-svg { width: 100%; max-width: 260px; height: auto; cursor: pointer; }
-
-  .body-legend {
-    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
-    padding: 0 8px;
-  }
-  .body-legend-item {
-    display: flex; align-items: center; gap: 5px;
-    font-size: 11px; color: var(--text2);
-  }
-  .body-legend-dot {
-    width: 10px; height: 10px; border-radius: 50%;
-  }
-
-  /* Selected Feelings Panel */
-  .selection-list {
-    display: flex; flex-direction: column; gap: 8px;
-    padding: 12px;
-    min-height: 120px;
-  }
-  .selection-empty {
-    text-align: center;
-    color: var(--text3);
-    font-size: 12px;
-    padding: 20px 0;
-    line-height: 1.6;
-  }
-  .sel-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    position: relative;
-  }
-  .sel-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .sel-info { flex: 1; }
-  .sel-name { font-size: 13px; font-weight: 500; }
-  .sel-core { font-size: 11px; color: var(--text3); }
-  .sel-intensity { display: flex; align-items: center; gap: 4px; }
-  .intensity-pip {
-    width: 14px; height: 14px; border-radius: 3px;
-    border: 1px solid var(--border);
-    cursor: pointer;
-    transition: all 0.1s;
-  }
-  .sel-remove {
-    width: 20px; height: 20px;
-    border-radius: 50%; background: var(--border);
-    border: none; cursor: pointer;
-    font-size: 12px; color: var(--text2);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: background 0.15s;
-  }
-  .sel-remove:hover { background: #ffcdd2; color: #c62828; }
-
-  /* Body sensations */
-  .body-sensations {
-    padding: 0 12px 12px;
-  }
-  .sensation-title { font-size: 11px; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
-  .sensation-chips { display: flex; flex-wrap: wrap; gap: 5px; }
-  .sensation-chip {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--text2);
-    cursor: pointer;
-    transition: all 0.15s;
-    user-select: none;
-  }
-  .sensation-chip.selected {
-    background: var(--accent-light);
-    border-color: var(--accent);
-    color: var(--accent);
-    font-weight: 500;
-  }
-
-  /* Notes */
-  .notes-wrap { padding: 0 12px 12px; }
-  .notes-label { font-size: 11px; font-weight: 600; color: var(--text2); margin-bottom: 5px; letter-spacing: 0.05em; text-transform: uppercase; }
-  .notes-input {
-    width: 100%;
-    padding: 8px 10px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 12px;
-    font-family: inherit;
-    background: var(--surface2);
-    color: var(--text);
-    resize: none;
-    line-height: 1.5;
-    transition: border-color 0.15s;
-  }
-  .notes-input:focus { outline: none; border-color: var(--accent); background: #fff; }
-
-  /* Export snapshot */
-  .snapshot-area {
-    margin: 12px;
-    padding: 12px;
-    background: var(--accent-light);
-    border-radius: 8px;
-    border: 1px solid #b2d8cf;
-    font-size: 12px;
-    color: var(--accent);
-    display: none;
-    white-space: pre-wrap;
-    line-height: 1.6;
-  }
-  .snapshot-area.visible { display: block; }
-
-  .btn-primary {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    padding: 8px 18px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s;
-    font-family: inherit;
-  }
-  .btn-primary:hover { background: #235a4c; }
-  .btn-outline {
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    padding: 8px 18px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: inherit;
-  }
-  .btn-outline:hover { background: var(--accent-light); }
-  .action-row { display: flex; gap: 8px; padding: 0 12px 12px; flex-wrap: wrap; }
-
+  .main{display:grid;grid-template-columns:1fr 340px;gap:0;min-height:calc(100vh - 54px)}
+  @media(max-width:900px){.main{grid-template-columns:1fr}}
+  /* Wheel area */
+  .wheel-area{display:flex;flex-direction:column;align-items:center;padding:16px 12px;gap:12px}
+  .wheel-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3)}
+  #wheel-svg{max-width:520px;width:100%;height:auto;cursor:pointer}
+  .zoom-hint{font-size:10px;color:var(--text3);text-align:center}
   /* Tooltip */
-  .tooltip {
-    position: fixed;
-    background: var(--text);
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 11px;
-    pointer-events: none;
-    z-index: 999;
-    opacity: 0;
-    transition: opacity 0.1s;
-    white-space: nowrap;
+  .tooltip{
+    position:fixed;background:#1A1610;color:#fff;padding:6px 12px;border-radius:8px;
+    font-size:12px;font-weight:500;pointer-events:none;opacity:0;transition:opacity .15s;
+    z-index:100;transform:translate(-50%,-130%);white-space:nowrap;max-width:220px;text-align:center
   }
-  .tooltip.visible { opacity: 1; }
-
-  /* Intensity row */
-  .intensity-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
-  .intensity-label { font-size: 10px; color: var(--text3); }
-
-  /* Print */
-  @media print {
-    .header-actions, .action-row, .layer-tabs { display: none !important; }
-    body { background: white; }
-    .panel { box-shadow: none; border: 1px solid #ddd; }
-  }
+  /* Right panel */
+  .side{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+  /* Selected emotion display */
+  .sel-display{padding:16px;border-bottom:1px solid var(--border)}
+  .sel-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:6px}
+  .sel-emotion{font-size:22px;font-weight:800;color:var(--accent);min-height:32px;line-height:1.2}
+  .sel-family{font-size:12px;color:var(--text3);margin-top:2px}
+  .sel-desc{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.6;padding:8px 10px;background:var(--surface2);border-radius:7px;min-height:40px}
+  /* Intensity slider */
+  .intensity-section{padding:12px 16px;border-bottom:1px solid var(--border)}
+  .int-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+  .int-val{font-size:14px;font-weight:800;color:var(--accent)}
+  input[type=range]{width:100%;accent-color:var(--accent);margin-bottom:4px}
+  .int-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--text3)}
+  /* Body map */
+  .body-section{padding:12px 16px;border-bottom:1px solid var(--border);flex:1}
+  .body-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px}
+  .body-map-wrap{display:flex;gap:10px;align-items:flex-start}
+  #body-svg{width:90px;flex-shrink:0;cursor:pointer}
+  .body-chips{flex:1;display:flex;flex-wrap:wrap;gap:4px}
+  .body-chip{font-size:11px;padding:4px 8px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;user-select:none;transition:all .12s}
+  .body-chip.on{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:600}
+  /* Notes & snapshot */
+  .notes-section{padding:12px 16px;border-bottom:1px solid var(--border)}
+  .notes-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:5px}
+  textarea.notes-input{width:100%;height:64px;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);resize:none;line-height:1.55}
+  textarea.notes-input:focus{outline:none;border-color:var(--accent);background:#fff}
+  .snap-section{padding:12px 16px}
+  .snap-out{background:var(--surface2);border-radius:8px;padding:10px;font-size:11px;white-space:pre-wrap;color:var(--text);border:1px solid var(--border);display:none;line-height:1.7;max-height:180px;overflow-y:auto;margin-top:8px}
+  .snap-out.visible{display:block}
+  .bp{background:var(--accent);color:#fff;border:none;padding:7px 14px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;margin-right:5px}
+  .bpo{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:7px 14px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit}
+  /* Emotion list fallback */
+  .emo-list{padding:8px 16px;display:none}
+  @media(max-width:900px){.wheel-area{padding:10px 6px}}
+  @media print{.no-print-nav{display:none!important}.side,.header{display:none!important}.main{grid-template-columns:1fr}.snap-out{display:block!important}}
 </style>
 </head>
 <body>
+  <!-- Back nav injected -->
+  <div class="no-print-nav" style="background:#1A1610;padding:6px 20px;display:flex;align-items:center;gap:12px;">
+    <a href="index.html" style="color:#9A9488;text-decoration:none;font-size:11px;font-family:Segoe UI,sans-serif;display:flex;align-items:center;gap:5px;">
+      ← Back to Aatmiya Toolkit
+    </a>
+  </div>
 
 <div class="header">
-  <div class="header-left">
-    <div class="logo-mark">A</div>
-    <div>
-      <div class="header-title">Feelings Wheel + Body Map</div>
-      <div class="header-sub">Aatmiya Hospital · Clinical Tool 01</div>
-    </div>
+  <div class="hl">
+    <div class="lm">A</div>
+    <div><div class="ht">Feelings Wheel + Body Map</div><div class="hs">Aatmiya Hospital · Tool 01 · In-session emotion tool</div></div>
   </div>
-  <div class="header-actions">
-    <button class="btn-ghost" onclick="resetAll()">Reset</button>
-    <button class="btn-ghost" onclick="generateSnapshot()">Copy snapshot</button>
-    <button class="btn-ghost" onclick="window.print()">Print</button>
+  <div class="ha">
+    <button class="bg" onclick="takeSnapshot()">Session snapshot</button>
+    <button class="bg" onclick="resetAll()">Reset</button>
+    <button class="bg" onclick="window.print()">Print</button>
   </div>
-</div>
-
-<div class="main">
-
-  <!-- Feelings Wheel Panel -->
-  <div class="panel">
-    <div class="panel-head">
-      <div class="panel-head-dot"></div>
-      <div>
-        <div class="panel-head-title">Feelings wheel</div>
-        <div class="panel-head-sub">Tap any segment to select</div>
-      </div>
-    </div>
-    <div class="wheel-container">
-      <div class="layer-tabs">
-        <button class="layer-tab active" onclick="setLayer(0,this)">Core (8)</button>
-        <button class="layer-tab" onclick="setLayer(1,this)">Secondary (40)</button>
-        <button class="layer-tab" onclick="setLayer(2,this)">Tertiary (120+)</button>
-      </div>
-      <svg id="wheel-svg" viewBox="-300 -300 600 600" xmlns="http://www.w3.org/2000/svg"></svg>
-    </div>
-  </div>
-
-  <!-- Body Map Panel -->
-  <div class="panel">
-    <div class="panel-head">
-      <div class="panel-head-dot" style="background:#8B4513"></div>
-      <div>
-        <div class="panel-head-title">Somatic body map</div>
-        <div class="panel-head-sub">Tap body regions to mark sensations</div>
-      </div>
-    </div>
-    <div class="body-map-wrap">
-      <svg id="body-svg" viewBox="0 0 200 420" xmlns="http://www.w3.org/2000/svg">
-        <!-- Front body silhouette -->
-        <!-- Head -->
-        <ellipse cx="100" cy="38" rx="28" ry="33" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="head" onclick="toggleBodyRegion('head',this)" style="cursor:pointer"/>
-        <!-- Neck -->
-        <rect x="88" y="68" width="24" height="18" rx="4" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="neck" onclick="toggleBodyRegion('neck',this)" style="cursor:pointer"/>
-        <!-- Chest -->
-        <rect x="66" y="84" width="68" height="58" rx="8" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="chest" onclick="toggleBodyRegion('chest',this)" style="cursor:pointer"/>
-        <!-- Abdomen -->
-        <rect x="68" y="140" width="64" height="52" rx="6" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="abdomen" onclick="toggleBodyRegion('abdomen',this)" style="cursor:pointer"/>
-        <!-- Left arm -->
-        <rect x="34" y="84" width="28" height="90" rx="10" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="left-arm" onclick="toggleBodyRegion('left-arm',this)" style="cursor:pointer"/>
-        <!-- Right arm -->
-        <rect x="138" y="84" width="28" height="90" rx="10" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="right-arm" onclick="toggleBodyRegion('right-arm',this)" style="cursor:pointer"/>
-        <!-- Left hand -->
-        <ellipse cx="48" cy="186" rx="14" ry="18" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="left-hand" onclick="toggleBodyRegion('left-hand',this)" style="cursor:pointer"/>
-        <!-- Right hand -->
-        <ellipse cx="152" cy="186" rx="14" ry="18" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="right-hand" onclick="toggleBodyRegion('right-hand',this)" style="cursor:pointer"/>
-        <!-- Pelvis -->
-        <rect x="66" y="190" width="68" height="42" rx="8" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="pelvis" onclick="toggleBodyRegion('pelvis',this)" style="cursor:pointer"/>
-        <!-- Left leg -->
-        <rect x="68" y="230" width="28" height="100" rx="10" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="left-leg" onclick="toggleBodyRegion('left-leg',this)" style="cursor:pointer"/>
-        <!-- Right leg -->
-        <rect x="104" y="230" width="28" height="100" rx="10" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="right-leg" onclick="toggleBodyRegion('right-leg',this)" style="cursor:pointer"/>
-        <!-- Left foot -->
-        <ellipse cx="82" cy="340" rx="18" ry="12" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="left-foot" onclick="toggleBodyRegion('left-foot',this)" style="cursor:pointer"/>
-        <!-- Right foot -->
-        <ellipse cx="118" cy="340" rx="18" ry="12" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="right-foot" onclick="toggleBodyRegion('right-foot',this)" style="cursor:pointer"/>
-        <!-- Shoulders -->
-        <ellipse cx="60" cy="88" rx="18" ry="12" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="left-shoulder" onclick="toggleBodyRegion('left-shoulder',this)" style="cursor:pointer"/>
-        <ellipse cx="140" cy="88" rx="18" ry="12" fill="#EDE8E0" stroke="#C4BFB5" stroke-width="1.5"
-          class="body-region" data-region="right-shoulder" onclick="toggleBodyRegion('right-shoulder',this)" style="cursor:pointer"/>
-
-        <!-- Region labels (small) -->
-        <text x="100" y="41" text-anchor="middle" font-size="8" fill="#888" pointer-events="none">Head</text>
-        <text x="100" y="117" text-anchor="middle" font-size="8" fill="#888" pointer-events="none">Chest</text>
-        <text x="100" y="168" text-anchor="middle" font-size="8" fill="#888" pointer-events="none">Abdomen</text>
-        <text x="100" y="212" text-anchor="middle" font-size="8" fill="#888" pointer-events="none">Pelvis</text>
-        <text x="48" y="138" text-anchor="middle" font-size="7" fill="#888" pointer-events="none">L arm</text>
-        <text x="152" y="138" text-anchor="middle" font-size="7" fill="#888" pointer-events="none">R arm</text>
-        <text x="82" y="285" text-anchor="middle" font-size="7" fill="#888" pointer-events="none">L leg</text>
-        <text x="118" y="285" text-anchor="middle" font-size="7" fill="#888" pointer-events="none">R leg</text>
-      </svg>
-
-      <div class="body-legend">
-        <div class="body-legend-item"><div class="body-legend-dot" style="background:#E53935"></div>Tension / pain</div>
-        <div class="body-legend-item"><div class="body-legend-dot" style="background:#2196F3"></div>Heaviness / numbness</div>
-        <div class="body-legend-item"><div class="body-legend-dot" style="background:#FF9800"></div>Flutter / energy</div>
-        <div class="body-legend-item"><div class="body-legend-dot" style="background:#4CAF50"></div>Ease / warmth</div>
-      </div>
-
-      <!-- Sensation type selector -->
-      <div style="width:100%">
-        <div class="sensation-title" style="padding:0 8px;margin-bottom:6px">Active sensation type</div>
-        <div class="sensation-chips" style="padding:0 8px" id="sensation-type-chips">
-          <div class="sensation-chip selected" data-type="tension" data-color="#E53935" onclick="selectSensationType(this)">Tension / pain</div>
-          <div class="sensation-chip" data-type="heavy" data-color="#2196F3" onclick="selectSensationType(this)">Heaviness / numbness</div>
-          <div class="sensation-chip" data-type="flutter" data-color="#FF9800" onclick="selectSensationType(this)">Flutter / energy</div>
-          <div class="sensation-chip" data-type="ease" data-color="#4CAF50" onclick="selectSensationType(this)">Ease / warmth</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Right: Selection + Notes -->
-  <div class="panel panel-right" style="display:flex;flex-direction:column;gap:0">
-
-    <!-- Selected feelings -->
-    <div class="panel-head">
-      <div class="panel-head-dot" style="background:#F5A623"></div>
-      <div>
-        <div class="panel-head-title">Selected feelings</div>
-        <div class="panel-head-sub">Tap wheel segments to add</div>
-      </div>
-    </div>
-    <div class="selection-list" id="selection-list">
-      <div class="selection-empty" id="sel-empty">
-        Tap any segment on the feelings wheel to begin.<br>
-        You can select multiple feelings.
-      </div>
-    </div>
-
-    <div style="border-top:1px solid var(--border)"></div>
-
-    <!-- Body sensations -->
-    <div style="padding:10px 12px 6px">
-      <div class="sensation-title">Body sensations marked</div>
-      <div class="sensation-chips" id="body-selected-list">
-        <span style="font-size:11px;color:var(--text3)">None yet — tap body map</span>
-      </div>
-    </div>
-
-    <div style="border-top:1px solid var(--border);margin-top:4px"></div>
-
-    <!-- Somatic descriptors -->
-    <div class="body-sensations" style="padding:10px 12px">
-      <div class="sensation-title">Add somatic descriptors</div>
-      <div class="sensation-chips" id="somatic-chips">
-        <div class="sensation-chip" onclick="toggleChip(this)">Tight</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Hollow</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Heavy</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Light</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Racing heart</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Breathless</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Nausea</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Dizzy</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Trembling</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Frozen</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Burning</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Cold</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Aching</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Tingling</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Warm</div>
-        <div class="sensation-chip" onclick="toggleChip(this)">Open</div>
-      </div>
-    </div>
-
-    <div style="border-top:1px solid var(--border)"></div>
-
-    <!-- Intensity overall -->
-    <div style="padding:10px 12px 6px">
-      <div class="sensation-title">Overall distress (0–10)</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <input type="range" id="distress-slider" min="0" max="10" value="5"
-          style="flex:1;accent-color:var(--accent)"
-          oninput="document.getElementById('distress-val').textContent=this.value">
-        <span id="distress-val" style="font-size:18px;font-weight:700;color:var(--accent);min-width:24px;text-align:center">5</span>
-      </div>
-    </div>
-
-    <div style="border-top:1px solid var(--border)"></div>
-
-    <!-- Notes -->
-    <div class="notes-wrap" style="padding:10px 12px">
-      <div class="notes-label">Clinical note</div>
-      <textarea class="notes-input" id="clinical-note" rows="3"
-        placeholder="Observations, context, session themes…"></textarea>
-    </div>
-
-    <!-- Actions -->
-    <div class="action-row">
-      <button class="btn-primary" onclick="generateSnapshot()">Generate snapshot</button>
-      <button class="btn-outline" onclick="resetAll()">Clear all</button>
-    </div>
-    <div class="snapshot-area" id="snapshot"></div>
-  </div>
-
 </div>
 
 <div class="tooltip" id="tooltip"></div>
 
-<script>
-// ============================================================
-// DATA
-// ============================================================
-const EMOTIONS = [
-  {
-    id:'joy', label:'Joy', color:'#F5A623', light:'#FEF3DC',
-    secondary:[
-      {id:'ecstatic',label:'Ecstatic', tertiary:['Elated','Euphoric','Blissful']},
-      {id:'cheerful',label:'Cheerful', tertiary:['Optimistic','Enthusiastic','Zest']},
-      {id:'content',label:'Content', tertiary:['Satisfied','Fulfilled','Grateful']},
-      {id:'proud',label:'Proud', tertiary:['Confident','Triumphant','Worthy']},
-      {id:'amusement',label:'Amused', tertiary:['Playful','Delighted','Jovial']}
-    ]
-  },
-  {
-    id:'trust', label:'Trust', color:'#4CAF50', light:'#E8F5E9',
-    secondary:[
-      {id:'admiration',label:'Admiration', tertiary:['Reverence','Awe','Respect']},
-      {id:'acceptance',label:'Acceptance', tertiary:['Belonging','Included','Safe']},
-      {id:'confident',label:'Confident', tertiary:['Secure','Assured','Faithful']},
-      {id:'compassion',label:'Compassion', tertiary:['Caring','Empathetic','Gentle']},
-      {id:'peaceful',label:'Peaceful', tertiary:['Calm','Serene','At ease']}
-    ]
-  },
-  {
-    id:'fear', label:'Fear', color:'#9C6EAD', light:'#F3EEF7',
-    secondary:[
-      {id:'terror',label:'Terror', tertiary:['Panic','Dread','Horror']},
-      {id:'anxiety',label:'Anxiety', tertiary:['Nervous','Apprehensive','Worried']},
-      {id:'insecure',label:'Insecure', tertiary:['Vulnerable','Helpless','Weak']},
-      {id:'rejected',label:'Rejected', tertiary:['Excluded','Isolated','Unloved']},
-      {id:'inadequate',label:'Inadequate', tertiary:['Inferior','Worthless','Ashamed']}
-    ]
-  },
-  {
-    id:'surprise', label:'Surprise', color:'#2196F3', light:'#E3F2FD',
-    secondary:[
-      {id:'amazed',label:'Amazed', tertiary:['Astonished','Stunned','Awe-struck']},
-      {id:'confused',label:'Confused', tertiary:['Unsure','Bewildered','Disoriented']},
-      {id:'excited',label:'Excited', tertiary:['Eager','Curious','Alert']},
-      {id:'moved',label:'Moved', tertiary:['Touched','Speechless','Overwhelmed']}
-    ]
-  },
-  {
-    id:'sadness', label:'Sadness', color:'#5C7AEA', light:'#EEF1FD',
-    secondary:[
-      {id:'grief',label:'Grief', tertiary:['Anguish','Heartbroken','Despair']},
-      {id:'lonely',label:'Lonely', tertiary:['Abandoned','Isolated','Disconnected']},
-      {id:'hopeless',label:'Hopeless', tertiary:['Powerless','Lost','Empty']},
-      {id:'guilty',label:'Guilty', tertiary:['Remorseful','Regretful','Ashamed']},
-      {id:'depressed',label:'Depressed', tertiary:['Heavy','Numb','Withdrawn']}
-    ]
-  },
-  {
-    id:'disgust', label:'Disgust', color:'#795548', light:'#EFEBE9',
-    secondary:[
-      {id:'contempt',label:'Contempt', tertiary:['Disdain','Scornful','Dismissive']},
-      {id:'revulsion',label:'Revulsion', tertiary:['Repulsed','Sickened','Nauseated']},
-      {id:'judgmental',label:'Judgmental', tertiary:['Critical','Disapproving','Intolerant']},
-      {id:'reluctant',label:'Reluctant', tertiary:['Hesitant','Resistant','Avoidant']}
-    ]
-  },
-  {
-    id:'anger', label:'Anger', color:'#E53935', light:'#FFEBEE',
-    secondary:[
-      {id:'rage',label:'Rage', tertiary:['Furious','Explosive','Violent']},
-      {id:'frustrated',label:'Frustrated', tertiary:['Annoyed','Irritated','Impatient']},
-      {id:'bitter',label:'Bitter', tertiary:['Resentful','Hostile','Envious']},
-      {id:'betrayed',label:'Betrayed', tertiary:['Cheated','Let down','Used']},
-      {id:'violated',label:'Violated', tertiary:['Provoked','Threatened','Humiliated']}
-    ]
-  },
-  {
-    id:'anticipation', label:'Anticipation', color:'#FF9800', light:'#FFF3E0',
-    secondary:[
-      {id:'hopeful',label:'Hopeful', tertiary:['Optimistic','Expectant','Wishing']},
-      {id:'interested',label:'Interested', tertiary:['Engaged','Curious','Alert']},
-      {id:'vigilant',label:'Vigilant', tertiary:['Watchful','Alert','Prepared']},
-      {id:'anxious_ant',label:'Anxious', tertiary:['On edge','Tense','Restless']}
-    ]
-  }
-];
+<div class="main">
+  <!-- Wheel -->
+  <div class="wheel-area">
+    <div class="wheel-title">Tap any segment to select an emotion</div>
+    <svg id="wheel-svg" viewBox="-260 -260 520 520" xmlns="http://www.w3.org/2000/svg">
+      <g id="wheel-g"></g>
+    </svg>
+    <div class="zoom-hint">Ring 1 = core families · Ring 2 = emotions · Ring 3 = specific feelings</div>
+  </div>
 
-let currentLayer = 0;
-let selectedFeelings = [];
-let bodyRegions = {}; // region -> {type, color}
-let activeSensationType = {type:'tension', color:'#E53935'};
+  <!-- Right panel -->
+  <div class="side">
+    <div class="sel-display">
+      <div class="sel-label">Selected emotion</div>
+      <div class="sel-emotion" id="sel-emotion">— tap the wheel —</div>
+      <div class="sel-family" id="sel-family"></div>
+      <div class="sel-desc" id="sel-desc">Tap any segment of the wheel to explore emotions.</div>
+    </div>
 
-// ============================================================
-// WHEEL DRAWING
-// ============================================================
-function drawWheel() {
-  const svg = document.getElementById('wheel-svg');
-  svg.innerHTML = '';
-  const n = EMOTIONS.length;
-  const coreR = 75;
-  const secR = 160;
-  const terR = 245;
+    <div class="intensity-section">
+      <div class="int-label">Intensity <span class="int-val" id="int-val">5 / 10</span></div>
+      <input type="range" id="intensity" min="1" max="10" value="5" oninput="document.getElementById('int-val').textContent=this.value+' / 10'">
+      <div class="int-labels"><span>Barely there</span><span>Moderate</span><span>Overwhelming</span></div>
+    </div>
 
-  EMOTIONS.forEach((em, i) => {
-    const startAngle = (i / n) * 2 * Math.PI - Math.PI / 2;
-    const endAngle = ((i + 1) / n) * 2 * Math.PI - Math.PI / 2;
-
-    // Core segment
-    if (currentLayer >= 0) {
-      const path = makeSector(0, 0, 0, coreR, startAngle, endAngle);
-      const el = document.createElementNS('http://www.w3.org/2000/svg','path');
-      el.setAttribute('d', path);
-      el.setAttribute('fill', em.color);
-      el.setAttribute('stroke', '#fff');
-      el.setAttribute('stroke-width', '2');
-      el.style.cursor = 'pointer';
-      el.style.transition = 'opacity 0.1s';
-      el.addEventListener('mouseenter', e => { el.style.opacity='0.8'; showTooltip(e, em.label); });
-      el.addEventListener('mouseleave', () => { el.style.opacity='1'; hideTooltip(); });
-      el.addEventListener('click', () => selectFeeling(em.id, em.label, em.color, 'core'));
-      svg.appendChild(el);
-
-      // Core label
-      const midA = (startAngle + endAngle) / 2;
-      const lx = Math.cos(midA) * 44;
-      const ly = Math.sin(midA) * 44;
-      const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
-      txt.setAttribute('x', lx); txt.setAttribute('y', ly);
-      txt.setAttribute('text-anchor','middle');
-      txt.setAttribute('dominant-baseline','central');
-      txt.setAttribute('font-size', '10');
-      txt.setAttribute('font-weight', '600');
-      txt.setAttribute('fill','#fff');
-      txt.setAttribute('pointer-events','none');
-      txt.textContent = em.label;
-      svg.appendChild(txt);
-    }
-
-    // Secondary segments
-    if (currentLayer >= 1) {
-      const nSec = em.secondary.length;
-      em.secondary.forEach((sec, si) => {
-        const sStart = startAngle + (si / nSec) * (endAngle - startAngle);
-        const sEnd = startAngle + ((si + 1) / nSec) * (endAngle - startAngle);
-        const path = makeSector(0, 0, coreR + 2, secR, sStart, sEnd);
-        const el = document.createElementNS('http://www.w3.org/2000/svg','path');
-        el.setAttribute('d', path);
-        el.setAttribute('fill', blendColor(em.color, '#fff', 0.35));
-        el.setAttribute('stroke', '#fff');
-        el.setAttribute('stroke-width', '1.5');
-        el.style.cursor = 'pointer';
-        el.style.transition = 'opacity 0.1s';
-        el.addEventListener('mouseenter', e => { el.style.opacity='0.75'; showTooltip(e, sec.label); });
-        el.addEventListener('mouseleave', () => { el.style.opacity='1'; hideTooltip(); });
-        el.addEventListener('click', () => selectFeeling(sec.id, sec.label, em.color, em.label));
-        svg.appendChild(el);
-
-        const midA = (sStart + sEnd) / 2;
-        const r = (coreR + 2 + secR) / 2;
-        const lx = Math.cos(midA) * r;
-        const ly = Math.sin(midA) * r;
-        const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
-        txt.setAttribute('x', lx); txt.setAttribute('y', ly);
-        txt.setAttribute('text-anchor','middle');
-        txt.setAttribute('dominant-baseline','central');
-        txt.setAttribute('font-size', '8.5');
-        txt.setAttribute('font-weight', '500');
-        txt.setAttribute('fill', darkenColor(em.color, 0.4));
-        txt.setAttribute('pointer-events','none');
-        txt.setAttribute('transform', `rotate(${(midA * 180 / Math.PI) + 90}, ${lx}, ${ly})`);
-        txt.textContent = sec.label;
-        svg.appendChild(txt);
-      });
-    }
-
-    // Tertiary segments
-    if (currentLayer >= 2) {
-      const nSec = em.secondary.length;
-      em.secondary.forEach((sec, si) => {
-        const sStart = startAngle + (si / nSec) * (endAngle - startAngle);
-        const sEnd = startAngle + ((si + 1) / nSec) * (endAngle - startAngle);
-        const nTer = sec.tertiary.length;
-        sec.tertiary.forEach((ter, ti) => {
-          const tStart = sStart + (ti / nTer) * (sEnd - sStart);
-          const tEnd = sStart + ((ti + 1) / nTer) * (sEnd - sStart);
-          const path = makeSector(0, 0, secR + 2, terR, tStart, tEnd);
-          const el = document.createElementNS('http://www.w3.org/2000/svg','path');
-          el.setAttribute('d', path);
-          el.setAttribute('fill', blendColor(em.color, '#fff', 0.6));
-          el.setAttribute('stroke', '#fff');
-          el.setAttribute('stroke-width', '1');
-          el.style.cursor = 'pointer';
-          el.style.transition = 'opacity 0.1s';
-          el.addEventListener('mouseenter', e => { el.style.opacity='0.7'; showTooltip(e, ter); });
-          el.addEventListener('mouseleave', () => { el.style.opacity='1'; hideTooltip(); });
-          el.addEventListener('click', () => selectFeeling(ter, ter, em.color, sec.label));
-          svg.appendChild(el);
-
-          const midA = (tStart + tEnd) / 2;
-          const r = (secR + 2 + terR) / 2;
-          const lx = Math.cos(midA) * r;
-          const ly = Math.sin(midA) * r;
-          const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
-          txt.setAttribute('x', lx); txt.setAttribute('y', ly);
-          txt.setAttribute('text-anchor','middle');
-          txt.setAttribute('dominant-baseline','central');
-          txt.setAttribute('font-size', '7.5');
-          txt.setAttribute('fill', darkenColor(em.color, 0.5));
-          txt.setAttribute('pointer-events','none');
-          txt.setAttribute('transform', `rotate(${(midA * 180 / Math.PI) + 90}, ${lx}, ${ly})`);
-          txt.textContent = ter;
-          svg.appendChild(txt);
-        });
-      });
-    }
-  });
-
-  // Centre circle
-  const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
-  c.setAttribute('cx','0'); c.setAttribute('cy','0'); c.setAttribute('r','22');
-  c.setAttribute('fill','#fff'); c.setAttribute('stroke','#ddd'); c.setAttribute('stroke-width','1');
-  svg.appendChild(c);
-  const ct = document.createElementNS('http://www.w3.org/2000/svg','text');
-  ct.setAttribute('x','0'); ct.setAttribute('y','0');
-  ct.setAttribute('text-anchor','middle'); ct.setAttribute('dominant-baseline','central');
-  ct.setAttribute('font-size','8'); ct.setAttribute('fill','#aaa'); ct.setAttribute('pointer-events','none');
-  ct.textContent = 'How I feel';
-  svg.appendChild(ct);
-
-  // Highlight selected
-  highlightSelected();
-}
-
-function makeSector(cx, cy, r1, r2, startA, endA) {
-  const x1 = cx + r1 * Math.cos(startA), y1 = cy + r1 * Math.sin(startA);
-  const x2 = cx + r2 * Math.cos(startA), y2 = cy + r2 * Math.sin(startA);
-  const x3 = cx + r2 * Math.cos(endA),   y3 = cy + r2 * Math.sin(endA);
-  const x4 = cx + r1 * Math.cos(endA),   y4 = cy + r1 * Math.sin(endA);
-  const large = (endA - startA) > Math.PI ? 1 : 0;
-  if (r1 === 0) {
-    return `M ${cx} ${cy} L ${x3} ${y3} A ${r2} ${r2} 0 ${large} 0 ${x2} ${y2} Z`;
-  }
-  return `M ${x1} ${y1} L ${x2} ${y2} A ${r2} ${r2} 0 ${large} 1 ${x3} ${y3} L ${x4} ${y4} A ${r1} ${r1} 0 ${large} 0 ${x1} ${y1} Z`;
-}
-
-function blendColor(hex, target, t) {
-  const r1=parseInt(hex.slice(1,3),16), g1=parseInt(hex.slice(3,5),16), b1=parseInt(hex.slice(5,7),16);
-  const r2=parseInt(target.slice(1,3),16), g2=parseInt(target.slice(3,5),16), b2=parseInt(target.slice(5,7),16);
-  const r=Math.round(r1+(r2-r1)*t), g=Math.round(g1+(g2-g1)*t), b=Math.round(b1+(b2-b1)*t);
-  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
-}
-
-function darkenColor(hex, amt) { return blendColor(hex,'#000000',amt); }
-
-function highlightSelected() {
-  // Visual — redraw is cheap enough
-}
-
-// ============================================================
-// FEELING SELECTION
-// ============================================================
-function selectFeeling(id, label, color, core) {
-  const existing = selectedFeelings.find(f => f.id === id);
-  if (existing) {
-    selectedFeelings = selectedFeelings.filter(f => f.id !== id);
-  } else {
-    selectedFeelings.push({ id, label, color, core, intensity: 5 });
-  }
-  renderSelectionList();
-}
-
-function renderSelectionList() {
-  const list = document.getElementById('selection-list');
-  const empty = document.getElementById('sel-empty');
-  if (selectedFeelings.length === 0) {
-    list.innerHTML = '<div class="selection-empty" id="sel-empty">Tap any segment on the feelings wheel to begin.<br>You can select multiple feelings.</div>';
-    return;
-  }
-  list.innerHTML = selectedFeelings.map(f => `
-    <div class="sel-item">
-      <div class="sel-dot" style="background:${f.color}"></div>
-      <div class="sel-info">
-        <div class="sel-name">${f.label}</div>
-        <div class="sel-core" style="color:${f.color}">${f.core !== 'core' ? f.core : 'Core emotion'}</div>
-        <div class="intensity-row">
-          <span class="intensity-label">Intensity:</span>
-          ${[1,2,3,4,5,6,7,8,9,10].map(n => `
-            <div class="intensity-pip"
-              style="background:${n <= f.intensity ? f.color : 'transparent'};border-color:${f.color}"
-              onclick="setIntensity('${f.id}',${n})"></div>
-          `).join('')}
-          <span class="intensity-label" style="margin-left:2px">${f.intensity}/10</span>
+    <div class="body-section">
+      <div class="body-label">Where do you feel this in your body?</div>
+      <div class="body-map-wrap">
+        <svg id="body-svg" viewBox="0 0 80 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Head -->
+          <ellipse cx="40" cy="22" rx="18" ry="20" fill="#E8EEF8" stroke="#B0C0D8" stroke-width="1.5" class="body-zone" data-zone="Head / mind" onclick="toggleBodyZone(this)" id="bz-head"/>
+          <!-- Neck -->
+          <rect x="33" y="40" width="14" height="12" rx="4" fill="#E8EEF8" stroke="#B0C0D8" stroke-width="1.5" class="body-zone" data-zone="Throat / neck" onclick="toggleBodyZone(this)" id="bz-neck"/>
+          <!-- Chest -->
+          <rect x="22" y="52" width="36" height="38" rx="8" fill="#E8EEF8" stroke="#B0C0D8" stroke-width="1.5" class="body-zone" data-zone="Chest / heart" onclick="toggleBodyZone(this)" id="bz-chest"/>
+          <!-- Stomach -->
+          <rect x="26" y="90" width="28" height="30" rx="7" fill="#E8EEF8" stroke="#B0C0D8" stroke-width="1.5" class="body-zone" data-zone="Stomach / gut" onclick="toggleBodyZone(this)" id="bz-stomach"/>
+          <!-- Left arm -->
+          <rect x="8" y="54" width="12" height="44" rx="6" fill="#E8EEF8" stroke="#B0C0D8" stroke-width="1.5" class="body-zone" data-zone="Shoulders / arms" onclick="toggleBodyZone(this)" id="bz-larm"/>
+          <!-- Right arm -->
+          <rect x="60" y="54" width="12" height="44" rx="6" fill="#E8EEF8" stroke="#B0C0D8" stroke-width="1.5" class="body-zone" data-zone="Shoulders / arms" onclick="toggleBodyZone(this)" id="bz-rarm"/>
+          <!-- Legs -->
+          <rect x="24" y="122" width="13" height="60" rx="6" fill="#E8EEF8" stroke="#B0C0D8" stroke-width="1.5" class="body-zone" data-zone="Legs / feet" onclick="toggleBodyZone(this)" id="bz-lleg"/>
+          <rect x="43" y="122" width="13" height="60" rx="6" fill="#E8EEF8" stroke="#B0C0D8" stroke-width="1.5" class="body-zone" data-zone="Legs / feet" onclick="toggleBodyZone(this)" id="bz-rleg"/>
+          <!-- Labels -->
+          <text x="40" y="22" text-anchor="middle" font-size="6" fill="#6070A0" dy="2">Head</text>
+          <text x="40" y="72" text-anchor="middle" font-size="6" fill="#6070A0">Chest</text>
+          <text x="40" y="107" text-anchor="middle" font-size="6" fill="#6070A0">Gut</text>
+        </svg>
+        <div class="body-chips" id="body-chips">
+          <div class="body-chip" onclick="toggleBodyChip(this)">Head / mind</div>
+          <div class="body-chip" onclick="toggleBodyChip(this)">Eyes</div>
+          <div class="body-chip" onclick="toggleBodyChip(this)">Throat / neck</div>
+          <div class="body-chip" onclick="toggleBodyChip(this)">Chest / heart</div>
+          <div class="body-chip" onclick="toggleBodyChip(this)">Breathing</div>
+          <div class="body-chip" onclick="toggleBodyChip(this)">Stomach / gut</div>
+          <div class="body-chip" onclick="toggleBodyChip(this)">Shoulders / arms</div>
+          <div class="body-chip" onclick="toggleBodyChip(this)">Hands</div>
+          <div class="body-chip" onclick="toggleBodyChip(this)">Legs / feet</div>
+          <div class="body-chip" onclick="toggleBodyChip(this)">Whole body</div>
+          <div class="body-chip" onclick="toggleBodyChip(this)">Skin / flush</div>
+          <div class="body-chip" onclick="toggleBodyChip(this)">Jaw / face</div>
         </div>
       </div>
-      <button class="sel-remove" onclick="selectFeeling('${f.id}','${f.label}','${f.color}','${f.core}')">×</button>
     </div>
-  `).join('');
+
+    <div class="notes-section">
+      <div class="notes-label">Session notes (optional)</div>
+      <textarea class="notes-input" id="session-notes" placeholder="What's happening? Any context, thoughts, or observations…"></textarea>
+    </div>
+
+    <div class="snap-section">
+      <button class="bp" onclick="takeSnapshot()">📋 Take snapshot</button>
+      <button class="bpo" onclick="resetAll()">Reset</button>
+      <div class="snap-out" id="snap-out"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+// Each family: { name, color, emotions: [{ name, desc, feelings: [str] }] }
+const FAMILIES = [
+  {
+    name:'Joyful', color:'#E8A020',
+    emotions:[
+      {name:'Playful',   desc:'A sense of fun, lightness, and delight.',     feelings:['Amusing','Energetic','Frisky','Boisterous','Carefree']},
+      {name:'Content',   desc:'A quiet, settled feeling of satisfaction.',    feelings:['Pleased','Satisfied','Comfortable','Trusting','At ease']},
+      {name:'Peaceful',  desc:'A gentle calm and sense of inner stillness.', feelings:['Serene','Relieved','Thankful','Comfortable','Still']},
+      {name:'Powerful',  desc:'Feeling capable, confident, and in control.', feelings:['Proud','Courageous','Faithful','Important','Creative']},
+      {name:'Excited',   desc:'High energy, enthusiasm, and anticipation.',  feelings:['Enthusiastic','Eager','Amazed','Awe','Hopeful']},
+    ]
+  },
+  {
+    name:'Sad', color:'#5580C0',
+    emotions:[
+      {name:'Lonely',    desc:'Feeling disconnected, unseen, or isolated.',  feelings:['Isolated','Abandoned','Victimised','Ignored','Left out']},
+      {name:'Vulnerable',desc:'Exposed, fragile, and uncertain of safety.',  feelings:['Fragile','Grief','Powerless','Unprotected','Needy']},
+      {name:'Despair',   desc:'A deep sense of hopelessness and loss.',      feelings:['Grief','Powerless','Miserable','Hopeless','Despair']},
+      {name:'Guilty',    desc:'Responsibility or shame for something done.', feelings:['Remorseful','Ashamed','Embarrassed','Regretful','Responsible']},
+      {name:'Depressed', desc:'Low mood, heavy fatigue, emotional flatness.',feelings:['Inferior','Empty','Bored','Tired','Indifferent']},
+    ]
+  },
+  {
+    name:'Angry', color:'#C84040',
+    emotions:[
+      {name:'Frustrated',desc:'Blocked, stuck, or unable to move forward.',  feelings:['Infuriated','Enraged','Hostile','Agitated','Irritated']},
+      {name:'Distant',   desc:'Withdrawn, emotionally shut down or cold.',   feelings:['Withdrawn','Numb','Suspicious','Removed','Bored']},
+      {name:'Critical',  desc:'Judging harshly — self or others.',           feelings:['Dismissive','Contemptuous','Resentful','Judgemental','Sceptical']},
+      {name:'Hateful',   desc:'Strong aversion, rejection, or disgust.',     feelings:['Violent','Vindictive','Disgusted','Loathing','Bitter']},
+      {name:'Aggressive',desc:'A readiness to confront or attack.',          feelings:['Provoked','Hostile','Threatening','Furious','Mad']},
+    ]
+  },
+  {
+    name:'Fearful', color:'#8050A0',
+    emotions:[
+      {name:'Scared',    desc:'A direct response to perceived threat or danger.',feelings:['Frightened','Helpless','Threatened','Overwhelmed','Panicked']},
+      {name:'Anxious',   desc:'Worry about future events, uncertainty.',     feelings:['Worried','Insecure','Nervous','Weak','Uneasy']},
+      {name:'Insecure',  desc:'Doubt about self-worth or others\' intentions.',feelings:['Inferior','Worthless','Insignificant','Excluded','Inadequate']},
+      {name:'Rejected',  desc:'Unwanted, dismissed, or cast aside.',         feelings:['Unwanted','Isolated','Excluded','Persecuted','Hurt']},
+      {name:'Submissive',desc:'Giving in, shrinking, feeling unable to resist.',feelings:['Inferior','Quiet','Powerless','Withdrawn','Passive']},
+    ]
+  },
+  {
+    name:'Disgusted', color:'#509060',
+    emotions:[
+      {name:'Awful',     desc:'Something feels deeply wrong or terrible.',   feelings:['Nauseated','Detestable','Revolted','Horrified','Hesitant']},
+      {name:'Repelled',  desc:'A strong pulling away from something.',       feelings:['Horrified','Aversion','Hesitant','Detestable','Revolted']},
+      {name:'Judgemental',desc:'Assigning blame or fault to self or others.',feelings:['Embarrassed','Appalled','Disgusted','Awful','Loathing']},
+      {name:'Avoidant',  desc:'Wanting to escape or stay away.',             feelings:['Aversion','Turned off','Nauseous','Revolted','Horrified']},
+      {name:'Sickened',  desc:'Physical or emotional nausea at something.',  feelings:['Nauseated','Detestable','Uncomfortable','Disturbed','Unsettled']},
+    ]
+  },
+  {
+    name:'Surprised', color:'#C07030',
+    emotions:[
+      {name:'Startled',  desc:'A sudden jolt — unexpected input.',           feelings:['Shocked','Dismayed','Confused','Disillusioned','Perplexed']},
+      {name:'Confused',  desc:'Uncertain, unclear, unable to make sense.',   feelings:['Disillusioned','Perplexed','Astonished','Awe','Uncertain']},
+      {name:'Amazed',    desc:'Astonished by something extraordinary.',      feelings:['Astonished','Awe','Stunned','Speechless','Energetic']},
+      {name:'Excited',   desc:'A mix of joy and surprise — delighted.',      feelings:['Energetic','Eager','Enthusiastic','Hopeful','Awe']},
+      {name:'Overcome',  desc:'Emotions that feel bigger than one can hold.',feelings:['Moved','Speechless','Awe','Astonished','Stunned']},
+    ]
+  },
+];
+
+// ─── DRAWING ─────────────────────────────────────────────────────────────────
+const svg = document.getElementById('wheel-g');
+const N_FAM = FAMILIES.length;          // 6
+const FAM_ARC = (2 * Math.PI) / N_FAM; // 60° each family
+const R0 = 0, R1 = 78, R2 = 148, R3 = 220; // ring radii
+const GAP = 0.018; // radians gap between segments
+
+function polarToXY(r, angle) {
+  return [r * Math.cos(angle), r * Math.sin(angle)];
 }
 
-function setIntensity(id, val) {
-  const f = selectedFeelings.find(f => f.id === id);
-  if (f) { f.intensity = val; renderSelectionList(); }
-}
-
-// ============================================================
-// BODY MAP
-// ============================================================
-function selectSensationType(el) {
-  document.querySelectorAll('#sensation-type-chips .sensation-chip').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  activeSensationType = { type: el.dataset.type, color: el.dataset.color };
-}
-
-function toggleBodyRegion(region, el) {
-  if (bodyRegions[region] && bodyRegions[region].type === activeSensationType.type) {
-    delete bodyRegions[region];
-    el.setAttribute('fill', '#EDE8E0');
-    el.setAttribute('stroke', '#C4BFB5');
-  } else {
-    bodyRegions[region] = { ...activeSensationType };
-    el.setAttribute('fill', activeSensationType.color + '55');
-    el.setAttribute('stroke', activeSensationType.color);
+function slicePath(r_inner, r_outer, a_start, a_end) {
+  const [x1, y1] = polarToXY(r_inner, a_start);
+  const [x2, y2] = polarToXY(r_outer, a_start);
+  const [x3, y3] = polarToXY(r_outer, a_end);
+  const [x4, y4] = polarToXY(r_inner, a_end);
+  const large = (a_end - a_start) > Math.PI ? 1 : 0;
+  if (r_inner < 5) {
+    return `M 0 0 L ${x2.toFixed(2)} ${y2.toFixed(2)} A ${r_outer} ${r_outer} 0 ${large} 1 ${x3.toFixed(2)} ${y3.toFixed(2)} Z`;
   }
-  renderBodySelected();
+  return [
+    `M ${x1.toFixed(2)} ${y1.toFixed(2)}`,
+    `L ${x2.toFixed(2)} ${y2.toFixed(2)}`,
+    `A ${r_outer} ${r_outer} 0 ${large} 1 ${x3.toFixed(2)} ${y3.toFixed(2)}`,
+    `L ${x4.toFixed(2)} ${y4.toFixed(2)}`,
+    `A ${r_inner} ${r_inner} 0 ${large} 0 ${x1.toFixed(2)} ${y1.toFixed(2)}`,
+    'Z'
+  ].join(' ');
 }
 
-function renderBodySelected() {
-  const wrap = document.getElementById('body-selected-list');
-  const keys = Object.keys(bodyRegions);
-  if (keys.length === 0) {
-    wrap.innerHTML = '<span style="font-size:11px;color:var(--text3)">None yet — tap body map</span>';
-    return;
+function labelAngle(a_start, a_end) { return (a_start + a_end) / 2; }
+
+function textOnArc(text, r, angle, fontSize, fill) {
+  const [x, y] = polarToXY(r, angle);
+  // Simple text — rotate to be tangential for ring 1, radial for ring 3
+  const deg = (angle * 180 / Math.PI) + 90;
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${deg.toFixed(1)})`);
+  const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('text-anchor','middle');
+  t.setAttribute('dominant-baseline','middle');
+  t.setAttribute('font-size', fontSize);
+  t.setAttribute('font-family','Segoe UI, system-ui, sans-serif');
+  t.setAttribute('font-weight','600');
+  t.setAttribute('fill', fill);
+  t.setAttribute('pointer-events','none');
+  // Flip if text would be upside down
+  if (angle > Math.PI / 2 && angle < 3 * Math.PI / 2) {
+    g.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${(deg + 180).toFixed(1)})`);
   }
-  const labels = {
-    'head':'Head','neck':'Neck','chest':'Chest','abdomen':'Abdomen',
-    'pelvis':'Pelvis','left-arm':'L arm','right-arm':'R arm',
-    'left-hand':'L hand','right-hand':'R hand','left-leg':'L leg',
-    'right-leg':'R leg','left-foot':'L foot','right-foot':'R foot',
-    'left-shoulder':'L shoulder','right-shoulder':'R shoulder'
-  };
-  wrap.innerHTML = keys.map(k => {
-    const r = bodyRegions[k];
-    return `<div class="sensation-chip selected" style="border-color:${r.color};color:${r.color};background:${r.color}22">${labels[k]||k}</div>`;
-  }).join('');
-}
-
-// ============================================================
-// UTILITY
-// ============================================================
-function toggleChip(el) { el.classList.toggle('selected'); }
-
-function setLayer(n, btn) {
-  currentLayer = n;
-  document.querySelectorAll('.layer-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  drawWheel();
-}
-
-function showTooltip(e, text) {
-  const t = document.getElementById('tooltip');
   t.textContent = text;
-  t.style.left = (e.clientX + 12) + 'px';
-  t.style.top = (e.clientY - 28) + 'px';
-  t.classList.add('visible');
+  g.appendChild(t);
+  return g;
 }
-function hideTooltip() { document.getElementById('tooltip').classList.remove('visible'); }
 
-function generateSnapshot() {
-  const feelings = selectedFeelings.map(f => `${f.label} (${f.core !== 'core' ? f.core + ' > ' : ''}intensity ${f.intensity}/10)`).join(', ');
-  const bodySel = Object.entries(bodyRegions).map(([k,v]) => `${k}: ${v.type}`).join(', ');
-  const chips = [...document.querySelectorAll('#somatic-chips .sensation-chip.selected')].map(c=>c.textContent).join(', ');
-  const distress = document.getElementById('distress-slider').value;
-  const note = document.getElementById('clinical-note').value;
-  const now = new Date().toLocaleString('en-IN', {dateStyle:'medium', timeStyle:'short'});
+function lighten(hex, amount) {
+  // Simple lighten: mix with white
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 0xff, g = (n >> 8) & 0xff, b = n & 0xff;
+  const lr = Math.round(r + (255 - r) * amount);
+  const lg = Math.round(g + (255 - g) * amount);
+  const lb = Math.round(b + (255 - b) * amount);
+  return `rgb(${lr},${lg},${lb})`;
+}
 
-  const text = [
-    `AATMIYA HOSPITAL — EMOTIONAL STATE SNAPSHOT`,
-    `Date/Time: ${now}`,
-    ``,
-    `FEELINGS REPORTED:`,
-    feelings || 'None selected',
-    ``,
-    `BODY MAP:`,
-    bodySel || 'No regions marked',
-    ``,
-    `SOMATIC DESCRIPTORS:`,
-    chips || 'None selected',
-    ``,
-    `OVERALL DISTRESS: ${distress}/10`,
-    ``,
-    `CLINICAL NOTE:`,
-    note || '—'
-  ].join('\n');
+function buildWheel() {
+  svg.innerHTML = '';
+  // Centre circle
+  const centre = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  centre.setAttribute('cx','0'); centre.setAttribute('cy','0');
+  centre.setAttribute('r','40'); centre.setAttribute('fill','#FFF5E8');
+  centre.setAttribute('stroke','#DDD'); centre.setAttribute('stroke-width','1');
+  svg.appendChild(centre);
+  const centreText = document.createElementNS('http://www.w3.org/2000/svg','text');
+  centreText.setAttribute('x','0'); centreText.setAttribute('y','0');
+  centreText.setAttribute('text-anchor','middle'); centreText.setAttribute('dominant-baseline','middle');
+  centreText.setAttribute('font-size','10'); centreText.setAttribute('font-weight','700');
+  centreText.setAttribute('fill','#8B6200'); centreText.setAttribute('pointer-events','none');
+  centreText.textContent = 'How do';
+  const centreText2 = document.createElementNS('http://www.w3.org/2000/svg','text');
+  centreText2.setAttribute('x','0'); centreText2.setAttribute('y','13');
+  centreText2.setAttribute('text-anchor','middle'); centreText2.setAttribute('dominant-baseline','middle');
+  centreText2.setAttribute('font-size','10'); centreText2.setAttribute('font-weight','700');
+  centreText2.setAttribute('fill','#8B6200'); centreText2.setAttribute('pointer-events','none');
+  centreText2.textContent = 'you feel?';
+  svg.appendChild(centreText); svg.appendChild(centreText2);
 
-  const snap = document.getElementById('snapshot');
-  snap.textContent = text;
-  snap.classList.add('visible');
+  FAMILIES.forEach((fam, fi) => {
+    const famStart = fi * FAM_ARC - Math.PI / 2;
+    const famEnd   = famStart + FAM_ARC;
+    const N_EMO = fam.emotions.length; // 5
+    const emoArc = (FAM_ARC - GAP * (N_EMO + 1)) / N_EMO;
+
+    // Ring 1 — family
+    const p1 = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p1.setAttribute('d', slicePath(42, R1 - 2, famStart + GAP, famEnd - GAP));
+    p1.setAttribute('fill', fam.color);
+    p1.setAttribute('stroke','#fff'); p1.setAttribute('stroke-width','2');
+    p1.style.cursor = 'pointer';
+    p1.addEventListener('mouseenter', e => showTooltip(fam.name, e));
+    p1.addEventListener('mouseleave', hideTooltip);
+    p1.addEventListener('click', () => selectEmotion(fam.name, fam.name, 'The core ' + fam.name.toLowerCase() + ' family.', fam.color));
+    svg.appendChild(p1);
+
+    // Ring 1 label
+    const midAngle = labelAngle(famStart, famEnd);
+    const [lx, ly] = polarToXY(60, midAngle);
+    const lt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lt.setAttribute('x', lx.toFixed(1)); lt.setAttribute('y', ly.toFixed(1));
+    lt.setAttribute('text-anchor','middle'); lt.setAttribute('dominant-baseline','middle');
+    lt.setAttribute('font-size','9'); lt.setAttribute('font-weight','800');
+    lt.setAttribute('fill','#fff'); lt.setAttribute('pointer-events','none');
+    lt.textContent = fam.name.toUpperCase();
+    svg.appendChild(lt);
+
+    // Ring 2 & 3 per emotion
+    fam.emotions.forEach((emo, ei) => {
+      const eStart = famStart + GAP * (ei + 1) + emoArc * ei;
+      const eEnd   = eStart + emoArc;
+      const eMid   = labelAngle(eStart, eEnd);
+
+      // Ring 2 — emotion
+      const col2 = lighten(fam.color, 0.3);
+      const p2 = document.createElementNS('http://www.w3.org/2000/svg','path');
+      p2.setAttribute('d', slicePath(R1 + 2, R2 - 2, eStart + GAP/2, eEnd - GAP/2));
+      p2.setAttribute('fill', col2);
+      p2.setAttribute('stroke','#fff'); p2.setAttribute('stroke-width','1.5');
+      p2.style.cursor = 'pointer';
+      p2.setAttribute('data-emo', emo.name);
+      p2.addEventListener('mouseenter', e => showTooltip(emo.name, e));
+      p2.addEventListener('mouseleave', hideTooltip);
+      p2.addEventListener('click', () => selectEmotion(emo.name, fam.name, emo.desc, fam.color));
+      svg.appendChild(p2);
+
+      // Ring 2 label
+      const [ex, ey] = polarToXY((R1 + R2) / 2, eMid);
+      const et = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      et.setAttribute('x', ex.toFixed(1)); et.setAttribute('y', ey.toFixed(1));
+      et.setAttribute('text-anchor','middle'); et.setAttribute('dominant-baseline','middle');
+      const deg2 = (eMid * 180 / Math.PI);
+      // Rotate label along arc
+      const rot2 = deg2 + (eMid > Math.PI/2 && eMid < 3*Math.PI/2 ? 90 : -90);
+      et.setAttribute('transform', `rotate(${rot2.toFixed(1)}, ${ex.toFixed(1)}, ${ey.toFixed(1)})`);
+      et.setAttribute('font-size','8.5'); et.setAttribute('font-weight','700');
+      et.setAttribute('fill','#fff'); et.setAttribute('pointer-events','none');
+      et.textContent = emo.name;
+      svg.appendChild(et);
+
+      // Ring 3 — specific feelings
+      const N_FEEL = emo.feelings.length; // 5
+      const feelArc = (emoArc - GAP * (N_FEEL - 1)) / N_FEEL;
+      emo.feelings.forEach((feel, fi2) => {
+        const fStart = eStart + GAP * fi2 + feelArc * fi2;
+        const fEnd   = fStart + feelArc;
+        const fMid   = labelAngle(fStart, fEnd);
+
+        const col3 = lighten(fam.color, 0.62);
+        const p3 = document.createElementNS('http://www.w3.org/2000/svg','path');
+        p3.setAttribute('d', slicePath(R2 + 2, R3 - 1, fStart + GAP*0.3, fEnd - GAP*0.3));
+        p3.setAttribute('fill', col3);
+        p3.setAttribute('stroke','#fff'); p3.setAttribute('stroke-width','1');
+        p3.style.cursor = 'pointer';
+        p3.addEventListener('mouseenter', e => showTooltip(feel, e));
+        p3.addEventListener('mouseleave', hideTooltip);
+        p3.addEventListener('click', () => selectEmotion(feel, fam.name, emo.desc, fam.color));
+        svg.appendChild(p3);
+
+        // Ring 3 label — radial, rotated, dark text
+        const [fx, fy] = polarToXY((R2 + R3) / 2, fMid);
+        const ft = document.createElementNS('http://www.w3.org/2000/svg','text');
+        ft.setAttribute('x', fx.toFixed(1)); ft.setAttribute('y', fy.toFixed(1));
+        ft.setAttribute('text-anchor','middle'); ft.setAttribute('dominant-baseline','middle');
+        const deg3 = (fMid * 180 / Math.PI);
+        const rot3 = deg3 + (fMid > Math.PI/2 && fMid < 3*Math.PI/2 ? 90 : -90);
+        ft.setAttribute('transform', `rotate(${rot3.toFixed(1)}, ${fx.toFixed(1)}, ${fy.toFixed(1)})`);
+        ft.setAttribute('font-size','7.2'); ft.setAttribute('font-weight','600');
+        ft.setAttribute('fill','#2A2A2A'); ft.setAttribute('pointer-events','none');
+        ft.textContent = feel;
+        svg.appendChild(ft);
+      });
+    });
+  });
+}
+
+// ─── INTERACTION ──────────────────────────────────────────────────────────────
+let currentEmotion = '';
+const tooltip = document.getElementById('tooltip');
+
+function showTooltip(text, e) {
+  tooltip.textContent = text;
+  tooltip.style.opacity = '1';
+  tooltip.style.left = e.clientX + 'px';
+  tooltip.style.top  = e.clientY + 'px';
+}
+function hideTooltip() { tooltip.style.opacity = '0'; }
+document.addEventListener('mousemove', e => {
+  if (tooltip.style.opacity === '1') {
+    tooltip.style.left = e.clientX + 'px';
+    tooltip.style.top  = e.clientY + 'px';
+  }
+});
+
+function selectEmotion(name, family, desc, color) {
+  currentEmotion = name;
+  document.getElementById('sel-emotion').textContent = name;
+  document.getElementById('sel-emotion').style.color = color;
+  document.getElementById('sel-family').textContent = 'Family: ' + family;
+  document.getElementById('sel-desc').textContent = desc;
+}
+
+function toggleBodyZone(el) {
+  el.classList.toggle('zone-active');
+  const fill = el.classList.contains('zone-active') ? '#4A7CC0' : '#E8EEF8';
+  el.setAttribute('fill', fill);
+  // Sync chip
+  const zone = el.dataset.zone;
+  document.querySelectorAll('.body-chip').forEach(c => {
+    if (c.textContent === zone) c.classList.toggle('on', el.classList.contains('zone-active'));
+  });
+}
+
+function toggleBodyChip(el) {
+  el.classList.toggle('on');
+  // Sync SVG
+  const zone = el.textContent;
+  document.querySelectorAll('.body-zone').forEach(z => {
+    if (z.dataset.zone === zone) {
+      const anyOn = [...document.querySelectorAll('.body-chip')].some(c => c.textContent === zone && c.classList.contains('on'));
+      z.setAttribute('fill', anyOn ? '#4A7CC0' : '#E8EEF8');
+    }
+  });
+}
+
+function takeSnapshot() {
+  const emotion    = currentEmotion || '(not selected)';
+  const intensity  = document.getElementById('intensity').value;
+  const bodySites  = [...document.querySelectorAll('.body-chip.on')].map(c => c.textContent).join(', ') || '(not specified)';
+  const notes      = document.getElementById('session-notes').value || '(none)';
+  const now        = new Date().toLocaleString('en-IN', {dateStyle:'medium', timeStyle:'short'});
+
+  const text = `SESSION SNAPSHOT — Aatmiya Hospital
+Time: ${now}
+
+Emotion identified: ${emotion}
+Intensity: ${intensity} / 10
+Body location: ${bodySites}
+Notes: ${notes}
+
+──────────────────────────────
+Tool 01 — Feelings Wheel + Body Map`;
+
+  const out = document.getElementById('snap-out');
+  out.textContent = text;
+  out.classList.add('visible');
   navigator.clipboard?.writeText(text);
+  out.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function resetAll() {
-  selectedFeelings = [];
-  bodyRegions = {};
-  document.querySelectorAll('.body-region').forEach(el => {
-    el.setAttribute('fill','#EDE8E0');
-    el.setAttribute('stroke','#C4BFB5');
-  });
-  document.querySelectorAll('.sensation-chip.selected').forEach(el => el.classList.remove('selected'));
-  document.getElementById('sensation-type-chips').querySelector('[data-type="tension"]').classList.add('selected');
-  activeSensationType = {type:'tension',color:'#E53935'};
-  document.getElementById('distress-slider').value = 5;
-  document.getElementById('distress-val').textContent = '5';
-  document.getElementById('clinical-note').value = '';
-  document.getElementById('snapshot').classList.remove('visible');
-  renderSelectionList();
-  renderBodySelected();
+  currentEmotion = '';
+  document.getElementById('sel-emotion').textContent = '— tap the wheel —';
+  document.getElementById('sel-emotion').style.color = 'var(--accent)';
+  document.getElementById('sel-family').textContent = '';
+  document.getElementById('sel-desc').textContent = 'Tap any segment of the wheel to explore emotions.';
+  document.getElementById('intensity').value = 5;
+  document.getElementById('int-val').textContent = '5 / 10';
+  document.getElementById('session-notes').value = '';
+  document.querySelectorAll('.body-chip.on').forEach(c => c.classList.remove('on'));
+  document.querySelectorAll('.body-zone').forEach(z => { z.setAttribute('fill','#E8EEF8'); z.classList.remove('zone-active'); });
+  document.getElementById('snap-out').classList.remove('visible');
 }
 
-// Init
-drawWheel();
+buildWheel();
 </script>
 </body>
 </html>
